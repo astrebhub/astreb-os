@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AI CABINET Control Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="styles.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <h1>AI CABINET</h1>
+      <p class="muted">Governed hybrid AI operating system. Control before autonomy.</p>
+
+      <label>Provider</label>
+      <select id="provider">
+        <option value="auto">Hybrid auto router</option>
+        <option value="openai">OpenAI</option>
+        <option value="gemini">Gemini</option>
+        <option value="claude">Claude placeholder</option>
+        <option value="ollama">Ollama local</option>
+        <option value="deepseek">DeepSeek placeholder</option>
+        <option value="mistral">Mistral placeholder</option>
+        <option value="local">Local mock</option>
+        <option value="manual">Manual/free mode</option>
+      </select>
+
+      <label>Mode</label>
+      <select id="mode">
+        <option value="chat">Analysis</option>
+        <option value="strategy">Strategy</option>
+        <option value="content">Public content</option>
+        <option value="code">Code</option>
+        <option value="legal_draft">Legal draft</option>
+        <option value="paperclip_task">Paperclip task draft</option>
+        <option value="telegram_draft">Telegram draft</option>
+        <option value="email_draft">Email draft</option>
+      </select>
+
+      <label>Input type</label>
+      <select id="inputType">
+        <option value="text">Text</option>
+        <option value="voice">Voice transcript</option>
+        <option value="image">Image task</option>
+        <option value="file">File task</option>
+        <option value="browser_action">Browser action</option>
+        <option value="email">Email</option>
+        <option value="calendar">Calendar</option>
+        <option value="plugin_action">Plugin action</option>
+      </select>
+
+      <label>Access level</label>
+      <select id="accessLevel">
+        <option value="0">Level 0 - read only</option>
+        <option value="1">Level 1 - recommendations</option>
+        <option value="2">Level 2 - drafts</option>
+        <option value="3" selected>Level 3 - approval queue</option>
+        <option value="4">Level 4 - controlled execution</option>
+        <option value="5">Level 5 - limited autonomous</option>
+      </select>
+
+      <label class="check">
+        <input id="localOnly" type="checkbox" />
+        Local-only security mode
+      </label>
+
+      <div class="nav-grid">
+        <button id="healthBtn">Runtime</button>
+        <button id="policyBtn">Policies</button>
+        <button id="routingBtn">Routing</button>
+        <button id="budgetBtn">Budget</button>
+        <button id="pluginsBtn">Plugins</button>
+        <button id="actionsBtn">Actions</button>
+        <button id="approvalsBtn">Approvals</button>
+        <button id="memoryLayersBtn">Memory</button>
+        <button id="auditBtn">Audit</button>
+        <button id="localRuntimeBtn">Local Models</button>
+        <button id="vectorBtn">Vector</button>
+        <button id="voiceBtn">Voice</button>
+        <button id="multimodalBtn">Multimodal</button>
+        <button id="accessBtn">Access</button>
+        <button id="agentsBtn">Agents</button>
+        <button id="evidenceBtn">Evidence</button>
+        <button id="observabilityBtn">Observe</button>
+        <button id="forecastsBtn">Forecasts</button>
+        <button id="calibrationBtn">Calibration</button>
+      </div>
+    </aside>
+
+    <main class="control-center">
+      <section class="panel gateway">
+        <div>
+          <h2>Gateway</h2>
+          <p class="muted">Every text, voice, image, file, browser, email, calendar, or plugin task enters the same governed microkernel pipeline.</p>
+        </div>
+        <textarea id="task" placeholder="Example: create a Telegram draft for Dr. Anna Smith at anna@example.com about governed AI execution."></textarea>
+        <div class="row">
+          <button id="sendBtn" class="primary">Run governed pipeline</button>
+          <span id="status"></span>
+        </div>
+      </section>
+
+      <section class="metrics">
+        <div class="metric"><span>Risk</span><strong id="riskMetric">-</strong></div>
+        <div class="metric"><span>Class</span><strong id="classMetric">-</strong></div>
+        <div class="metric"><span>Decision</span><strong id="decisionMetric">-</strong></div>
+        <div class="metric"><span>Cost est.</span><strong id="costMetric">-</strong></div>
+      </section>
+
+      <section class="panel">
+        <h2>Controlled Output</h2>
+        <div id="meta"></div>
+        <pre id="result"></pre>
+      </section>
+
+      <section class="panel forecast-panel">
+        <div>
+          <h2>Forecasting & Risk Calibration</h2>
+          <p class="muted">Create a measurable forecast, save it, and later resolve it with Brier Score.</p>
+        </div>
+        <div class="forecast-grid">
+          <label>Raw question
+            <input id="forecastQuestion" value="Will the partner pilot generate qualified leads?" />
+          </label>
+          <label>Domain
+            <select id="forecastDomain">
+              <option value="business">business</option>
+              <option value="legal">legal</option>
+              <option value="investment">investment</option>
+              <option value="security">security</option>
+              <option value="software">software</option>
+              <option value="partnership" selected>partnership</option>
+              <option value="personal">personal</option>
+              <option value="recruitment">recruitment</option>
+              <option value="AI-governance">AI-governance</option>
+            </select>
+          </label>
+          <label>Deadline
+            <input id="forecastDeadline" type="date" value="2026-09-30" />
+          </label>
+          <label>User probability %
+            <input id="forecastProbability" type="number" min="1" max="99" value="70" />
+          </label>
+        </div>
+        <label>Success condition</label>
+        <input id="forecastSuccess" value="at least 10 qualified leads verified in CRM or shared lead log" />
+        <label>Factors JSON</label>
+        <textarea id="forecastFactors">[
+  {"name":"contact already established","direction":"up","strength":"medium","confidence":"medium"},
+  {"name":"no written pilot process","direction":"down","strength":"medium","confidence":"high"},
+  {"name":"high dependency on partner motivation","direction":"down","strength":"medium","confidence":"medium"}
+]</textarea>
+        <label>Risks JSON</label>
+        <textarea id="forecastRisks">[
+  {"name":"unclear roles and liability","category":"legal","probability":15,"impact":"medium","detectability":"medium","early_warning_signals":["no written scope before launch"],"mitigation_actions":["sign a written pilot with KPI and scope"],"residual_risk_after_mitigation":7},
+  {"name":"partner loses motivation","category":"human","probability":45,"impact":"high","detectability":"medium","early_warning_signals":["no response for more than 5 days"],"mitigation_actions":["run weekly check-in and short pilot"],"residual_risk_after_mitigation":25},
+  {"name":"lead tracking is incomplete","category":"technical","probability":20,"impact":"medium","detectability":"easy","early_warning_signals":["audit log or CRM rows are missing"],"mitigation_actions":["use CRM or shared lead log"],"residual_risk_after_mitigation":8}
+]</textarea>
+        <div class="row">
+          <button id="createForecastBtn" class="primary">Create forecast</button>
+          <span id="forecastStatus"></span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Operations</h2>
+        <pre id="sideOutput"></pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

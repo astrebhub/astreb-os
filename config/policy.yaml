@@ -1,0 +1,114 @@
+rules:
+  public:
+    name: public_standard
+    mask: false
+    allow_cloud: true
+    require_approval: false
+    local_only: false
+    model_restrictions:
+      allow: [openai, gemini, claude, mistral, deepseek, ollama, local, manual]
+    plugin_restrictions:
+      allowed_data_classes: [public]
+    budget:
+      max_cost_per_request: 0.25
+
+  internal:
+    name: internal_controlled
+    mask: true
+    allow_cloud: true
+    require_approval: true
+    local_only: false
+    model_restrictions:
+      allow: [openai, gemini, ollama, local, manual]
+    plugin_restrictions:
+      allowed_data_classes: [public, internal]
+    budget:
+      max_cost_per_request: 0.10
+
+  confidential:
+    name: confidential_local_only
+    mask: true
+    allow_cloud: false
+    require_approval: true
+    local_only: true
+    model_restrictions:
+      allow: [ollama, local, manual]
+      deny: [openai, gemini, claude, mistral, deepseek]
+    plugin_restrictions:
+      allowed_data_classes: []
+    budget:
+      max_cost_per_request: 0.00
+
+  personal:
+    name: personal_data_firewall
+    mask: true
+    allow_cloud: false
+    require_approval: true
+    local_only: true
+    model_restrictions:
+      allow: [ollama, local, manual]
+      deny: [openai, gemini, claude, mistral, deepseek]
+    plugin_restrictions:
+      allowed_data_classes: []
+    budget:
+      max_cost_per_request: 0.00
+
+  default:
+    name: default_safe_policy
+    mask: true
+    allow_cloud: false
+    require_approval: true
+    local_only: true
+
+access_levels:
+  0: read_only_assistant
+  1: analysis_and_recommendations
+  2: draft_generation_only
+  3: action_proposals_approval_queue
+  4: controlled_execution_after_approval
+  5: limited_autonomous_low_risk_only
+
+kill_switches:
+  emergency_stop_env: EMERGENCY_STOP
+  local_only_env: LOCAL_ONLY_MODE
+
+learning:
+  allowed_flow: [observation, hypothesis, proposal, approval_required, memory_update, audit_record]
+  forbidden_autonomous_updates: [constitution, role_instruction, policy, audit]
+
+roles:
+  owner:
+    max_access_level: 5
+    permissions: [all]
+  admin:
+    max_access_level: 4
+    permissions: [approve, configure, audit]
+  operator:
+    max_access_level: 3
+    permissions: [submit, draft, approve_low_risk]
+  agent:
+    max_access_level: 2
+    permissions: [submit, draft]
+  guest:
+    max_access_level: 1
+    permissions: [submit_analysis]
+  client:
+    max_access_level: 1
+    permissions: [submit_analysis]
+
+voice_policy:
+  interruptions: allow_owner_interrupt
+  emotional_routing: local_first_for_sensitive_voice
+  transcripts: store_masked_only
+  require_approval_for_calls: true
+
+multimodal_policy:
+  image:
+    require_classification: true
+    allow_cloud: false
+  file:
+    require_pii_scan: true
+    allow_cloud: false
+  browser_action:
+    require_approval: true
+    allow_direct_execution: false

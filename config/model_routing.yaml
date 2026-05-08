@@ -1,0 +1,83 @@
+routes:
+  - name: sensitive_local_only
+    provider: ollama
+    reason: sensitive_data_local_intelligence
+    when:
+      risk_level: high
+      max_cost: 999
+
+  - name: local_only_sensitive
+    provider: local
+    reason: sensitive_or_local_policy
+    when:
+      risk_level: high
+      max_cost: 999
+
+  - name: low_cost_content
+    provider: gemini
+    reason: low_risk_low_cost_content
+    when:
+      risk_level: low
+      mode: content
+      max_cost: 0.05
+
+  - name: critical_reasoning
+    provider: openai
+    reason: critical_reasoning_route
+    when:
+      risk_level: medium
+      max_cost: 0.10
+
+  - name: cheap_bulk_processing
+    provider: ollama
+    reason: cheap_bulk_processing_local_model
+    when:
+      risk_level: low
+      max_cost: 0.01
+
+models:
+  openai:
+    default: gpt-4.1-mini
+  gemini:
+    default: gemini-2.0-flash
+  local:
+    default: local-mock
+  ollama:
+    default: llama3:latest
+    coding: qwen2.5-coder:latest
+    reasoning: deepseek-r1:latest
+  claude:
+    default: claude-3-5-sonnet
+  deepseek:
+    default: deepseek-chat
+  mistral:
+    default: mistral-small
+
+local_runtime:
+  supported:
+    - llama3
+    - mistral
+    - deepseek
+    - phi
+    - qwen-coder
+  runtimes:
+    - ollama
+    - gguf
+    - cpu
+    - gpu
+  offline_operation: true
+
+voice_routing:
+  stt:
+    private: whisper_local
+    public: openai_realtime
+  tts:
+    private: piper
+    public: elevenlabs
+  latency_target_ms: 800
+
+tool_routing:
+  browser_action: plugin_sandbox
+  email: approval_center
+  calendar: approval_center
+  plugin_action: plugin_sandbox
