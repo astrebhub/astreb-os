@@ -1,5 +1,7 @@
 # AI CABINET — Governed Hybrid AI Operating System
 
+![AI Cabinet concept visualization](docs/assets/ai-cabinet-concept.png)
+
 AI Cabinet is not a chatbot and not a thin API wrapper. It is a secure microkernel control layer for governed AI execution across local and cloud intelligence.
 
 ## What It Does
