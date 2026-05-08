@@ -133,6 +133,89 @@ Remove Startup folder fallback:
 powershell.exe -ExecutionPolicy Bypass -File .\scripts\uninstall_startup_folder_autostart.ps1
 ```
 
+## Ubuntu Deployment And Autostart
+
+Install Python 3.11+ and venv support first if needed:
+
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip
+```
+
+Deploy the backend dependencies:
+
+```bash
+cd ai_cabinet_mvp
+chmod +x scripts/*.sh
+./scripts/deploy_unix.sh
+```
+
+Start manually:
+
+```bash
+./scripts/start_ai_cabinet.sh
+```
+
+Install current-user autostart with systemd:
+
+```bash
+./scripts/install_ubuntu_autostart.sh
+```
+
+Check service status and logs:
+
+```bash
+systemctl --user status ai-cabinet.service
+journalctl --user -u ai-cabinet.service -f
+```
+
+Remove Ubuntu autostart:
+
+```bash
+./scripts/uninstall_ubuntu_autostart.sh
+```
+
+## macOS Deployment And Autostart
+
+Install Python 3.11+ first if needed:
+
+```bash
+brew install python
+```
+
+Deploy the backend dependencies:
+
+```bash
+cd ai_cabinet_mvp
+chmod +x scripts/*.sh
+./scripts/deploy_unix.sh
+```
+
+Start manually:
+
+```bash
+./scripts/start_ai_cabinet.sh
+```
+
+Install current-user autostart with launchd:
+
+```bash
+./scripts/install_macos_autostart.sh
+```
+
+Check LaunchAgent status and logs:
+
+```bash
+launchctl print gui/$(id -u)/nl.jazekker.ai-cabinet
+tail -f logs/launchd.out.log logs/launchd.err.log
+```
+
+Remove macOS autostart:
+
+```bash
+./scripts/uninstall_macos_autostart.sh
+```
+
 ## Environment
 
 ```env
