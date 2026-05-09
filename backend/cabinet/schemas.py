@@ -25,8 +25,8 @@ ActionStatus = Literal["draft", "pending_approval", "approved", "executed", "rej
 
 
 class SubmitRequest(BaseModel):
-    user_id: str = "local_user"
-    session_id: str = "local_session"
+    user_id: str = "owner"
+    session_id: str = "default_session"
     agent_id: str = "default_agent"
     provider: ProviderName = "auto"
     mode: ModeName = "chat"

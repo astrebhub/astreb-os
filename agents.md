@@ -1,8 +1,8 @@
-# Jazekker AI Cabinet Agents
+﻿# AI Cabinet Agent Registry
 
-Project: AI Cabinet for Jazekker.nl
+Project: AI Cabinet
 Version: 1.0
-Phase: AI Editorial Cabinet
+Profile: Editorial Governance Workspace
 
 ## Agent System Rule
 
@@ -21,7 +21,7 @@ Responsibilities:
 - Convert briefs into article outlines.
 - Improve structure, clarity, and tone.
 - Identify weak claims and missing context.
-- Enforce Jazekker editorial modes.
+- Enforce configured editorial modes.
 - Prepare publish-ready drafts for review.
 
 Default risk: medium.
@@ -90,7 +90,7 @@ Requires human approval for:
 
 ### Trend Analyst Agent
 
-Purpose: Detect signals relevant to Jazekker.
+Purpose: Detect signals relevant to AI Cabinet.
 
 Responsibilities:
 

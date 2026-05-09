@@ -79,7 +79,7 @@ class ForecastCreateRequest(BaseModel):
     legal_context: str = ""
     human_context: str = ""
     technical_context: str = ""
-    created_by: str = "local_user"
+    created_by: str = "owner"
     base_rate: Optional[float] = Field(default=None, ge=1, le=99)
     formal_event: Optional[FormalEvent] = None
     factors: List[ForecastFactor] = Field(default_factory=list)

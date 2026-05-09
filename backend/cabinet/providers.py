@@ -35,13 +35,13 @@ class ProviderAdapter:
         if provider == "ollama":
             return await self._ollama(model, prompt)
         if provider in ["claude", "deepseek", "mistral", "manual"]:
-            return await self._local("local-mock", prompt, f"{provider} adapter placeholder; local safe fallback used.")
+            return await self._local("local-safe-fallback", prompt, f"{provider} adapter not configured; local safe fallback used.")
         return await self._local(model, prompt)
 
     async def _openai(self, model: str, prompt: str) -> ProviderResult:
         openai_key = self._secret("openai_key", "OPENAI_API_KEY")
         if not openai_key:
-            return await self._local("local-mock", prompt, "OpenAI key missing; local fallback used.")
+            return await self._local("local-safe-fallback", prompt, "OpenAI key missing; local safe fallback used.")
 
         payload = {
             "model": model,
@@ -66,7 +66,7 @@ class ProviderAdapter:
     async def _gemini(self, model: str, prompt: str) -> ProviderResult:
         gemini_key = self._secret("gemini_key", "GEMINI_API_KEY")
         if not gemini_key:
-            return await self._local("local-mock", prompt, "Gemini key missing; local fallback used.")
+            return await self._local("local-safe-fallback", prompt, "Gemini key missing; local safe fallback used.")
 
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={gemini_key}"
         payload = {"contents": [{"parts": [{"text": f"{self._system_prompt()}\n\n{prompt}"}]}]}
@@ -84,7 +84,7 @@ class ProviderAdapter:
     async def _local(self, model: str, prompt: str, prefix: str = "Local fallback response.") -> ProviderResult:
         text = (
             f"{prefix}\n\n"
-            "AI Cabinet processed this task in local mock mode. "
+            "AI Cabinet processed this task through the local safe fallback. "
             "No external provider received the prompt.\n\n"
             f"Draft:\n{prompt[:1200]}"
         )
@@ -99,13 +99,13 @@ class ProviderAdapter:
                     json={"model": model, "prompt": f"{self._system_prompt()}\n\n{prompt}", "stream": False},
                 )
             if response.status_code >= 400:
-                return await self._local("local-mock", prompt, "Ollama returned an error; local mock fallback used.")
+                return await self._local("local-safe-fallback", prompt, "Ollama returned an error; local safe fallback used.")
             data = response.json()
             text = data.get("response", "")
             tokens = int(data.get("eval_count") or max(1, len(prompt + text) // 4))
             return ProviderResult(text=text, model=model, tokens_used=tokens, cost_real=0.0)
         except Exception:
-            return await self._local("local-mock", prompt, "Ollama unavailable; local mock fallback used.")
+            return await self._local("local-safe-fallback", prompt, "Ollama unavailable; local safe fallback used.")
 
     def _system_prompt(self) -> str:
         return (

@@ -18,7 +18,7 @@ class SecretsVault:
                 "name": name,
                 "provider": provider,
                 "encrypted_value": encoded,
-                "metadata": {"encoding": "base64_mvp_placeholder"},
+                "metadata": {"encoding": "development_store_not_production_kms"},
             }
         )
 

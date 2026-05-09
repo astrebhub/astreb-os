@@ -21,7 +21,7 @@ class VoiceRuntime:
             "status": "prepared_not_enabled",
         }
 
-    def normalize_turn(self, transcript: str, speaker_id: str = "local_user") -> Dict[str, Any]:
+    def normalize_turn(self, transcript: str, speaker_id: str = "owner") -> Dict[str, Any]:
         return {
             "input_type": "voice",
             "speaker_id": speaker_id,

@@ -20,7 +20,7 @@ class IdentityAccessLayer:
     def ensure_user(self, user_id: str, requested_access: int) -> Dict[str, Any]:
         user = self.database.get_user(user_id)
         if not user:
-            role = "owner" if user_id == "local_user" else "guest"
+            role = "owner" if user_id == "owner" else "guest"
             self.database.upsert_user(
                 {
                     "id": user_id,

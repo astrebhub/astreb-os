@@ -17,7 +17,7 @@ class TokenCostEstimator:
     model_prices = {
         "gpt-4.1-mini": 0.0000004,
         "gemini-2.0-flash": 0.0000002,
-        "local-mock": 0.0,
+        "local-safe-fallback": 0.0,
     }
 
     def __init__(self, database: Database):

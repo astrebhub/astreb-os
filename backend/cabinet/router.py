@@ -25,10 +25,10 @@ class ModelRouter:
         policy: PolicyDecision,
     ) -> RouteDecision:
         if policy.local_only or not policy.allow_cloud:
-            return RouteDecision("local", "local-mock", "policy_requires_local")
+            return RouteDecision("local", "local-safe-fallback", "policy_requires_local")
 
         if risk_level == "high":
-            return RouteDecision("local", "local-mock", "high_risk_requires_local")
+            return RouteDecision("local", "local-safe-fallback", "high_risk_requires_local")
 
         if requested_provider != "auto":
             return self._requested_route(requested_provider)
@@ -50,7 +50,7 @@ class ModelRouter:
 
     def _requested_route(self, provider: str) -> RouteDecision:
         if provider == "local":
-            return RouteDecision("local", "local-mock", "requested_local")
+            return RouteDecision("local", "local-safe-fallback", "requested_local")
         return RouteDecision(provider, self._model_for(provider), "requested_provider")
 
     def _model_for(self, provider: str) -> str:
@@ -66,4 +66,4 @@ class ModelRouter:
             return os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
         if provider == "mistral":
             return os.getenv("MISTRAL_MODEL", "mistral-small")
-        return "local-mock"
+        return "local-safe-fallback"

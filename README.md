@@ -1,102 +1,115 @@
-# AI CABINET — Governed Hybrid AI Operating System
+# AI Cabinet
 
 ![AI Cabinet concept visualization](docs/assets/ai-cabinet-concept.png)
 
-> Release status: public MVP / governed prototype. AI Cabinet demonstrates an
-> AI control-plane architecture, not a fully hardened enterprise deployment.
+AI Cabinet is a governed hybrid AI control plane: a microkernel runtime for
+policy-bound, auditable, local-first AI execution.
 
-AI Cabinet is not a chatbot and not a thin API wrapper. It is a secure microkernel control layer for governed AI execution across local and cloud intelligence.
-
-## What It Does
-
-- Routes tasks across OpenAI, Gemini, Ollama/local, manual mode, and placeholder enterprise providers.
-- Enforces YAML policy before model calls.
-- Masks PII and secrets.
-- Blocks cloud routing for personal/confidential data.
-- Governs tokens, cost, quotas, and emergency stop.
-- Logs audit, budget events, action queue states, and memory proposals.
-- Supports governed memory evolution through proposal and approval.
-- Provides plugin manifest validation and sandbox metadata.
-- Exposes an AI Control Center browser UI.
-- Normalizes text, voice, image, file, browser, email, calendar, and plugin action inputs.
-- Tracks runtime state transitions and approval center records.
-- Adds identity/access, secrets vault, agent registry, evidence, and observability layers.
-- Registers a governed GitHub Manager agent for repository planning, issue and PR drafting, CI review, release notes, and approval-gated external actions.
-
-## Jazekker Phase 1 Skeleton
-
-The Jazekker-specific AI Editorial Cabinet contract lives in:
-
-- `architecture.md`: product architecture, phases, governance flow, and dashboard surface.
-- `agents.md`: specialist agent roles, boundaries, approval triggers, and forbidden behavior.
-- `workflows.md`: governed editorial, translation, SEO, evidence, community, newsletter, trend, and strategy workflows.
-- `policies.yaml`: declarative Phase 1 governance policy for editorial AI operations.
-
-## Folder Structure
+It is not a chatbot, prompt wrapper, or automation script. AI Cabinet is the
+trusted control layer between users, agents, models, tools, memory, budgets,
+and external actions.
 
 ```text
-ai_cabinet_mvp/
-  kernel/ router/ security/ policies/ providers/
-  local_runtime/
-    models/ embeddings/ vector_memory/ gpu/ quantized/
-  plugins/
-  memory/ audit/ runtime/ ui/ budget/ voice/
-  connectors/ vector_memory/ embeddings/ action_queue/
-  backend/
-    main.py
-    cabinet/
-      actions.py
-      agent_registry.py
-      approval_center.py
-      budget_governor.py
-      classifier.py
-      config.py
-      database.py
-      evidence.py
-      identity.py
-      local_runtime.py
-      memory_engine.py
-      multimodal.py
-      observability.py
-      output_guard.py
-      pii.py
-      pipeline.py
-      plugin_sandbox.py
-      policy.py
-      providers.py
-      router.py
-      secrets_vault.py
-      schemas.py
-      state_engine.py
-      tokens.py
-  config/
-    policy.yaml
-    model_routing.yaml
-  frontend/
-    index.html
-    app.js
-    styles.css
+CONTROL BEFORE AUTONOMY
 ```
+
+## Why It Exists
+
+Modern AI systems can generate, automate, and act faster than most organizations
+can govern them. AI Cabinet addresses the missing layer between AI capability
+and operational control: a runtime that classifies work, applies policy, routes
+models, protects sensitive data, records audit evidence, and separates drafts
+from approved actions.
 
 ## Execution Pipeline
 
 ```text
-INPUT -> MULTIMODAL NORMALIZER -> STATE ENGINE -> PII DETECTOR ->
-DATA CLASSIFIER -> POLICY ENGINE -> TOKEN / COST GOVERNOR ->
-MODEL / VOICE / TOOL ROUTER -> LOCAL OR CLOUD RUNTIME ->
-PLUGIN SANDBOX -> OUTPUT GUARD -> ACTION QUEUE -> APPROVAL CENTER -> AUDIT LOG ->
-MEMORY UPDATE PROPOSAL -> HUMAN APPROVAL IF REQUIRED
+INPUT
+  -> MULTIMODAL NORMALIZER
+  -> STATE ENGINE
+  -> PII DETECTOR
+  -> DATA CLASSIFIER
+  -> POLICY ENGINE
+  -> TOKEN / COST GOVERNOR
+  -> MODEL / VOICE / TOOL ROUTER
+  -> LOCAL OR CLOUD RUNTIME
+  -> PLUGIN SANDBOX
+  -> PROVIDER ADAPTER
+  -> OUTPUT GUARD
+  -> ACTION QUEUE
+  -> APPROVAL CENTER
+  -> AUDIT LOG
+  -> MEMORY UPDATE PROPOSAL
+  -> HUMAN APPROVAL IF REQUIRED
 ```
 
-## Setup
+## Platform Capabilities
+
+| Subsystem | Purpose |
+| --- | --- |
+| Gateway | Accepts governed text, voice, image, file, browser, email, calendar, and plugin tasks. |
+| PII Layer | Detects and masks personal data, secrets, phone numbers, emails, names, and IBAN-like values. |
+| Classifier | Determines data class, risk level, task type, and routing implications. |
+| Policy Engine | Enforces YAML governance before model calls or action proposals. |
+| Cost Governor | Estimates tokens and cost, enforces per-request, daily, monthly, user, and agent limits. |
+| Model Router | Routes work across OpenAI, Gemini, Ollama/local, manual mode, and enterprise adapter slots. |
+| Local Runtime | Supports local-first execution paths, Ollama status, local model inventory, and offline fallback. |
+| Output Guard | Scans model output for PII leakage, dangerous instructions, and unauthorized action claims. |
+| Action Queue | Converts external actions into drafts, approval records, no-op execution records, or rollback states. |
+| Approval Center | Separates model/agent proposals from human authority. |
+| Audit Layer | Records request, risk, data class, policy, provider, model, token, cost, status, and action metadata. |
+| Memory Engine | Stores governed operational memory and learning proposals that require approval. |
+| Plugin Sandbox | Validates plugin manifests, permissions, forbidden actions, and allowed data classes. |
+| Agent Registry | Defines controlled agents with roles, instructions, permissions, budgets, tools, memory scope, and risk level. |
+| Evidence Layer | Stores source metadata, confidence, verification status, URL, timestamp, and citation. |
+| Observability | Records latency, runtime health events, blocked actions, policy violations, and provider decisions. |
+
+## Governance Contract
+
+AI Cabinet does not treat AI autonomy as the default.
+
+Agents may draft, analyze, classify, route, critique, and propose. They may not
+publish, delete, send, merge, release, alter durable memory, change policy, or
+execute external actions without an approval record.
+
+Sensitive work is local-first. Public and low-risk tasks may use cloud models
+when policy permits. Personal, confidential, secret-bearing, or high-risk work
+is masked, blocked, routed local-only, or converted into an approval-gated draft
+depending on policy.
+
+## Current Release Status
+
+This repository is a public MVP of the AI Cabinet control-plane architecture. It
+is suitable for developer review, governance architecture discussion, local
+demos, and early open-source collaboration.
+
+It is not yet a hardened enterprise deployment. Before production use, replace
+the development secrets vault with a managed KMS, add production AuthN/AuthZ,
+deploy an append-only audit store, and run connector workers inside hardened
+runtime isolation.
+
+## Quick Start
+
+### Windows
+
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
+python -m uvicorn main:app --reload --port 8000
+```
+
+### macOS / Ubuntu
 
 ```bash
 cd backend
-python -m venv .venv
-.venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-copy .env.example .env
-uvicorn main:app --reload --port 8000
+cp .env.example .env
+python -m uvicorn main:app --reload --port 8000
 ```
 
 Open:
@@ -105,121 +118,21 @@ Open:
 http://127.0.0.1:8000
 ```
 
-## Windows Autostart
+Set `ADMIN_API_TOKEN` in `backend/.env` before using administrative Control
+Center panels such as audit, actions, memory, secrets, config, agents, evidence,
+and observability. The browser UI includes an Admin token field.
 
-Install autostart at Windows logon:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File .\scripts\install_autostart.ps1
-```
-
-Start script:
-
-```powershell
-.\scripts\start_ai_cabinet.ps1
-```
-
-Remove autostart:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File .\scripts\uninstall_autostart.ps1
-```
-
-Logs are written to `logs/autostart.log` and `logs/autostart_install.log`.
-
-If Windows blocks Scheduled Task registration, use the current-user Startup folder fallback:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File .\scripts\install_startup_folder_autostart.ps1
-```
-
-Remove Startup folder fallback:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File .\scripts\uninstall_startup_folder_autostart.ps1
-```
-
-## Ubuntu Deployment And Autostart
-
-Install Python 3.11+ and venv support first if needed:
+## Docker
 
 ```bash
-sudo apt update
-sudo apt install -y python3 python3-venv python3-pip
+cp backend/.env.example backend/.env
+docker compose up --build
 ```
 
-Deploy the backend dependencies:
+Open:
 
-```bash
-cd ai_cabinet_mvp
-chmod +x scripts/*.sh
-./scripts/deploy_unix.sh
-```
-
-Start manually:
-
-```bash
-./scripts/start_ai_cabinet.sh
-```
-
-Install current-user autostart with systemd:
-
-```bash
-./scripts/install_ubuntu_autostart.sh
-```
-
-Check service status and logs:
-
-```bash
-systemctl --user status ai-cabinet.service
-journalctl --user -u ai-cabinet.service -f
-```
-
-Remove Ubuntu autostart:
-
-```bash
-./scripts/uninstall_ubuntu_autostart.sh
-```
-
-## macOS Deployment And Autostart
-
-Install Python 3.11+ first if needed:
-
-```bash
-brew install python
-```
-
-Deploy the backend dependencies:
-
-```bash
-cd ai_cabinet_mvp
-chmod +x scripts/*.sh
-./scripts/deploy_unix.sh
-```
-
-Start manually:
-
-```bash
-./scripts/start_ai_cabinet.sh
-```
-
-Install current-user autostart with launchd:
-
-```bash
-./scripts/install_macos_autostart.sh
-```
-
-Check LaunchAgent status and logs:
-
-```bash
-launchctl print gui/$(id -u)/nl.jazekker.ai-cabinet
-tail -f logs/launchd.out.log logs/launchd.err.log
-```
-
-Remove macOS autostart:
-
-```bash
-./scripts/uninstall_macos_autostart.sh
+```text
+http://127.0.0.1:8000
 ```
 
 ## Environment
@@ -241,98 +154,126 @@ EMERGENCY_STOP=false
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 ```
 
-Administrative Control Center endpoints require the `X-AI-Cabinet-Admin-Token`
-header when `ADMIN_API_TOKEN` is configured. The browser UI has an Admin token
-field in the sidebar and stores it in local browser storage for local demo use.
-
-## Docker
-
-```bash
-cp backend/.env.example backend/.env
-docker compose up --build
-```
-
-Open:
+## Repository Structure
 
 ```text
-http://127.0.0.1:8000
+backend/
+  main.py
+  cabinet/
+    actions.py
+    agent_registry.py
+    approval_center.py
+    budget_governor.py
+    classifier.py
+    config.py
+    database.py
+    evidence.py
+    forecasting.py
+    identity.py
+    local_runtime.py
+    memory_engine.py
+    multimodal.py
+    observability.py
+    output_guard.py
+    pii.py
+    pipeline.py
+    plugin_sandbox.py
+    policy.py
+    providers.py
+    router.py
+    secrets_vault.py
+    schemas.py
+    state_engine.py
+    tokens.py
+config/
+  policy.yaml
+  model_routing.yaml
+frontend/
+  index.html
+  app.js
+  styles.css
+plugins/
+  */manifest.yaml
+docs/
+  repository-presentation-architecture.md
+scripts/
+  Windows, Ubuntu, and macOS autostart helpers
+tests/
+  governance pipeline tests
 ```
 
-## API
+## API Surface
 
-- `POST /submit` runs the governed execution pipeline.
-- `GET /health` shows runtime pipeline and provider state.
-- `GET /budget/status` shows budget event history.
-- `GET /local-runtime/status` shows Ollama/local runtime readiness.
-- `POST /local-runtime/models/{model}/load` records safe load intent.
-- `POST /local-runtime/models/{model}/unload` records safe unload intent.
-- `GET /plugins` validates sandbox manifests.
-- `GET /actions` shows action lifecycle records.
-- `POST /actions/{id}/approve`, `/reject`, `/execute`, `/rollback`.
-- `GET /memory/layers` shows governed memory and learning proposals.
-- `POST /memory/proposals/{id}/approve`, `/reject`.
-- `GET /audit` shows audit records.
-- `GET /voice/status` shows future voice pipeline readiness.
-- `GET /multimodal/status` shows unified input governance readiness.
-- `GET /state/{request_id}` shows state machine transitions.
-- `GET /approvals` shows approval center records.
-- `GET /access/users` shows identity/access records.
-- `POST /secrets` stores a secret in the MVP vault.
-- `GET /agents` and `POST /agents` manage agent registry records.
-- `github_manager_agent` is registered by default for governed GitHub operations.
-- `GET /evidence` shows source/evidence records.
-- `GET /observability/events` shows runtime telemetry.
-- `POST /vector-memory/add` stores local deterministic embedding memory.
-- `POST /vector-memory/search` searches local SQLite vector memory.
-- `POST /forecasts` creates a saved ForecastRecord with base rate, factors, risk layers, bias check, scenarios, and final probability.
-- `GET /forecasts` lists saved forecast records.
-- `POST /forecasts/{forecast_id}/outcome` resolves a binary forecast and calculates Brier Score.
-- `GET /forecasts/calibration-profile` summarizes user calibration, recurring bias, and domain performance.
+| Area | Endpoints |
+| --- | --- |
+| Runtime | `POST /submit`, `GET /health`, `GET /state/{request_id}` |
+| Governance | `GET /config/policy`, `GET /config/model-routing`, `GET /approvals`, `GET /actions` |
+| Audit | `GET /audit`, `GET /observability/events` |
+| Memory | `GET /memory/layers`, `POST /memory/proposals/{id}/approve`, `POST /vector-memory/search` |
+| Agents | `GET /agents`, `POST /agents` |
+| Plugins | `GET /plugins` |
+| Local Runtime | `GET /local-runtime/status`, `POST /local-runtime/models/{model}/load` |
+| Forecasting | `POST /forecasts`, `GET /forecasts`, `POST /forecasts/{id}/outcome` |
+| Voice / Multimodal | `GET /voice/status`, `GET /multimodal/status` |
 
-## Database Schema
+Administrative endpoints require `X-AI-Cabinet-Admin-Token` when
+`ADMIN_API_TOKEN` is configured.
 
-SQLite tables:
+## GitHub Manager Agent
 
-- `audit_log`: request, risk, data class, policy, provider, tokens, cost, status.
-- `action_queue`: draft, pending_approval, approved, executed, rejected, rollback.
-- `memory`: operational request/response memory.
-- `governed_memory`: layered governed memory.
-- `memory_proposals`: learning updates requiring approval.
-- `budget_events`: per-user, per-agent, per-session budget records.
-- `local_runtime_models`: local model inventory metadata.
-- `vector_memory`: placeholder for local vector storage.
-- local deterministic embeddings are available for offline vector search in MVP form.
-- `runtime_state`: received, normalized, classified, masked, policy_checked, budget_checked, routed, executed, scanned, queued, approved, audited, memory_proposed, completed, failed, rollback_requested.
-- `users`, `sessions`, `api_keys`: identity and access.
-- `secrets_vault`: MVP placeholder secret storage; replace with a real key-management backend before production use.
-- `agent_registry`: controlled agent definitions.
-- `evidence_sources`: source, URL, timestamp, confidence, verification status, citation.
-- `observability_events`: health, latency, failures, blocked actions, policy violations.
-- `approvals`: approval center records.
-- `forecast_records`: measurable forecasts, outcome status, Brier Score, and full ForecastRecord JSON.
+`github_manager_agent` is registered by default for governed repository work.
+It may prepare issues, pull request plans, review summaries, CI diagnostics,
+branch plans, and release notes. It may not push, merge, delete branches,
+publish releases, close issues, change repository settings, or handle secrets
+without an approval record.
 
-## Long-Term Scaling Roadmap
+## Testing
 
-- Replace local mock with managed Ollama and native GGUF worker pool.
-- Add real local embeddings and vector search.
-- Add PostgreSQL, pgvector, and append-only audit log.
-- Add signed plugin registry.
-- Add connector workers with isolated credentials.
-- Add policy test suite and governance review UI.
-- Add per-agent budgets, model SLAs, latency scoring, and routing simulation.
-- Add voice STT/TTS connectors and SIP gateway.
+```bash
+cd backend
+python -m pytest ../tests
+```
 
-## Enterprise Roadmap
+CI runs the same governance test suite through GitHub Actions.
 
-- SSO, RBAC, tenant isolation.
-- SIEM export, OpenTelemetry, compliance retention.
-- Key vault integration.
-- Human approval inbox and dual-control approvals.
-- Model risk management, red-team gates, eval pipelines.
-- Enterprise connectors for Microsoft Graph, Google Workspace, Slack, Teams, Jira, Notion, CRM.
+## Autostart
+
+Windows:
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\scripts\install_autostart.ps1
+```
+
+Ubuntu:
+
+```bash
+chmod +x scripts/*.sh
+./scripts/deploy_unix.sh
+./scripts/install_ubuntu_autostart.sh
+```
+
+macOS:
+
+```bash
+chmod +x scripts/*.sh
+./scripts/deploy_unix.sh
+./scripts/install_macos_autostart.sh
+```
+
+## Roadmap
+
+| Layer | Direction |
+| --- | --- |
+| Runtime | Managed local model workers, GGUF serving, GPU scheduling, and offline profiles. |
+| Data | PostgreSQL, pgvector, retention policies, and append-only audit storage. |
+| Governance | Policy tests, signed policies, dual-control approvals, and governance review UI. |
+| Connectors | Signed connector workers for GitHub, email, calendar, CRM, Teams, Slack, and Notion. |
+| Security | KMS-backed secrets, RBAC, session auth, connector isolation, and supply-chain scanning. |
+| Observability | OpenTelemetry, SIEM export, budget dashboards, and policy violation reporting. |
+| Enterprise | SSO, tenant isolation, compliance retention, model risk management, and eval pipelines. |
 
 ## Open Source
 
-This project is released under the MIT License. See `CONTRIBUTING.md`,
+AI Cabinet is released under the MIT License. See `CONTRIBUTING.md`,
 `SECURITY.md`, and `CODE_OF_CONDUCT.md` before opening public issues or pull
 requests.

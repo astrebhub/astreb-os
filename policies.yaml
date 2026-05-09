@@ -1,6 +1,6 @@
-version: "1.0"
-project: "jazekker_ai_cabinet"
-phase: "ai_editorial_cabinet"
+﻿version: "1.0"
+project: "ai_cabinet"
+profile: "editorial_governance_workspace"
 
 principles:
   - id: "human_in_the_loop"

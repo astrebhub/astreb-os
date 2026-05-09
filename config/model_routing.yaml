@@ -41,7 +41,7 @@ models:
   gemini:
     default: gemini-2.0-flash
   local:
-    default: local-mock
+    default: local-safe-fallback
   ollama:
     default: llama3:latest
     coding: qwen2.5-coder:latest

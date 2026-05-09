@@ -1,12 +1,12 @@
-# Jazekker AI Cabinet Architecture
+﻿# AI Cabinet Editorial Governance Architecture
 
-Project: AI Cabinet for Jazekker.nl
+Project: AI Cabinet
 Version: 1.0
-Phase: AI Editorial Cabinet
+Profile: Editorial Governance Workspace
 
 ## Purpose
 
-AI Cabinet is the control layer for the Jazekker media ecosystem. It is not a chatbot, CMS helper, or bulk article generator. It is an AI-native operating layer for editorial governance, workflow orchestration, quality control, memory, auditability, and decision intelligence.
+AI Cabinet is the control layer for the editorial or knowledge-work ecosystem. It is not a chatbot, CMS helper, or bulk article generator. It is an AI-native operating layer for editorial governance, workflow orchestration, quality control, memory, auditability, and decision intelligence.
 
 The first implementation phase should stay narrow: build an AI Editorial Cabinet that governs content work before expanding into broader ecosystem governance.
 
@@ -22,7 +22,7 @@ AI CABINET
 Editorial / AI / Community / Analytics / Governance
   |
   v
-Jazekker Ecosystem
+Governed Workspace
 ```
 
 ## Core Principle
@@ -134,7 +134,7 @@ Responsibilities:
 - Provide traceability for editorial and governance review.
 - Preserve evidence for future correction.
 
-## Jazekker Domains
+## AI Cabinet Domains
 
 AI Cabinet must support these domains:
 
@@ -203,7 +203,7 @@ Build:
 
 ### Phase 3: AI Ecosystem Platform
 
-Goal: Operate Jazekker as an AI-native media ecosystem.
+Goal: Operate AI Cabinet as an AI-native media ecosystem.
 
 Build:
 

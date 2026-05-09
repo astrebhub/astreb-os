@@ -1,8 +1,8 @@
-# Jazekker AI Cabinet Workflows
+﻿# AI Cabinet Governed Workflow Profiles
 
-Project: AI Cabinet for Jazekker.nl
+Project: AI Cabinet
 Version: 1.0
-Phase: AI Editorial Cabinet
+Profile: Editorial Governance Workspace
 
 ## Workflow Rule
 
@@ -207,7 +207,7 @@ Steps:
 - Collect candidate signals.
 - Filter noise and duplicates.
 - Cluster topics.
-- Score relevance to Jazekker.
+- Score relevance to AI Cabinet.
 - Propose editorial opportunities.
 
 Outputs:
