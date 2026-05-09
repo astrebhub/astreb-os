@@ -2,6 +2,9 @@
 
 ![AI Cabinet concept visualization](docs/assets/ai-cabinet-concept.png)
 
+> Release status: public MVP / governed prototype. AI Cabinet demonstrates an
+> AI control-plane architecture, not a fully hardened enterprise deployment.
+
 AI Cabinet is not a chatbot and not a thin API wrapper. It is a secure microkernel control layer for governed AI execution across local and cloud intelligence.
 
 ## What It Does
@@ -18,6 +21,7 @@ AI Cabinet is not a chatbot and not a thin API wrapper. It is a secure microkern
 - Normalizes text, voice, image, file, browser, email, calendar, and plugin action inputs.
 - Tracks runtime state transitions and approval center records.
 - Adds identity/access, secrets vault, agent registry, evidence, and observability layers.
+- Registers a governed GitHub Manager agent for repository planning, issue and PR drafting, CI review, release notes, and approval-gated external actions.
 
 ## Jazekker Phase 1 Skeleton
 
@@ -226,6 +230,7 @@ OPENAI_MODEL=gpt-4.1-mini
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.0-flash
 APP_NAME=AI CABINET v0.2
+ADMIN_API_TOKEN=change-me-before-public-demo
 TOKEN_LIMIT_PER_REQUEST=8000
 SESSION_COST_LIMIT=1.00
 DAILY_COST_LIMIT=5.00
@@ -234,6 +239,23 @@ DAILY_TOKEN_LIMIT_PER_USER=50000
 LOCAL_ONLY_MODE=false
 EMERGENCY_STOP=false
 OLLAMA_BASE_URL=http://127.0.0.1:11434
+```
+
+Administrative Control Center endpoints require the `X-AI-Cabinet-Admin-Token`
+header when `ADMIN_API_TOKEN` is configured. The browser UI has an Admin token
+field in the sidebar and stores it in local browser storage for local demo use.
+
+## Docker
+
+```bash
+cp backend/.env.example backend/.env
+docker compose up --build
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000
 ```
 
 ## API
@@ -257,6 +279,7 @@ OLLAMA_BASE_URL=http://127.0.0.1:11434
 - `GET /access/users` shows identity/access records.
 - `POST /secrets` stores a secret in the MVP vault.
 - `GET /agents` and `POST /agents` manage agent registry records.
+- `github_manager_agent` is registered by default for governed GitHub operations.
 - `GET /evidence` shows source/evidence records.
 - `GET /observability/events` shows runtime telemetry.
 - `POST /vector-memory/add` stores local deterministic embedding memory.
@@ -281,7 +304,7 @@ SQLite tables:
 - local deterministic embeddings are available for offline vector search in MVP form.
 - `runtime_state`: received, normalized, classified, masked, policy_checked, budget_checked, routed, executed, scanned, queued, approved, audited, memory_proposed, completed, failed, rollback_requested.
 - `users`, `sessions`, `api_keys`: identity and access.
-- `secrets_vault`: MVP encrypted placeholder secret storage.
+- `secrets_vault`: MVP placeholder secret storage; replace with a real key-management backend before production use.
 - `agent_registry`: controlled agent definitions.
 - `evidence_sources`: source, URL, timestamp, confidence, verification status, citation.
 - `observability_events`: health, latency, failures, blocked actions, policy violations.
@@ -307,3 +330,9 @@ SQLite tables:
 - Human approval inbox and dual-control approvals.
 - Model risk management, red-team gates, eval pipelines.
 - Enterprise connectors for Microsoft Graph, Google Workspace, Slack, Teams, Jira, Notion, CRM.
+
+## Open Source
+
+This project is released under the MIT License. See `CONTRIBUTING.md`,
+`SECURITY.md`, and `CODE_OF_CONDUCT.md` before opening public issues or pull
+requests.

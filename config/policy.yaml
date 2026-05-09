@@ -112,3 +112,15 @@ multimodal_policy:
   browser_action:
     require_approval: true
     allow_direct_execution: false
+  github_ops:
+    require_approval: true
+    allow_direct_execution: false
+    approval_required_for:
+      - push
+      - merge
+      - create_pr
+      - close_issue
+      - publish_release
+      - delete_branch
+      - change_repository_settings
+      - handle_secrets

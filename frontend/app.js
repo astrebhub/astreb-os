@@ -1,10 +1,16 @@
 const $ = (id) => document.getElementById(id);
 const API_BASE = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : "";
 
+function adminHeaders() {
+  const token = $("adminToken")?.value || localStorage.getItem("AI_CABINET_ADMIN_TOKEN") || "";
+  if (token) localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token);
+  return token ? {"X-AI-Cabinet-Admin-Token": token} : {};
+}
+
 async function postJSON(url, body = {}) {
   const res = await fetch(`${API_BASE}${url}`, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type": "application/json", ...adminHeaders()},
     body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error(await res.text());
@@ -12,10 +18,15 @@ async function postJSON(url, body = {}) {
 }
 
 async function getJSON(url) {
-  const res = await fetch(`${API_BASE}${url}`);
+  const res = await fetch(`${API_BASE}${url}`, {headers: adminHeaders()});
   if (!res.ok) throw new Error(await res.text());
   return await res.json();
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  const savedToken = localStorage.getItem("AI_CABINET_ADMIN_TOKEN");
+  if (savedToken && $("adminToken")) $("adminToken").value = savedToken;
+});
 
 function renderSide(data) {
   $("sideOutput").textContent = JSON.stringify(data, null, 2);
@@ -35,6 +46,7 @@ $("sendBtn").onclick = async () => {
 
   try {
     const data = await postJSON("/submit", {
+      agent_id: $("mode").value === "github_ops" ? "github_manager_agent" : "default_agent",
       provider: $("provider").value,
       mode: $("mode").value,
       input_type: $("inputType").value,

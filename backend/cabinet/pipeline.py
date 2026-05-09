@@ -129,7 +129,7 @@ class CabinetPipeline:
             estimate = self.estimator.evaluate(req.user_id, prompt, preliminary_route.model)
             if estimate.blocked:
                 raise HTTPException(status_code=429, detail=estimate.reason)
-            budget_decision = self.budget.evaluate(req.user_id, "default_agent", request_id, estimate.cost_estimated)
+            budget_decision = self.budget.evaluate(req.user_id, req.agent_id, request_id, estimate.cost_estimated)
             if not budget_decision.allowed:
                 raise HTTPException(status_code=429, detail=budget_decision.reason)
             self.state.transition(
@@ -226,7 +226,7 @@ class CabinetPipeline:
                 )
             self.budget.record(
                 req.user_id,
-                "default_agent",
+                req.agent_id,
                 request_id,
                 estimate.tokens_estimated,
                 provider_result.tokens_used,

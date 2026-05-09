@@ -1,0 +1,12 @@
+services:
+  ai-cabinet:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend:/app/backend
+      - ./config:/app/config
+      - ./frontend:/app/frontend
+      - ./plugins:/app/plugins

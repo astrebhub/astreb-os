@@ -235,6 +235,26 @@ Outputs:
 - Scenario map.
 - Decision log proposal.
 
+### GitHub Operations
+
+Purpose: Coordinate repository work without bypassing governance.
+
+Steps:
+
+- Classify repository task, target repo, branch, and external-action risk.
+- Inspect available repository, issue, pull request, CI, and release context.
+- Draft issue, branch plan, pull request summary, review response, CI diagnosis, or release notes.
+- Separate observed repository facts from proposed actions.
+- Route push, merge, release, deletion, settings, or secret-related work to the approval queue.
+- Audit the decision and attach evidence or command/output references where available.
+
+Outputs:
+
+- GitHub operations brief.
+- Proposed issue, pull request, branch, or release package.
+- CI or review-risk summary.
+- Approval queue item for external repository actions.
+
 ## Approval Levels
 
 - Low risk: agent may draft and recommend.

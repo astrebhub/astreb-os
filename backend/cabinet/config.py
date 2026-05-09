@@ -29,6 +29,7 @@ def getenv_float(name: str, default: float) -> float:
 
 
 APP_NAME = os.getenv("APP_NAME", "AI CABINET v0.2")
+ADMIN_API_TOKEN = os.getenv("ADMIN_API_TOKEN", "")
 TOKEN_LIMIT_PER_REQUEST = getenv_int("TOKEN_LIMIT_PER_REQUEST", 8000)
 DAILY_COST_LIMIT = getenv_float("DAILY_COST_LIMIT", 5.0)
 DAILY_TOKEN_LIMIT_PER_USER = getenv_int("DAILY_TOKEN_LIMIT_PER_USER", 50000)

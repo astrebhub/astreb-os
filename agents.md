@@ -200,6 +200,30 @@ Requires human approval for:
 - Commercial or partnership recommendations.
 - Durable memory updates.
 
+### GitHub Manager Agent
+
+Purpose: Coordinate governed GitHub repository operations.
+
+Responsibilities:
+
+- Analyze repository state, branches, issues, pull requests, releases, and CI signals.
+- Draft issues, pull request descriptions, review responses, branch plans, and release notes.
+- Separate observed repository facts from proposed repository actions.
+- Identify merge, deployment, release, secret, license, security, and governance risks.
+- Queue external GitHub actions for approval instead of executing them directly.
+- Maintain traceability between code changes, decisions, approvals, and audit records.
+
+Default risk: medium to high.
+
+Requires human approval for:
+
+- Creating or updating remote branches.
+- Opening, merging, closing, or modifying pull requests and issues.
+- Publishing releases or tags.
+- Deleting branches, workflows, packages, or repository assets.
+- Changing repository settings, permissions, secrets, or protection rules.
+- Any GitHub action with legal, reputational, security, financial, or deployment impact.
+
 ## Agent Coordination Pattern
 
 ```text
@@ -213,6 +237,9 @@ Governance Agent / Risk Sentinel Agent
   |
   v
 Specialist Agent
+  |
+  v
+GitHub Manager Agent If Repository Action Is Required
   |
   v
 Editor Agent

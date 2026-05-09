@@ -26,6 +26,8 @@ Thumbs.db
 dist/
 build/
 *.zip
+*.b64.part*
+github_bundle/
 
 # Local model artifacts
 local_runtime/models/*

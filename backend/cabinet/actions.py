@@ -11,6 +11,7 @@ ACTION_INTENTS = {
     "paperclip_task": ("paperclip_plugin", "create_task_draft"),
     "telegram_draft": ("telegram_plugin", "draft_message"),
     "email_draft": ("email_plugin", "draft_email"),
+    "github_ops": ("github_connector", "prepare_github_action"),
 }
 
 
@@ -101,4 +102,6 @@ class ActionQueue:
             return {"channel": "manual_target", "message_draft": output}
         if mode == "email_draft":
             return {"to": "manual_recipient", "subject": task[:80], "body_draft": output}
+        if mode == "github_ops":
+            return {"target": "manual_repository", "task": task, "operations_brief": output}
         return {"draft": output}

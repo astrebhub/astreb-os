@@ -14,6 +14,7 @@ ModeName = Literal[
     "file_review",
     "browser_action",
     "calendar_action",
+    "github_ops",
     "voice_turn",
     "paperclip_task",
     "telegram_draft",

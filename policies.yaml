@@ -112,6 +112,11 @@ workflow_rules:
     if: "workflow == 'seo' and proposed_title_changes_meaning"
     then:
       require: ["editor_review"]
+  github_external_action:
+    if: "workflow == 'github_ops' and intent in ['push', 'merge', 'create_pr', 'close_issue', 'publish_release', 'delete_branch', 'change_repository_settings']"
+    then:
+      require: ["human_approval", "audit_record", "destination_confirmation"]
+      forbid: ["direct_agent_execution"]
 
 agent_permissions:
   editor_agent:
@@ -141,6 +146,9 @@ agent_permissions:
   ecosystem_strategist_agent:
     may: ["map_ecosystem", "propose_strategy", "identify_opportunities"]
     must_not: ["change_strategy_memory_without_approval"]
+  github_manager_agent:
+    may: ["analyze_repository", "draft_issue", "draft_pull_request", "draft_release_notes", "review_ci_status", "propose_branch_plan", "queue_github_action_for_approval"]
+    must_not: ["push_without_approval", "merge_without_approval", "delete_branch_without_approval", "publish_release_without_approval", "change_repository_settings_without_approval", "store_repository_secrets"]
 
 model_routing:
   local_required_when:

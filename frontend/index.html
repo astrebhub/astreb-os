@@ -31,6 +31,7 @@
         <option value="strategy">Strategy</option>
         <option value="content">Public content</option>
         <option value="code">Code</option>
+        <option value="github_ops">GitHub operations</option>
         <option value="legal_draft">Legal draft</option>
         <option value="paperclip_task">Paperclip task draft</option>
         <option value="telegram_draft">Telegram draft</option>
@@ -63,6 +64,9 @@
         <input id="localOnly" type="checkbox" />
         Local-only security mode
       </label>
+
+      <label>Admin token</label>
+      <input id="adminToken" type="password" placeholder="Required for audit, actions, secrets, config" />
 
       <div class="nav-grid">
         <button id="healthBtn">Runtime</button>
