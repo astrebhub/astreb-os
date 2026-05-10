@@ -57,6 +57,8 @@ models:
     default: llama3:latest
     coding: qwen2.5-coder:latest
     reasoning: deepseek-r1:latest
+    compact: phi3:latest
+    lightweight: gemma2:2b
   claude:
     default: claude-3-5-sonnet
   deepseek:
@@ -68,9 +70,10 @@ local_runtime:
   supported:
     - llama3
     - mistral
-    - deepseek
     - phi
     - qwen-coder
+    - gemma
+    - deepseek
   runtimes:
     - ollama
     - gguf

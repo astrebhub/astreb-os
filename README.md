@@ -55,7 +55,7 @@ INPUT
 | Cost Governor | Estimates tokens and cost, enforces per-request, daily, monthly, user, and agent limits. |
 | Model Router | Routes work across OpenAI, Gemini, Ollama/local, manual mode, and enterprise adapter slots. |
 | Free Model Layer | Supports Ollama local models, OpenRouter free routing, Gemini slots, and local-safe fallback when keys are missing. |
-| Local Runtime | Supports local-first execution paths, Ollama status, local model inventory, and offline fallback. |
+| Local Runtime | Supports local-first execution paths for Llama 3, Mistral, Phi, Qwen, Gemma, and DeepSeek families through Ollama/local inventory and offline fallback. |
 | Output Guard | Scans model output for PII leakage, dangerous instructions, and unauthorized action claims. |
 | Action Queue | Converts external actions into drafts, approval records, no-op execution records, or rollback states. |
 | Approval Center | Separates model/agent proposals from human authority. |
@@ -196,6 +196,9 @@ LOCAL_ONLY_MODE=false
 EMERGENCY_STOP=false
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 OLLAMA_MODEL=qwen2.5:0.5b
+LOCAL_GENERAL_MODEL=llama3:latest
+LOCAL_CODER_MODEL=qwen2.5-coder:latest
+LOCAL_REASONING_MODEL=deepseek-r1:latest
 OPENROUTER_API_KEY=
 OPENROUTER_MODEL=openrouter/free
 OPENROUTER_SITE_URL=http://127.0.0.1:8000

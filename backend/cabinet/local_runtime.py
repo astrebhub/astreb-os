@@ -7,7 +7,7 @@ import httpx
 from . import config
 
 
-LOCAL_MODEL_FAMILIES = ["llama3", "mistral", "deepseek", "phi", "qwen-coder"]
+LOCAL_MODEL_FAMILIES = ["llama3", "mistral", "phi", "qwen-coder", "gemma", "deepseek"]
 
 
 @dataclass

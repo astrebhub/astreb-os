@@ -24,6 +24,23 @@ AI Cabinet supports a free/local-first model stack without putting API keys in s
    - Best for: public/low-risk cloud drafting
    - Requires: `GEMINI_API_KEY`
 
+## Local Free Model Families
+
+AI Cabinet treats these as first-class local/free model families through the
+Ollama/local runtime layer:
+
+| Family | Example Ollama model | Best use |
+| --- | --- | --- |
+| Llama 3 | `llama3:latest` | General local assistant and private drafting |
+| Mistral | `mistral:latest` | Fast local drafting and analysis |
+| Phi | `phi3:latest` | Lightweight local tasks on weaker machines |
+| Qwen | `qwen2.5-coder:latest` | Coding, structured tasks, and technical drafting |
+| Gemma | `gemma2:2b` | Lightweight general local processing |
+
+These models are free to run locally in the sense that AI Cabinet does not pay
+an API provider for them. They still require local CPU/GPU resources and enough
+RAM for the selected model.
+
 ## Governance Rules
 
 - Personal, confidential, or high-risk tasks stay local.
@@ -44,6 +61,9 @@ GEMINI_MODEL=gemini-2.0-flash
 
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 OLLAMA_MODEL=qwen2.5:0.5b
+LOCAL_GENERAL_MODEL=llama3:latest
+LOCAL_CODER_MODEL=qwen2.5-coder:latest
+LOCAL_REASONING_MODEL=deepseek-r1:latest
 ```
 
 ## Runtime Test
