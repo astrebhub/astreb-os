@@ -1,0 +1,28 @@
+name: notion_plugin
+permissions:
+  - draft_notion_page
+  - propose_database_update
+  - summarize_workspace_notes
+forbidden:
+  - publish_page_without_approval
+  - update_database_without_approval
+  - delete_page_without_approval
+  - change_permissions_without_approval
+risk_level: medium
+allowed_data_classes:
+  - public
+  - internal
+requires_approval:
+  - create_page
+  - update_database
+  - delete_page
+  - share_page
+max_autonomous_level: 2
+sandbox:
+  network: deny_until_connector_approved
+  filesystem: deny
+  execution: draft_only
+signed_connector:
+  status: unsigned
+  signer: ""
+  signature: ""

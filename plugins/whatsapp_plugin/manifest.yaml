@@ -1,18 +1,23 @@
-name: telegram_plugin
+name: whatsapp_plugin
 permissions:
-  - draft_message
+  - draft_whatsapp_message
+  - summarize_whatsapp_thread
 forbidden:
   - send_message_without_approval
-risk_level: medium
+  - read_contacts_without_approval
+  - export_thread_without_approval
+risk_level: high
 allowed_data_classes:
   - public
 requires_approval:
   - send_message
-max_autonomous_level: 2
+  - read_thread
+  - export_thread
+max_autonomous_level: 1
 sandbox:
   network: deny_until_connector_approved
   filesystem: deny
-  execution: no_direct_execution
+  execution: draft_only
 signed_connector:
   status: unsigned
   signer: ""

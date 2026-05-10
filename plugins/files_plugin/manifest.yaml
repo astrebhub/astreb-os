@@ -1,0 +1,29 @@
+name: files_plugin
+permissions:
+  - draft_file_plan
+  - summarize_allowed_file_metadata
+  - propose_file_operation
+forbidden:
+  - read_private_files_without_scope
+  - write_files_without_approval
+  - delete_files_without_approval
+  - move_files_without_approval
+  - read_credentials_or_secrets
+risk_level: high
+allowed_data_classes:
+  - public
+  - internal
+requires_approval:
+  - read_file
+  - write_file
+  - move_file
+  - delete_file
+max_autonomous_level: 1
+sandbox:
+  network: deny
+  filesystem: allow_scoped_paths_only
+  execution: draft_only
+signed_connector:
+  status: unsigned
+  signer: ""
+  signature: ""

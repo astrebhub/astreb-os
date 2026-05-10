@@ -336,6 +336,18 @@ class Database:
             conn.commit()
             return dict(row)
 
+    def get_action(self, action_id: str) -> Optional[Dict[str, Any]]:
+        with self.connect() as conn:
+            row = conn.execute("SELECT * FROM action_queue WHERE id = ?", (action_id,)).fetchone()
+        if not row:
+            return None
+        record = dict(row)
+        try:
+            record["payload"] = json.loads(record.get("payload") or "{}")
+        except json.JSONDecodeError:
+            record["payload"] = {}
+        return record
+
     def list_rows(self, table: str, limit: int) -> Iterable[Dict[str, Any]]:
         with self.connect() as conn:
             rows = conn.execute(f"SELECT * FROM {table} ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
@@ -538,6 +550,19 @@ class Database:
             )
             conn.commit()
         return record["id"]
+
+    def get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
+        with self.connect() as conn:
+            row = conn.execute("SELECT * FROM agent_registry WHERE id = ?", (agent_id,)).fetchone()
+        if not row:
+            return None
+        record = dict(row)
+        for key in ["permissions", "budget", "tools"]:
+            try:
+                record[key] = json.loads(record.get(key) or "[]" if key != "budget" else record.get(key) or "{}")
+            except json.JSONDecodeError:
+                record[key] = {} if key == "budget" else []
+        return record
 
     def insert_evidence(self, record: Dict[str, Any]) -> str:
         with self.connect() as conn:

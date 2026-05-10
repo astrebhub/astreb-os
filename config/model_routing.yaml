@@ -21,6 +21,13 @@ routes:
       mode: content
       max_cost: 0.05
 
+  - name: free_cloud_public
+    provider: openrouter
+    reason: public_low_risk_free_cloud
+    when:
+      risk_level: low
+      max_cost: 0.00
+
   - name: critical_reasoning
     provider: openai
     reason: critical_reasoning_route
@@ -40,6 +47,10 @@ models:
     default: gpt-4.1-mini
   gemini:
     default: gemini-2.0-flash
+  openrouter:
+    default: openrouter/free
+    free_router: openrouter/free
+    llama_free: meta-llama/llama-3.2-3b-instruct:free
   local:
     default: local-safe-fallback
   ollama:

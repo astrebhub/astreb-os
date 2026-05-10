@@ -1,0 +1,34 @@
+name: github_connector
+permissions:
+  - prepare_github_action
+  - draft_issue
+  - draft_pull_request
+  - draft_release_notes
+  - write_local_report_artifact
+forbidden:
+  - push_without_approval
+  - merge_without_approval
+  - publish_release_without_approval
+  - change_repository_settings_without_approval
+  - delete_repository_content_without_approval
+risk_level: high
+allowed_data_classes:
+  - public
+  - internal
+requires_approval:
+  - prepare_github_action
+  - write_local_report_artifact
+  - push
+  - merge
+  - publish_release
+max_autonomous_level: 0
+sandbox:
+  network: deny_until_connector_approved
+  filesystem: allow_runtime_reports_only
+  writable_paths:
+    - runtime/reports
+  execution: local_artifact_only
+signed_connector:
+  status: unsigned
+  signer: ""
+  signature: ""

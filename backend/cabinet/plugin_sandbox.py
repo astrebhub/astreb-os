@@ -23,10 +23,19 @@ class PluginSandbox:
         required = ["name", "permissions", "forbidden", "risk_level", "requires_approval"]
         missing = [key for key in required if key not in manifest]
         allowed_data_classes = manifest.get("allowed_data_classes", ["public"])
+        signed_connector = manifest.get("signed_connector", {})
+        signed = bool(
+            signed_connector.get("signature")
+            and signed_connector.get("signer")
+            and signed_connector.get("status") == "signed"
+        )
         return {
             "valid": not missing,
             "missing": missing,
             "isolated": True,
+            "signed": signed,
+            "signature_status": signed_connector.get("status", "unsigned"),
             "network_default": "deny_until_connector_approved",
             "allowed_data_classes": allowed_data_classes,
+            "execution_gate": "policy_plus_approval_plus_audit",
         }

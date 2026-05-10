@@ -3,7 +3,18 @@ from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-ProviderName = Literal["auto", "openai", "gemini", "claude", "ollama", "deepseek", "mistral", "local", "manual"]
+ProviderName = Literal[
+    "auto",
+    "openai",
+    "gemini",
+    "openrouter",
+    "claude",
+    "ollama",
+    "deepseek",
+    "mistral",
+    "local",
+    "manual",
+]
 ModeName = Literal[
     "chat",
     "strategy",
@@ -15,6 +26,8 @@ ModeName = Literal[
     "browser_action",
     "calendar_action",
     "github_ops",
+    "computer_ops",
+    "microsoft_ops",
     "voice_turn",
     "paperclip_task",
     "telegram_draft",
@@ -28,6 +41,8 @@ class SubmitRequest(BaseModel):
     user_id: str = "owner"
     session_id: str = "default_session"
     agent_id: str = "default_agent"
+    profile_id: str = "owner_default"
+    dialog_mode: str = "operator"
     provider: ProviderName = "auto"
     mode: ModeName = "chat"
     input_type: InputKind = "text"

@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv_runtime/
 venv/
 env/
 
@@ -9,6 +10,8 @@ env/
 backend/*.db
 backend/*.db-*
 logs/
+runtime/reports/*
+!runtime/reports/README.md
 
 # Secrets
 backend/.env

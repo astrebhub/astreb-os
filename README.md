@@ -3,7 +3,8 @@
 ![AI Cabinet concept visualization](docs/assets/ai-cabinet-concept.png)
 
 AI Cabinet is a governed hybrid AI control plane: a microkernel runtime for
-policy-bound, auditable, local-first AI execution.
+policy-bound, auditable, local-first AI execution with controlled agents and
+ASTI signed connector governance.
 
 It is not a chatbot, prompt wrapper, or automation script. AI Cabinet is the
 trusted control layer between users, agents, models, tools, memory, budgets,
@@ -53,6 +54,7 @@ INPUT
 | Policy Engine | Enforces YAML governance before model calls or action proposals. |
 | Cost Governor | Estimates tokens and cost, enforces per-request, daily, monthly, user, and agent limits. |
 | Model Router | Routes work across OpenAI, Gemini, Ollama/local, manual mode, and enterprise adapter slots. |
+| Free Model Layer | Supports Ollama local models, OpenRouter free routing, Gemini slots, and local-safe fallback when keys are missing. |
 | Local Runtime | Supports local-first execution paths, Ollama status, local model inventory, and offline fallback. |
 | Output Guard | Scans model output for PII leakage, dangerous instructions, and unauthorized action claims. |
 | Action Queue | Converts external actions into drafts, approval records, no-op execution records, or rollback states. |
@@ -60,6 +62,7 @@ INPUT
 | Audit Layer | Records request, risk, data class, policy, provider, model, token, cost, status, and action metadata. |
 | Memory Engine | Stores governed operational memory and learning proposals that require approval. |
 | Plugin Sandbox | Validates plugin manifests, permissions, forbidden actions, and allowed data classes. |
+| ASTI Connector Layer | Registers governed connector hands, signature state, allowed actions, data classes, and execution gates. |
 | Agent Registry | Defines controlled agents with roles, instructions, permissions, budgets, tools, memory scope, and risk level. |
 | Evidence Layer | Stores source metadata, confidence, verification status, URL, timestamp, and citation. |
 | Observability | Records latency, runtime health events, blocked actions, policy violations, and provider decisions. |
@@ -71,6 +74,46 @@ AI Cabinet does not treat AI autonomy as the default.
 Agents may draft, analyze, classify, route, critique, and propose. They may not
 publish, delete, send, merge, release, alter durable memory, change policy, or
 execute external actions without an approval record.
+
+## ASTI Connector Layer
+
+ASTI means **Agentic Secure Tool Interface**.
+
+It is the AI Cabinet-native connector layer for governed agent capabilities.
+Instead of giving a model direct access to email, calendar, files, browser,
+GitHub, Microsoft 365, Telegram, WhatsApp, Notion, or the local computer, AI
+Cabinet exposes connector manifests and policy gates.
+
+```text
+Agent proposes
+  -> Policy checks
+  -> Connector manifest restricts
+  -> Approval required
+  -> Audit records
+  -> Executor only after signature
+```
+
+Current ASTI connectors include:
+
+```text
+email_plugin
+calendar_plugin
+telegram_plugin
+whatsapp_plugin
+browser_plugin
+files_plugin
+paperclip_plugin
+notion_plugin
+github_connector
+microsoft_365_connector
+computer_control_plugin
+```
+
+In the public MVP all real-world connector execution is disabled until a
+connector is signed and an action is explicitly approved. Drafts, proposals,
+dry-runs, queue records, audit records, and local report artifacts are enabled.
+
+See [ASTI Connector Layer](docs/asti-connector-layer.md).
 
 Sensitive work is local-first. Public and low-risk tasks may use cloud models
 when policy permits. Personal, confidential, secret-bearing, or high-risk work
@@ -152,6 +195,11 @@ DAILY_TOKEN_LIMIT_PER_USER=50000
 LOCAL_ONLY_MODE=false
 EMERGENCY_STOP=false
 OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=qwen2.5:0.5b
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=openrouter/free
+OPENROUTER_SITE_URL=http://127.0.0.1:8000
+OPENROUTER_APP_TITLE=AI Cabinet
 ```
 
 ## Repository Structure
@@ -165,6 +213,7 @@ backend/
     approval_center.py
     budget_governor.py
     classifier.py
+    connector_registry.py
     config.py
     database.py
     evidence.py
@@ -188,6 +237,8 @@ backend/
 config/
   policy.yaml
   model_routing.yaml
+  dialog_modes.yaml
+  user_profiles.yaml
 frontend/
   index.html
   app.js
@@ -195,6 +246,9 @@ frontend/
 plugins/
   */manifest.yaml
 docs/
+  asti-connector-layer.md
+  free-models-setup.md
+  agent-action-test-scenario.md
   repository-presentation-architecture.md
 scripts/
   Windows, Ubuntu, and macOS autostart helpers
@@ -211,7 +265,7 @@ tests/
 | Audit | `GET /audit`, `GET /observability/events` |
 | Memory | `GET /memory/layers`, `POST /memory/proposals/{id}/approve`, `POST /vector-memory/search` |
 | Agents | `GET /agents`, `POST /agents` |
-| Plugins | `GET /plugins` |
+| Plugins / ASTI | `GET /plugins`, `GET /connectors/status`, `GET /connectors/{name}`, `POST /connectors/{name}/dry-run` |
 | Local Runtime | `GET /local-runtime/status`, `POST /local-runtime/models/{model}/load` |
 | Forecasting | `POST /forecasts`, `GET /forecasts`, `POST /forecasts/{id}/outcome` |
 | Voice / Multimodal | `GET /voice/status`, `GET /multimodal/status` |
@@ -226,6 +280,24 @@ It may prepare issues, pull request plans, review summaries, CI diagnostics,
 branch plans, and release notes. It may not push, merge, delete branches,
 publish releases, close issues, change repository settings, or handle secrets
 without an approval record.
+
+## Built-In Governed Agents
+
+AI Cabinet registers controlled agents by default:
+
+| Agent | Purpose |
+| --- | --- |
+| `cabinet_operator` | Runtime status, operational steps, and safe configuration help. |
+| `governance_architect` | Governance architecture, policy gates, and risk control. |
+| `github_manager_agent` | Issues, PR plans, CI summaries, release notes, and repository proposals. |
+| `computer_control_agent` | Local computer operation planning and local report artifacts only. |
+| `microsoft_365_agent` | Outlook, Calendar, Teams, Planner, OneDrive, and SharePoint drafts/proposals only. |
+| `editorial_agent` | Editorial structure, tone, and claim discipline. |
+| `research_agent` | Evidence packs, source confidence, and uncertainty separation. |
+| `risk_sentinel` | Privacy, legal, operational, and reputational risk checks. |
+
+These agents operate behind the same Gateway, Policy Engine, Router, Approval
+Center, Audit Layer, and Memory Layer.
 
 ## Testing
 

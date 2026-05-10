@@ -19,6 +19,8 @@ class OutputGuard:
 
     def scan(self, output: str, input_pii: PiiResult) -> Dict[str, Any]:
         raw_pii = self.pii_detector.contains_raw_pii(output)
+        if not input_pii.findings.get("NAME"):
+            raw_pii["NAME"] = 0
         leaks = {}
         for kind, values in input_pii.findings.items():
             leaked = [value for value in values if value and value in output]

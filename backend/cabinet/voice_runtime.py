@@ -6,6 +6,8 @@ class VoiceRuntime:
     def status(self) -> Dict[str, Any]:
         return {
             "providers": {
+                "browser_stt": ["web_speech_api"],
+                "browser_tts": ["speech_synthesis"],
                 "stt": ["openai_realtime", "deepgram", "whisper_local"],
                 "tts": ["elevenlabs", "piper", "openai_realtime"],
             },
@@ -18,7 +20,13 @@ class VoiceRuntime:
                 "transcripts",
                 "voice_identity",
             ],
-            "status": "prepared_not_enabled",
+            "status": "browser_voice_enabled_cloud_voice_prepared",
+            "safety": {
+                "audio_storage": "disabled",
+                "pipeline_input": "transcript_only",
+                "external_voice_providers": "not_enabled",
+                "governance": "voice transcript enters the same policy pipeline",
+            },
         }
 
     def normalize_turn(self, transcript: str, speaker_id: str = "owner") -> Dict[str, Any]:

@@ -1,0 +1,37 @@
+name: computer_control_plugin
+permissions:
+  - diagnose_local_runtime
+  - draft_command_plan
+  - prepare_computer_action
+  - write_local_report_artifact
+forbidden:
+  - run_shell_commands_without_signed_executor
+  - delete_files_without_approval
+  - install_software_without_approval
+  - uninstall_software_without_approval
+  - modify_registry_without_approval
+  - stop_services_without_approval
+  - read_credentials_or_secrets
+  - change_startup_items_without_approval
+risk_level: high
+allowed_data_classes:
+  - public
+  - internal
+requires_approval:
+  - prepare_computer_action
+  - write_local_report_artifact
+  - run_command
+  - modify_file
+  - change_startup
+max_autonomous_level: 0
+sandbox:
+  network: deny
+  filesystem: allow_runtime_reports_only
+  writable_paths:
+    - runtime/reports
+  execution: local_artifact_only
+  shell: disabled_until_signed_executor
+signed_connector:
+  status: unsigned
+  signer: ""
+  signature: ""

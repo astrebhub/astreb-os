@@ -2,6 +2,19 @@ from dataclasses import dataclass
 from typing import Any, Dict
 
 
+ACTION_TASK_TYPES = {
+    "github_ops",
+    "computer_ops",
+    "microsoft_ops",
+    "browser_action",
+    "calendar_action",
+    "paperclip_task",
+    "telegram_draft",
+    "email_draft",
+    "legal_draft",
+}
+
+
 @dataclass
 class PolicyDecision:
     name: str
@@ -37,7 +50,10 @@ class PolicyEngine:
         blocked = access_level < 2 and classification["task_type"].endswith("_draft")
         reason = "access_level_too_low" if blocked else rule.get("name", f"{data_class}_policy")
 
-        if access_level <= 3 and classification["task_type"].endswith("_draft"):
+        task_type = classification["task_type"]
+        if access_level <= 3 and (task_type.endswith("_draft") or task_type in ACTION_TASK_TYPES):
+            require_approval = True
+        if risk_level == "high" and task_type in ACTION_TASK_TYPES:
             require_approval = True
 
         return PolicyDecision(

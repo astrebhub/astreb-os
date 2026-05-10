@@ -19,6 +19,18 @@ class PiiResult:
 
 
 class PiiDetector:
+    name_allowlist = {
+        "AI Cabinet",
+        "Microsoft Graph",
+        "Microsoft Office",
+        "Microsoft Teams",
+        "Microsoft Planner",
+        "Microsoft Outlook",
+        "Microsoft SharePoint",
+        "OpenAI Codex",
+        "GitHub Actions",
+    }
+
     patterns = {
         "EMAIL": re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE),
         "PHONE": re.compile(r"(?<!\w)(?:\+?\d[\d\s().-]{7,}\d)(?!\w)"),
@@ -37,6 +49,8 @@ class PiiDetector:
         masked = text
         for kind, pattern in self.patterns.items():
             matches = list(dict.fromkeys(match.group(0) for match in pattern.finditer(masked)))
+            if kind == "NAME":
+                matches = [value for value in matches if value not in self.name_allowlist]
             findings[kind].extend(matches)
             for value in matches:
                 masked = masked.replace(value, f"[MASKED_{kind}]")

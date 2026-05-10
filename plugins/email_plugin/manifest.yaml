@@ -17,3 +17,7 @@ sandbox:
   network: deny_until_connector_approved
   filesystem: deny
   execution: no_direct_execution
+signed_connector:
+  status: unsigned
+  signer: ""
+  signature: ""

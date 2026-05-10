@@ -1,0 +1,51 @@
+name: microsoft_365_connector
+permissions:
+  - draft_outlook_email
+  - draft_calendar_event
+  - draft_teams_reply
+  - draft_planner_task
+  - prepare_onedrive_file_workflow
+  - prepare_sharepoint_workflow
+  - write_local_report_artifact
+forbidden:
+  - send_email_without_approval
+  - post_teams_message_without_approval
+  - create_calendar_event_without_approval
+  - share_files_without_approval
+  - delete_files_without_approval
+  - change_permissions_without_approval
+  - read_credentials_or_tokens
+  - call_microsoft_graph_without_signed_connector
+risk_level: high
+allowed_data_classes:
+  - public
+  - internal
+requires_approval:
+  - prepare_microsoft_action
+  - send_email
+  - post_teams_message
+  - create_calendar_event
+  - share_file
+  - change_permission
+max_autonomous_level: 0
+sandbox:
+  network: deny_until_microsoft_graph_oauth_approved
+  filesystem: allow_runtime_reports_only
+  writable_paths:
+    - runtime/reports
+  execution: local_artifact_only
+  oauth: disabled_until_owner_consent
+future_connector:
+  provider: microsoft_graph
+  scopes_planned:
+    - Mail.Read
+    - Mail.Send
+    - Calendars.ReadWrite
+    - Files.ReadWrite
+    - Sites.ReadWrite.All
+    - Team.ReadBasic.All
+    - ChannelMessage.Send
+signed_connector:
+  status: unsigned
+  signer: ""
+  signature: ""

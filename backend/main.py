@@ -14,9 +14,12 @@ from cabinet.approval_center import ApprovalCenter
 from cabinet.budget_governor import BudgetGovernor
 from cabinet.classifier import DataClassifier
 from cabinet.config import ADMIN_API_TOKEN, APP_NAME, FRONTEND_DIR, load_yaml
+from cabinet.connector_registry import ConnectorRegistry
+from cabinet.control_center import PROCESS_MAP, panel_audit
 from cabinet.database import Database
 from cabinet.evidence import EvidenceLayer
 from cabinet.forecasting import ForecastCreateRequest, ForecastOutcomeRequest, ForecastingEngine
+from cabinet.guide_agent import CabinetGuideAgent
 from cabinet.identity import IdentityAccessLayer
 from cabinet.local_runtime import LocalRuntimeManager
 from cabinet.memory_engine import MemoryEngine
@@ -64,6 +67,11 @@ class AgentRegisterRequest(BaseModel):
     risk_level: str = "low"
     status: str = "active"
 
+
+class GuideChatRequest(BaseModel):
+    message: str = ""
+    ui_state: Dict[str, Any] = {}
+
 app = FastAPI(title=APP_NAME)
 app.add_middleware(
     CORSMiddleware,
@@ -81,7 +89,9 @@ pii_detector = PiiDetector()
 action_queue = ActionQueue(database)
 memory_engine = MemoryEngine(database)
 local_runtime = LocalRuntimeManager()
-plugin_sandbox = PluginSandbox(Path(__file__).resolve().parents[2] / "plugins")
+PLUGIN_ROOT = Path(__file__).resolve().parents[1] / "plugins"
+plugin_sandbox = PluginSandbox(PLUGIN_ROOT)
+connector_registry = ConnectorRegistry(PLUGIN_ROOT)
 vector_memory = VectorMemory(database, LocalEmbeddingEngine())
 state_engine = StateEngine(database)
 identity_layer = IdentityAccessLayer(database)
@@ -92,6 +102,7 @@ approval_center = ApprovalCenter(database)
 evidence_layer = EvidenceLayer(database)
 observability_layer = ObservabilityLayer(database)
 forecasting_engine = ForecastingEngine(database)
+guide_agent = CabinetGuideAgent()
 pipeline = CabinetPipeline(
     database=database,
     state=state_engine,
@@ -248,6 +259,24 @@ async def plugins():
     return read_plugin_manifests()
 
 
+@app.get("/connectors/status")
+async def connectors_status():
+    return connector_registry.capabilities()
+
+
+@app.get("/connectors/{connector_name}")
+async def connector_detail(connector_name: str):
+    connector = connector_registry.get(connector_name)
+    if not connector:
+        raise HTTPException(status_code=404, detail="Connector not found")
+    return connector
+
+
+@app.post("/connectors/{connector_name}/dry-run", dependencies=[Depends(require_admin_token)])
+async def connector_dry_run(connector_name: str, action: str, data_class: str = "public", access_level: int = 2):
+    return connector_registry.dry_run(connector_name, action, data_class, access_level)
+
+
 @app.get("/approvals", dependencies=[Depends(require_admin_token)])
 async def approvals(limit: int = 50):
     return list(database.list_rows("approvals", limit))
@@ -282,6 +311,43 @@ async def secret_metadata(name: str):
 @app.get("/agents", dependencies=[Depends(require_admin_token)])
 async def agents(limit: int = 50):
     return list(database.list_rows("agent_registry", limit))
+
+
+@app.get("/runtime/personalization")
+async def runtime_personalization():
+    return {
+        "profiles": load_yaml("user_profiles.yaml").get("profiles", {}),
+        "dialog_modes": load_yaml("dialog_modes.yaml").get("modes", {}),
+        "agents": list(database.list_rows("agent_registry", 100)),
+    }
+
+
+@app.post("/guide/chat")
+async def guide_chat(req: GuideChatRequest):
+    import os
+
+    runtime = connector_registry.capabilities()
+    runtime.update(
+        {
+            "app": APP_NAME,
+            "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
+            "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
+            "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY")),
+            "local_only_mode": os.getenv("LOCAL_ONLY_MODE", "false").lower() == "true",
+        }
+    )
+    reply = guide_agent.reply(req.message, req.ui_state, runtime)
+    return {
+        "agent_id": "cabinet_guide_agent",
+        "answer": reply.answer,
+        "suggestions": reply.suggestions,
+        "recommended_panel": reply.recommended_panel,
+        "governance": {
+            "execution": "advisory_only",
+            "external_actions": "none",
+            "policy": "control_before_autonomy",
+        },
+    }
 
 
 @app.post("/agents", dependencies=[Depends(require_admin_token)])
@@ -354,6 +420,16 @@ async def multimodal_status():
     }
 
 
+@app.get("/control-center/process-map")
+async def control_center_process_map():
+    return PROCESS_MAP
+
+
+@app.get("/control-center/panel-audit")
+async def control_center_panel_audit():
+    return panel_audit()
+
+
 @app.post("/vector-memory/add", dependencies=[Depends(require_admin_token)])
 async def add_vector_memory(req: VectorAddRequest):
     return vector_memory.add(req.namespace, req.content)
@@ -372,6 +448,16 @@ async def policy_config():
 @app.get("/config/model-routing", dependencies=[Depends(require_admin_token)])
 async def model_routing_config():
     return load_yaml("model_routing.yaml")
+
+
+@app.get("/config/dialog-modes", dependencies=[Depends(require_admin_token)])
+async def dialog_modes_config():
+    return load_yaml("dialog_modes.yaml")
+
+
+@app.get("/config/user-profiles", dependencies=[Depends(require_admin_token)])
+async def user_profiles_config():
+    return load_yaml("user_profiles.yaml")
 
 
 @app.get("/health")
@@ -403,5 +489,12 @@ async def health():
         "states": state_engine.states(),
         "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
         "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
+        "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY")),
+        "free_models": {
+            "local": "ollama_or_local_safe_fallback",
+            "openrouter": os.getenv("OPENROUTER_MODEL", "openrouter/free"),
+            "gemini": os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
+        },
+        "connectors": connector_registry.capabilities(),
         "local_only_mode": os.getenv("LOCAL_ONLY_MODE", "false").lower() == "true",
     }

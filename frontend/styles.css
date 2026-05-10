@@ -49,6 +49,13 @@ button {
   color: #111;
   font-weight: 700;
 }
+button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+button.loading {
+  background: #dfe7ef;
+}
 .nav-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -97,6 +104,44 @@ textarea {
   align-items: center;
   gap: 14px;
 }
+.voice-control {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #dce2e8;
+  border-radius: 8px;
+  background: #f7f9fb;
+}
+.voice-row,
+.voice-settings {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+.voice-settings {
+  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr) minmax(160px, 1fr);
+}
+.voice-control button {
+  min-height: 40px;
+}
+.voice-status {
+  color: #4f5b67;
+  font-size: 13px;
+}
+.voice-transcript {
+  min-height: 44px;
+  max-height: 120px;
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid #dce2e8;
+  border-radius: 8px;
+  padding: 10px;
+}
+.voice-check {
+  margin: 0;
+  min-height: 40px;
+}
 .row .primary {
   width: auto;
   min-width: 220px;
@@ -108,6 +153,35 @@ textarea {
   display: grid;
   grid-template-columns: repeat(4, minmax(120px, 1fr));
   gap: 12px;
+}
+.process-map-panel {
+  display: grid;
+  gap: 12px;
+}
+.process-map {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(92px, 1fr));
+  gap: 8px;
+}
+.process-node {
+  position: relative;
+  min-height: 54px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border: 1px solid #cfd6dd;
+  border-radius: 8px;
+  background: #f7f9fb;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+.process-node:not(:last-child)::after {
+  content: ">";
+  position: absolute;
+  right: -8px;
+  color: #64707c;
+  font-weight: 800;
 }
 .metric {
   background: #ffffff;
@@ -152,8 +226,117 @@ pre {
   padding: 14px;
   border-radius: 8px;
 }
+.guide-launcher {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 20;
+  width: auto;
+  min-width: 150px;
+  background: #174ea6;
+  color: white;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.24);
+}
+.guide-panel {
+  position: fixed;
+  right: 22px;
+  bottom: 78px;
+  z-index: 21;
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(660px, calc(100vh - 110px));
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  background: #ffffff;
+  border: 1px solid #cfd6dd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+}
+.guide-panel[hidden] {
+  display: none;
+}
+.guide-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  background: #101418;
+  color: white;
+}
+.guide-header span {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  opacity: 0.72;
+}
+.guide-header button {
+  width: auto;
+  background: #2a333d;
+  color: white;
+}
+.guide-messages {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 260px;
+  overflow: auto;
+  padding: 14px;
+  background: #f7f9fb;
+}
+.guide-message {
+  padding: 10px 12px;
+  border-radius: 8px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+.guide-message.user {
+  justify-self: end;
+  max-width: 86%;
+  background: #174ea6;
+  color: white;
+}
+.guide-message.agent {
+  justify-self: start;
+  max-width: 94%;
+  background: white;
+  border: 1px solid #dce2e8;
+}
+.guide-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #e5ebf0;
+}
+.guide-suggestions button {
+  width: auto;
+  padding: 7px 9px;
+  font-size: 13px;
+  background: #e8eef4;
+}
+.guide-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 12px 14px 14px;
+  border-top: 1px solid #e5ebf0;
+}
+.guide-form button {
+  width: auto;
+  min-width: 76px;
+  background: #174ea6;
+  color: white;
+}
 @media (max-width: 900px) {
   .app { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: 1fr 1fr; }
+  .process-map { grid-template-columns: 1fr 1fr; }
   .forecast-grid { grid-template-columns: 1fr; }
+  .voice-row,
+  .voice-settings { grid-template-columns: 1fr; }
+  .guide-panel {
+    right: 12px;
+    bottom: 70px;
+  }
 }

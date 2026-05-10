@@ -44,6 +44,8 @@ class ModelRouter:
                 continue
             return RouteDecision(route["provider"], self._model_for(route["provider"]), route.get("reason", "matched_route"))
 
+        if risk_level == "low" and os.getenv("OPENROUTER_API_KEY"):
+            return RouteDecision("openrouter", self._model_for("openrouter"), "low_risk_free_cloud")
         if risk_level == "low" and os.getenv("GEMINI_API_KEY"):
             return RouteDecision("gemini", self._model_for("gemini"), "low_risk_low_cost")
         return RouteDecision("openai", self._model_for("openai"), "default_cloud_route")
@@ -58,6 +60,8 @@ class ModelRouter:
             return os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
         if provider == "gemini":
             return os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+        if provider == "openrouter":
+            return os.getenv("OPENROUTER_MODEL", "openrouter/free")
         if provider == "ollama":
             return os.getenv("OLLAMA_MODEL", "llama3:latest")
         if provider == "claude":

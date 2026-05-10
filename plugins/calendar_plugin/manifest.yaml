@@ -1,0 +1,28 @@
+name: calendar_plugin
+permissions:
+  - read_calendar_summary
+  - draft_calendar_event
+  - propose_reschedule
+forbidden:
+  - create_event_without_approval
+  - update_event_without_approval
+  - delete_event_without_approval
+  - invite_external_guests_without_approval
+risk_level: medium
+allowed_data_classes:
+  - public
+  - internal
+requires_approval:
+  - create_event
+  - update_event
+  - delete_event
+  - invite_guest
+max_autonomous_level: 2
+sandbox:
+  network: deny_until_connector_approved
+  filesystem: deny
+  execution: draft_only
+signed_connector:
+  status: unsigned
+  signer: ""
+  signature: ""

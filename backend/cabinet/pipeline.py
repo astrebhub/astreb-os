@@ -75,6 +75,40 @@ class CabinetPipeline:
         self.observability = observability
         self.memory_engine = memory_engine
 
+    def _resolve_personalization(self, req: SubmitRequest) -> dict:
+        profiles = config.load_yaml("user_profiles.yaml").get("profiles", {})
+        modes = config.load_yaml("dialog_modes.yaml").get("modes", {})
+        profile = profiles.get(req.profile_id) or profiles.get("owner_default") or {}
+        dialog_mode = modes.get(req.dialog_mode) or modes.get(profile.get("default_dialog_mode", "operator")) or {}
+        agent_id = req.agent_id
+        if agent_id == "default_agent" and dialog_mode.get("default_agent"):
+            agent_id = dialog_mode["default_agent"]
+        agent = self.database.get_agent(agent_id) or self.database.get_agent("default_agent") or {}
+        profile_summary = (
+            f"language={profile.get('language', 'en')}; timezone={profile.get('timezone', '')}; "
+            f"style={profile.get('preferred_style', 'practical')}; "
+            f"priorities={', '.join(profile.get('priorities', []))}"
+        )
+        return {
+            "profile": profile,
+            "dialog_mode": dialog_mode,
+            "agent": agent,
+            "agent_id": agent.get("id", agent_id),
+            "dialog_mode_id": req.dialog_mode,
+            "profile_id": req.profile_id,
+            "local_only": bool(dialog_mode.get("local_only") or profile.get("local_first") and req.dialog_mode == "local_private"),
+            "prompt_context": {
+                "profile_id": req.profile_id,
+                "dialog_mode": req.dialog_mode,
+                "agent_id": agent.get("id", agent_id),
+                "profile_summary": profile_summary,
+                "dialog_contract": dialog_mode.get("prompt_contract", ""),
+                "agent_instructions": agent.get("instructions", ""),
+                "allowed_actions": ", ".join(dialog_mode.get("allowed_actions", []) + agent.get("permissions", [])),
+                "forbidden_actions": ", ".join(dialog_mode.get("forbidden_actions", [])),
+            },
+        }
+
     async def run(self, req: SubmitRequest) -> SubmitResponse:
         request_id = str(uuid.uuid4())
         now = int(time.time())
@@ -88,7 +122,18 @@ class CabinetPipeline:
         started_at = time.time()
 
         try:
-            self.state.transition(request_id, "received", {"input_type": req.input_type, "mode": req.mode})
+            personalization = self._resolve_personalization(req)
+            self.state.transition(
+                request_id,
+                "received",
+                {
+                    "input_type": req.input_type,
+                    "mode": req.mode,
+                    "dialog_mode": personalization["dialog_mode_id"],
+                    "agent_id": personalization["agent_id"],
+                    "profile_id": personalization["profile_id"],
+                },
+            )
             identity = self.identity.ensure_user(req.user_id, req.access_level)
             if not identity["allowed"]:
                 raise HTTPException(status_code=403, detail="access_level_exceeds_role")
@@ -110,7 +155,7 @@ class CabinetPipeline:
                 classification,
                 pii_result.has_pii,
                 req.access_level,
-                req.local_only or config.LOCAL_ONLY_MODE,
+                req.local_only or personalization["local_only"] or config.LOCAL_ONLY_MODE,
             )
             if policy.blocked:
                 raise HTTPException(status_code=403, detail=policy.reason)
@@ -125,11 +170,22 @@ class CabinetPipeline:
                 0.0,
                 policy,
             )
-            prompt = build_provider_prompt(provider_input, req.mode, policy.name, classification)
+            prompt = build_provider_prompt(
+                provider_input,
+                req.mode,
+                policy.name,
+                classification,
+                personalization["prompt_context"],
+            )
             estimate = self.estimator.evaluate(req.user_id, prompt, preliminary_route.model)
             if estimate.blocked:
                 raise HTTPException(status_code=429, detail=estimate.reason)
-            budget_decision = self.budget.evaluate(req.user_id, req.agent_id, request_id, estimate.cost_estimated)
+            budget_decision = self.budget.evaluate(
+                req.user_id,
+                personalization["agent_id"],
+                request_id,
+                estimate.cost_estimated,
+            )
             if not budget_decision.allowed:
                 raise HTTPException(status_code=429, detail=budget_decision.reason)
             self.state.transition(
@@ -226,7 +282,7 @@ class CabinetPipeline:
                 )
             self.budget.record(
                 req.user_id,
-                req.agent_id,
+                personalization["agent_id"],
                 request_id,
                 estimate.tokens_estimated,
                 provider_result.tokens_used,
