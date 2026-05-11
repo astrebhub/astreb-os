@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jazekker.nl/schemas/distribution-metadata.schema.json",
+  "title": "JAZEKKER Distribution Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["object_id", "channel", "status", "draft_path", "approval_id"],
+  "properties": {
+    "object_id": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["website", "rss", "newsletter", "linkedin", "telegram"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["not_started", "draft", "approved", "scheduled", "published", "blocked"]
+    },
+    "draft_path": {
+      "type": ["string", "null"]
+    },
+    "scheduled_for": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "approval_id": {
+      "type": ["string", "null"]
+    },
+    "public_url": {
+      "type": ["string", "null"],
+      "format": "uri"
+    }
+  }
+}

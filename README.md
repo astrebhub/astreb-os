@@ -297,10 +297,28 @@ AI Cabinet registers controlled agents by default:
 | `microsoft_365_agent` | Outlook, Calendar, Teams, Planner, OneDrive, and SharePoint drafts/proposals only. |
 | `editorial_agent` | Editorial structure, tone, and claim discipline. |
 | `research_agent` | Evidence packs, source confidence, and uncertainty separation. |
+| `trend_analyst_agent` | Jazekker signal analysis, noise filtering, and Orientation Object candidates. |
+| `distribution_orchestrator_agent` | Channel-specific Jazekker drafts after approval; no direct publishing. |
 | `risk_sentinel` | Privacy, legal, operational, and reputational risk checks. |
 
 These agents operate behind the same Gateway, Policy Engine, Router, Approval
 Center, Audit Layer, and Memory Layer.
+
+## JAZEKKER Orientation Runtime
+
+JAZEKKER is the public intelligence hub layer for AI Cabinet. Its working
+strategy lives in `docs/strategy/jazekker/`, with runtime schemas in
+`ai-cabinet/schemas/` and sample Orientation Objects in `content/orientation/`.
+
+The core object is the Orientation Object:
+
+```text
+Noise -> Signals -> Context -> Orientation -> Trust -> Coordination -> Clarity
+```
+
+AI Cabinet may draft, classify, interpret, transform, and propose Jazekker
+content. It may not publish, schedule, distribute, or update strategic memory
+without an approval record.
 
 ## Testing
 

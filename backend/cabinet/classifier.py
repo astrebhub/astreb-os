@@ -86,6 +86,27 @@ class DataClassifier:
         "upload",
         "download",
     ]
+    jazekker_markers = [
+        "jazekker",
+        "orientation object",
+        "orientation-native",
+        "signal intake",
+        "noise level",
+        "impact horizon",
+        "source confidence",
+        "public intelligence hub",
+        "agentic media runtime",
+    ]
+    sensitive_public_markers = [
+        "political",
+        "legal",
+        "medical",
+        "financial",
+        "reputational",
+        "privacy",
+        "security",
+        "investigation",
+    ]
     action_markers = [
         "send",
         "delete",
@@ -126,6 +147,9 @@ class DataClassifier:
             or any(marker in lowered for marker in self.computer_markers)
             or mode == "microsoft_ops"
             or any(marker in lowered for marker in self.microsoft_markers)
+            or mode in ["orientation_draft", "distribution_draft"]
+            or any(marker in lowered for marker in self.jazekker_markers)
+            or any(marker in lowered for marker in self.sensitive_public_markers)
         ):
             risk_level = "medium"
         else:

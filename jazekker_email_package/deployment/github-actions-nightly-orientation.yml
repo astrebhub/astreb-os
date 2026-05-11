@@ -1,0 +1,26 @@
+name: Jazekker Nightly Orientation Draft
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 21 * * *"
+
+jobs:
+  nightly-orientation-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Governance notice
+        run: |
+          echo "This workflow is a placeholder for draft generation only."
+          echo "It must not publish content automatically."
+          echo "Human approval is required before publication."
+
+      # Future steps:
+      # - collect approved source signals
+      # - generate orientation object drafts
+      # - save drafts with approval_status: draft
+      # - create pull request for review
+

@@ -1,0 +1,78 @@
+{
+  "id": "oo-2026-05-11-agentic-media-runtime",
+  "title": "Agentic media runtime reframes publishing as governed interpretation",
+  "slug": "agentic-media-runtime-governed-interpretation",
+  "status": "draft",
+  "language": "en",
+  "created_at": "2026-05-11T12:00:00+02:00",
+  "updated_at": "2026-05-11T12:00:00+02:00",
+  "signal": {
+    "summary": "Media systems can use AI not just to generate articles, but to classify signals, enforce policy, structure interpretation, and prepare approved distribution drafts.",
+    "signal_type": "technology",
+    "why_now": "The rise of AI agents makes it necessary to separate interpretation, transformation, approval, publishing, and memory updates."
+  },
+  "context": "JAZEKKER's strategic shift is to make AI Cabinet the governance and orchestration core, while the public site becomes an intelligence hub rather than a content feed.",
+  "noise_level": "medium",
+  "impact_horizon": "weeks",
+  "who_should_care": [
+    "media founders",
+    "editors",
+    "AI product strategists",
+    "public-interest technology teams"
+  ],
+  "systemic_effects": [
+    "Content production becomes a controlled pipeline rather than isolated drafting.",
+    "Editorial trust depends on source visibility, confidence, and approval states.",
+    "Distribution becomes a governed transformation layer, not a direct AI action."
+  ],
+  "next_orientation_step": "Implement Orientation Object schemas and use them as the source-of-truth layer before building channel-specific publishing tools.",
+  "sources": [
+    {
+      "title": "JAZEKKER Agentic Strategic Media Operating System",
+      "url": "https://example.invalid/jazekker-agentic-media-runtime",
+      "source_type": "internal",
+      "publisher": "JAZEKKER",
+      "published_at": null,
+      "last_checked": "2026-05-11",
+      "confidence": "medium",
+      "notes": "Internal strategy source. Replace placeholder URL with repository path or public documentation before publication."
+    }
+  ],
+  "confidence": {
+    "level": "medium",
+    "rationale": "This is a strategic interpretation based on the updated Jazekker package; it should be validated through MVP use.",
+    "last_checked": "2026-05-11"
+  },
+  "governance": {
+    "risk_level": "medium",
+    "sensitive_domains": ["reputational"],
+    "approval_required": true,
+    "approval_status": "not_requested",
+    "ai_assisted": true,
+    "human_reviewer": null,
+    "audit_ids": []
+  },
+  "distribution": {
+    "website": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "newsletter": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "linkedin": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "telegram": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "rss": {
+      "status": "not_started",
+      "draft_path": null
+    }
+  },
+  "strategic_memory_note": "Jazekker should explain agentic media as governed interpretation rather than automated publishing."
+}

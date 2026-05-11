@@ -39,3 +39,25 @@ profiles:
       - do not invent sources
       - do not blur fact and interpretation
       - do not publish directly
+
+  jazekker_orientation:
+    user_id: owner
+    display_name: Jazekker Orientation Runtime
+    language: en
+    timezone: Europe/Amsterdam
+    preferred_style: calm, strategic, source-aware
+    default_provider: ollama
+    default_dialog_mode: orientation
+    default_access_level: 2
+    local_first: true
+    priorities:
+      - signal over noise
+      - source confidence
+      - orientation before publication
+      - human approval before distribution
+      - strategic memory only after approval
+    forbidden_preferences:
+      - do not invent sources
+      - do not publish or schedule directly
+      - do not hide uncertainty
+      - do not update durable strategy without approval

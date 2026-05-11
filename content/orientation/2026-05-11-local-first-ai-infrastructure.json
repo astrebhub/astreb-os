@@ -1,0 +1,78 @@
+{
+  "id": "oo-2026-05-11-local-first-ai-infrastructure",
+  "title": "Local-first AI infrastructure is becoming a trust and resilience pattern",
+  "slug": "local-first-ai-trust-resilience",
+  "status": "draft",
+  "language": "en",
+  "created_at": "2026-05-11T12:00:00+02:00",
+  "updated_at": "2026-05-11T12:00:00+02:00",
+  "signal": {
+    "summary": "Local-first AI execution is increasingly relevant for sensitive workflows that need privacy, cost control, and operational continuity.",
+    "signal_type": "infrastructure",
+    "why_now": "Agentic workflows create more opportunities for sensitive data exposure, making local routing and cloud restrictions more important."
+  },
+  "context": "For public intelligence work, local-first does not mean refusing cloud models. It means routing by data class, risk level, policy, and approval status.",
+  "noise_level": "low",
+  "impact_horizon": "months",
+  "who_should_care": [
+    "privacy-conscious organizations",
+    "editorial teams",
+    "AI governance teams",
+    "developers building controlled AI tools"
+  ],
+  "systemic_effects": [
+    "Sensitive workflows can be routed away from cloud providers.",
+    "Cost and token budgets become part of governance.",
+    "Public trust improves when AI processing boundaries are explicit."
+  ],
+  "next_orientation_step": "Define which Jazekker workflows must stay local-only and which public, low-risk workflows can use cloud models.",
+  "sources": [
+    {
+      "title": "AI Cabinet policy configuration",
+      "url": "https://example.invalid/local-ai-cabinet-policy",
+      "source_type": "internal",
+      "publisher": "AI Cabinet",
+      "published_at": null,
+      "last_checked": "2026-05-11",
+      "confidence": "medium",
+      "notes": "Internal repository source. Replace placeholder URL with repository path or public documentation before publication."
+    }
+  ],
+  "confidence": {
+    "level": "medium",
+    "rationale": "The local-first pattern is implemented in the project policy model, but broader market framing needs external source support.",
+    "last_checked": "2026-05-11"
+  },
+  "governance": {
+    "risk_level": "medium",
+    "sensitive_domains": ["privacy", "security"],
+    "approval_required": true,
+    "approval_status": "not_requested",
+    "ai_assisted": true,
+    "human_reviewer": null,
+    "audit_ids": []
+  },
+  "distribution": {
+    "website": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "newsletter": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "linkedin": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "telegram": {
+      "status": "not_started",
+      "draft_path": null
+    },
+    "rss": {
+      "status": "not_started",
+      "draft_path": null
+    }
+  },
+  "strategic_memory_note": "Local-first should be presented as a governance and resilience feature, not as an anti-cloud slogan."
+}

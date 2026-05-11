@@ -18,6 +18,8 @@ class AgentRegistry:
             self.ensure_microsoft_365_agent(),
             self.ensure_editorial_agent(),
             self.ensure_research_agent(),
+            self.ensure_trend_analyst_agent(),
+            self.ensure_distribution_orchestrator_agent(),
             self.ensure_risk_sentinel(),
         ]
 
@@ -224,6 +226,57 @@ class AgentRegistry:
                 "budget": {"daily_cost": 1.0, "max_cost_per_request": 0.1},
                 "tools": ["evidence_layer", "audit_log"],
                 "memory_scope": "project",
+                "risk_level": "medium",
+                "status": "active",
+            }
+        )
+
+    def ensure_trend_analyst_agent(self) -> str:
+        return self.register(
+            {
+                "id": "trend_analyst_agent",
+                "role": "jazekker_signal_and_trend_analyst",
+                "instructions": (
+                    "Identify meaningful signals for Jazekker, separate signal from noise, "
+                    "estimate impact horizon, and draft Orientation Object candidates. "
+                    "Never present emerging events as verified without sources and confidence notes."
+                ),
+                "permissions": [
+                    "analyze_signals",
+                    "draft_orientation_object",
+                    "estimate_noise_level",
+                    "estimate_impact_horizon",
+                    "recommend_editorial_opportunity",
+                ],
+                "budget": {"daily_cost": 1.0, "max_cost_per_request": 0.1},
+                "tools": ["evidence_layer", "policy_engine", "audit_log"],
+                "memory_scope": "project",
+                "risk_level": "medium",
+                "status": "active",
+            }
+        )
+
+    def ensure_distribution_orchestrator_agent(self) -> str:
+        return self.register(
+            {
+                "id": "distribution_orchestrator_agent",
+                "role": "jazekker_distribution_orchestrator",
+                "instructions": (
+                    "Transform approved Jazekker Orientation Objects into channel-specific drafts "
+                    "for website, RSS, newsletter, LinkedIn, and Telegram. Never publish, send, post, "
+                    "schedule, or claim external distribution without an approved action record."
+                ),
+                "permissions": [
+                    "draft_website_version",
+                    "draft_newsletter_item",
+                    "draft_linkedin_post",
+                    "draft_telegram_post",
+                    "draft_rss_metadata",
+                    "prepare_publish_queue_proposal",
+                ],
+                "budget": {"daily_cost": 1.0, "max_cost_per_request": 0.1},
+                "tools": ["policy_engine", "approval_center", "action_queue", "audit_log"],
+                "memory_scope": "operational",
                 "risk_level": "medium",
                 "status": "active",
             }

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jazekker.nl/schemas/source.schema.json",
+  "title": "JAZEKKER Source Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "url",
+    "source_type",
+    "publisher",
+    "last_checked",
+    "confidence",
+    "verification_status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^src-[a-z0-9-]+$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["primary", "official", "expert", "media", "community", "internal", "unknown"]
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "published_at": {
+      "type": ["string", "null"],
+      "format": "date"
+    },
+    "last_checked": {
+      "type": "string",
+      "format": "date"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": ["unverified", "partially_verified", "verified", "disputed"]
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

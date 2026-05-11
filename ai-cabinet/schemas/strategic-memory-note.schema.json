@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jazekker.nl/schemas/strategic-memory-note.schema.json",
+  "title": "JAZEKKER Strategic Memory Note",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "object_id", "status", "summary", "memory_layer", "approval_required"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^memory-[a-z0-9-]+$"
+    },
+    "object_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proposal", "approved", "rejected", "archived"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 20
+    },
+    "memory_layer": {
+      "type": "string",
+      "enum": ["theme", "narrative", "source_reliability", "audience_reaction", "editorial_decision", "ecosystem_pattern"]
+    },
+    "approval_required": {
+      "type": "boolean",
+      "const": true
+    },
+    "approval_id": {
+      "type": ["string", "null"]
+    }
+  }
+}

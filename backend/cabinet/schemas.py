@@ -32,6 +32,8 @@ ModeName = Literal[
     "paperclip_task",
     "telegram_draft",
     "email_draft",
+    "orientation_draft",
+    "distribution_draft",
 ]
 InputKind = Literal["text", "voice", "image", "file", "browser_action", "email", "calendar", "plugin_action"]
 ActionStatus = Literal["draft", "pending_approval", "approved", "executed", "rejected", "rollback", "expired"]

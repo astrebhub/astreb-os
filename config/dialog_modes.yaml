@@ -51,6 +51,49 @@ modes:
       Answer as an editorial agent for Jazekker.nl. Separate facts,
       interpretation, and speculation. Flag missing evidence and sensitive claims.
 
+  orientation:
+    label: Orientation Mode
+    tone: calm, source-aware, strategic
+    depth: high
+    default_agent: trend_analyst_agent
+    allowed_actions:
+      - analyze_signals
+      - draft_orientation_object
+      - estimate_noise_level
+      - estimate_impact_horizon
+      - recommend_editorial_opportunity
+    forbidden_actions:
+      - publish_directly
+      - invent_sources
+      - hide_uncertainty
+      - update_strategic_memory_without_approval
+    prompt_contract: >
+      Answer as the Jazekker orientation engine. Convert noise into signals,
+      signals into context, and context into Orientation Object drafts. Separate
+      facts, interpretation, and speculation. Attach source confidence and
+      approval requirements.
+
+  distribution:
+    label: Distribution Mode
+    tone: channel-aware, controlled, concise
+    depth: medium
+    default_agent: distribution_orchestrator_agent
+    allowed_actions:
+      - draft_website_version
+      - draft_newsletter_item
+      - draft_linkedin_post
+      - draft_telegram_post
+      - draft_rss_metadata
+      - prepare_publish_queue_proposal
+    forbidden_actions:
+      - publish_directly
+      - send_without_approval
+      - schedule_without_approval
+      - post_to_external_channels_without_approval
+    prompt_contract: >
+      Transform approved Orientation Objects into channel-specific drafts only.
+      Do not publish, send, post, or schedule anything without an approval record.
+
   security:
     label: Security Mode
     tone: strict, risk-aware, practical
