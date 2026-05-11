@@ -282,6 +282,24 @@
     </form>
   </section>
 
-  <script src="app.js?v=process-map-v1"></script>
+  <section id="agentCenterModal" class="agent-center-modal" aria-label="Agent Center" hidden>
+    <div class="agent-center-backdrop" id="agentCenterBackdrop"></div>
+    <div class="agent-center-window" role="dialog" aria-modal="true" aria-labelledby="agentCenterTitle">
+      <header class="agent-center-header">
+        <div>
+          <h2 id="agentCenterTitle">Agent Center</h2>
+          <p>Governed agents. Draft, analyze, propose, queue. No direct execution without approval.</p>
+        </div>
+        <button id="agentCenterClose" type="button" aria-label="Close Agent Center">Close</button>
+      </header>
+      <div class="agent-center-toolbar">
+        <span id="agentCenterStatus">Loading agents...</span>
+        <button id="agentCenterRefresh" type="button">Refresh</button>
+      </div>
+      <div id="agentCloudGrid" class="agent-cloud-grid"></div>
+    </div>
+  </section>
+
+  <script src="app.js?v=agent-center-v1"></script>
 </body>
 </html>

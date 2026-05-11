@@ -752,6 +752,157 @@ function renderPanelAudit(data) {
   $("status").textContent = "Panel audit loaded";
 }
 
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function parseMaybeJSON(value, fallback) {
+  if (Array.isArray(value) || (value && typeof value === "object")) return value;
+  if (typeof value !== "string" || !value.trim()) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function compactAgentName(agentId) {
+  return String(agentId || "agent")
+    .replace(/_agent$/u, "")
+    .replaceAll("_", " ")
+    .replace(/\b\w/gu, (letter) => letter.toUpperCase());
+}
+
+function inferAgentTriggers(agent) {
+  const role = String(agent.role || "");
+  const risk = String(agent.risk_level || "medium");
+  const base = [
+    "policy conflict",
+    "PII or sensitive data",
+    "external side effect",
+    "durable memory update"
+  ];
+  if (risk === "high") base.unshift("owner approval required before execution");
+  if (role.includes("github")) base.push("push, merge, release, issue, PR, repo setting change");
+  if (role.includes("microsoft")) base.push("send email, post Teams message, create meeting, share file");
+  if (role.includes("computer")) base.push("shell command, file deletion, install, registry/startup change");
+  if (role.includes("editorial")) base.push("publication, sensitive framing, unsupported claim");
+  if (role.includes("research")) base.push("uncertain source used as fact");
+  if (role.includes("risk")) base.push("risk override or blocked output");
+  if (role.includes("navigation")) base.push("configuration change requested by owner");
+  return [...new Set(base)].slice(0, 7);
+}
+
+function renderAgentCloud(agent) {
+  const permissions = parseMaybeJSON(agent.permissions, []);
+  const tools = parseMaybeJSON(agent.tools, []);
+  const budget = parseMaybeJSON(agent.budget, {});
+  const triggers = inferAgentTriggers(agent);
+  const risk = String(agent.risk_level || "medium").toLowerCase();
+  const agentId = agent.id || "agent";
+  return `
+    <article class="agent-cloud">
+      <div class="agent-cloud-header">
+        <div class="agent-cloud-title">
+          <h3>${escapeHTML(compactAgentName(agentId))}</h3>
+          <span>${escapeHTML(agentId)} · ${escapeHTML(agent.role || "controlled agent")}</span>
+        </div>
+        <span class="agent-risk ${escapeHTML(risk)}">${escapeHTML(risk)}</span>
+      </div>
+      <div class="agent-cloud-section">
+        <strong>Who he is</strong>
+        <p>${escapeHTML(agent.instructions || "Governed AI Cabinet agent operating behind the microkernel.")}</p>
+      </div>
+      <div class="agent-cloud-section">
+        <strong>Operations</strong>
+        <div class="agent-chip-row">
+          ${permissions.slice(0, 10).map((item) => `<span class="agent-chip">${escapeHTML(item)}</span>`).join("") || "<span class=\"agent-chip\">draft</span>"}
+        </div>
+      </div>
+      <div class="agent-cloud-section">
+        <strong>Tools under control</strong>
+        <div class="agent-chip-row">
+          ${tools.slice(0, 8).map((item) => `<span class="agent-chip">${escapeHTML(item)}</span>`).join("") || "<span class=\"agent-chip\">model_router</span>"}
+        </div>
+      </div>
+      <div class="agent-cloud-section">
+        <strong>What it waits for</strong>
+        <div class="agent-chip-row">
+          ${triggers.map((item) => `<span class="agent-chip">${escapeHTML(item)}</span>`).join("")}
+        </div>
+      </div>
+      <div class="agent-cloud-section">
+        <strong>Limits</strong>
+        <p>Memory: ${escapeHTML(agent.memory_scope || "operational")} · Daily budget: ${escapeHTML(budget.daily_cost ?? "-")} · Max/request: ${escapeHTML(budget.max_cost_per_request ?? "-")} · Status: ${escapeHTML(agent.status || "active")}</p>
+      </div>
+      <div class="agent-cloud-actions">
+        <button class="primary-action" type="button" data-select-agent="${escapeHTML(agentId)}">Use agent</button>
+        <button type="button" data-draft-agent-test="${escapeHTML(agentId)}">Draft test</button>
+      </div>
+    </article>
+  `;
+}
+
+async function loadAgentsForCenter() {
+  try {
+    return await getJSON("/agents");
+  } catch {
+    const personalization = await getJSON("/runtime/personalization");
+    return personalization.agents || [];
+  }
+}
+
+async function openAgentCenter() {
+  const modal = $("agentCenterModal");
+  const grid = $("agentCloudGrid");
+  const status = $("agentCenterStatus");
+  if (!modal || !grid || !status) return;
+  modal.hidden = false;
+  grid.innerHTML = "";
+  status.textContent = "Loading governed agents...";
+  try {
+    const agents = await loadAgentsForCenter();
+    grid.innerHTML = agents.map(renderAgentCloud).join("");
+    status.textContent = `${agents.length} governed agents loaded. Direct execution remains approval-gated.`;
+    renderSidePanel("Agent Center", {
+      agents_loaded: agents.length,
+      execution_model: "draft, analyze, propose, queue; execute only after approval",
+      agents
+    });
+  } catch (e) {
+    status.textContent = `Agent Center error: ${e.message}`;
+    grid.innerHTML = `<div class="agent-cloud"><strong>Could not load agents</strong><p>${escapeHTML(e.message)}</p></div>`;
+  }
+}
+
+function closeAgentCenter() {
+  const modal = $("agentCenterModal");
+  if (modal) modal.hidden = true;
+}
+
+function selectAgentFromCenter(agentId) {
+  const select = $("agent");
+  if (select) {
+    select.value = agentId;
+    localStorage.setItem(AGENT_KEY, agentId);
+  }
+  $("status").textContent = `Selected agent: ${agentId}`;
+  closeAgentCenter();
+}
+
+function draftAgentTest(agentId) {
+  const task = $("task");
+  if (task) {
+    task.value = `Run a safe governed test for ${agentId}. Explain what you can do, what you cannot do, which approval triggers apply, and prepare a draft action report without executing external actions.`;
+  }
+  selectAgentFromCenter(agentId);
+}
+
 function renderSideMessage(title, message, extra = {}) {
   renderSidePanel(title, {message, ...extra});
 }
@@ -869,15 +1020,19 @@ $("vectorBtn").onclick = async () => {
 $("voiceBtn").onclick = () => runPanel("voiceBtn", "Voice Runtime", () => getJSON("/voice/status"));
 $("multimodalBtn").onclick = () => runPanel("multimodalBtn", "Multimodal Runtime", () => getJSON("/multimodal/status"));
 $("accessBtn").onclick = () => runPanel("accessBtn", "Access Control", () => getJSON("/access/users"));
-$("agentsBtn").onclick = () => runPanel("agentsBtn", "Agent Registry", async () => {
-  try {
-    return await getJSON("/agents");
-  } catch (e) {
-    const personalization = await getJSON("/runtime/personalization");
-    return {
-      note: "Showing public personalization fallback because /agents requires admin token.",
-      agents: personalization.agents || []
-    };
+$("agentsBtn").onclick = () => openAgentCenter();
+$("agentCenterClose").onclick = () => closeAgentCenter();
+$("agentCenterBackdrop").onclick = () => closeAgentCenter();
+$("agentCenterRefresh").onclick = () => openAgentCenter();
+$("agentCloudGrid").addEventListener("click", (event) => {
+  const selectButton = event.target.closest("[data-select-agent]");
+  if (selectButton) {
+    selectAgentFromCenter(selectButton.dataset.selectAgent);
+    return;
+  }
+  const testButton = event.target.closest("[data-draft-agent-test]");
+  if (testButton) {
+    draftAgentTest(testButton.dataset.draftAgentTest);
   }
 });
 $("personalizationBtn").onclick = () => runPanel("personalizationBtn", "Personalization", () => getJSON("/runtime/personalization"));

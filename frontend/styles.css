@@ -328,6 +328,174 @@ pre {
   background: #174ea6;
   color: white;
 }
+.agent-center-modal[hidden] {
+  display: none;
+}
+.agent-center-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.agent-center-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 18, 24, 0.62);
+}
+.agent-center-window {
+  position: relative;
+  width: min(1180px, 100%);
+  max-height: min(840px, calc(100vh - 48px));
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  overflow: hidden;
+  border: 1px solid #cfd6dd;
+  border-radius: 8px;
+  background: #f6f8fa;
+  box-shadow: 0 28px 80px rgba(10, 15, 20, 0.36);
+}
+.agent-center-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+  padding: 18px;
+  background: #101418;
+  color: white;
+}
+.agent-center-header h2 {
+  margin: 0 0 6px;
+}
+.agent-center-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.45;
+}
+.agent-center-header button,
+.agent-center-toolbar button,
+.agent-cloud-actions button {
+  width: auto;
+}
+.agent-center-header button {
+  background: #2a333d;
+  color: white;
+}
+.agent-center-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid #dce2e8;
+  background: white;
+}
+.agent-center-toolbar span {
+  color: #4f5b67;
+  font-size: 13px;
+}
+.agent-cloud-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap: 14px;
+  overflow: auto;
+  padding: 18px;
+}
+.agent-cloud {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-height: 320px;
+  padding: 16px;
+  border: 1px solid #d8e0e7;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(23, 78, 166, 0.10), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+.agent-cloud-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: start;
+}
+.agent-cloud-title {
+  min-width: 0;
+}
+.agent-cloud-title h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+.agent-cloud-title span {
+  display: block;
+  color: #64707c;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.agent-risk {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #e8eef4;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.agent-risk.high {
+  background: #fde8e8;
+  color: #9b1c1c;
+}
+.agent-risk.medium {
+  background: #fff4d6;
+  color: #735c0f;
+}
+.agent-risk.low {
+  background: #e1f5ec;
+  color: #17633a;
+}
+.agent-cloud-section {
+  display: grid;
+  gap: 7px;
+}
+.agent-cloud-section strong {
+  font-size: 12px;
+  color: #4f5b67;
+  text-transform: uppercase;
+}
+.agent-cloud-section p {
+  margin: 0;
+  color: #26313a;
+  line-height: 1.45;
+}
+.agent-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.agent-chip {
+  padding: 5px 7px;
+  border-radius: 8px;
+  background: #e8eef4;
+  color: #26313a;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.agent-cloud-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+.agent-cloud-actions button {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+.agent-cloud-actions .primary-action {
+  background: #174ea6;
+  color: white;
+}
 @media (max-width: 900px) {
   .app { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: 1fr 1fr; }
@@ -338,5 +506,14 @@ pre {
   .guide-panel {
     right: 12px;
     bottom: 70px;
+  }
+  .agent-center-modal {
+    padding: 12px;
+  }
+  .agent-center-header {
+    flex-direction: column;
+  }
+  .agent-cloud-grid {
+    grid-template-columns: 1fr;
   }
 }
