@@ -359,7 +359,11 @@ const I18N = {
 };
 
 function currentLanguage() {
-  return localStorage.getItem(LANGUAGE_KEY) || "en";
+  const saved = localStorage.getItem(LANGUAGE_KEY);
+  if (saved && I18N[saved]) return saved;
+  const selected = $("language")?.value;
+  if (selected && I18N[selected]) return selected;
+  return "ru";
 }
 
 function t(key) {
@@ -368,7 +372,7 @@ function t(key) {
 }
 
 function applyLanguage(language) {
-  const selectedLanguage = I18N[language] ? language : "en";
+  const selectedLanguage = I18N[language] ? language : "ru";
   localStorage.setItem(LANGUAGE_KEY, selectedLanguage);
   document.documentElement.lang = selectedLanguage;
   if ($("language")) $("language").value = selectedLanguage;
@@ -504,14 +508,18 @@ function speakText(text) {
 
 function guideHistory() {
   try {
-    return JSON.parse(localStorage.getItem(GUIDE_HISTORY_KEY) || "[]");
+    return JSON.parse(localStorage.getItem(guideHistoryKey()) || "[]");
   } catch (_) {
     return [];
   }
 }
 
 function saveGuideHistory(history) {
-  localStorage.setItem(GUIDE_HISTORY_KEY, JSON.stringify(history.slice(-30)));
+  localStorage.setItem(guideHistoryKey(), JSON.stringify(history.slice(-30)));
+}
+
+function guideHistoryKey() {
+  return `${GUIDE_HISTORY_KEY}_${currentLanguage()}`;
 }
 
 function appendGuideMessage(role, text) {

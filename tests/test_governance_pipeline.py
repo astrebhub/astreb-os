@@ -156,3 +156,14 @@ def test_guide_agent_uses_selected_interface_language():
     assert "microkernel" in en.answer or "Cabinet controls" in en.answer
     assert "governed runtime" in nl.answer
     assert ru.suggestions[0].startswith("Объясни")
+
+
+def test_guide_agent_defaults_to_russian_for_owner_and_cyrillic():
+    agent = CabinetGuideAgent()
+    runtime = {"connectors_total": 11}
+
+    owner_reply = agent.reply("pipeline", {"profile": "owner_default"}, runtime)
+    cyrillic_reply = agent.reply("как работает кабинет", {}, runtime)
+
+    assert "Микрокернель" in owner_reply.answer
+    assert "AI Cabinet работает" in cyrillic_reply.answer

@@ -191,7 +191,7 @@ class CabinetGuideAgent:
     """Built-in navigation agent for explaining and operating AI Cabinet safely."""
 
     def reply(self, message: str, ui_state: Dict[str, Any], runtime: Dict[str, Any]) -> GuideReply:
-        language = self._language(ui_state)
+        language = self._language(ui_state, message)
         text = message.lower().strip()
         if not text:
             return self._reply(language, "welcome", runtime, "default", "health")
@@ -238,11 +238,18 @@ class CabinetGuideAgent:
         suggestions = texts["suggestions"].get(suggestion_key, texts["suggestions"]["default"])
         return GuideReply(answer=answer, suggestions=suggestions, recommended_panel=panel)
 
-    def _language(self, ui_state: Dict[str, Any]) -> str:
+    def _language(self, ui_state: Dict[str, Any], message: str = "") -> str:
         language = str(ui_state.get("language") or "").lower()
         if language in GUIDE_TEXT:
             return language
-        return "en"
+        profile = str(ui_state.get("profile") or "").lower()
+        if profile == "owner_default":
+            return "ru"
+        if profile == "jazekker_editorial":
+            return "nl"
+        if any("а" <= char <= "я" or "ё" == char for char in message.lower()):
+            return "ru"
+        return "ru"
 
     def _matches(self, text: str, patterns: List[str]) -> bool:
         return any(pattern in text for pattern in patterns)
