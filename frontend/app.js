@@ -535,9 +535,9 @@ function restoreGuideMessages() {
   if (!history.length) {
     appendGuideMessage(
       "agent",
-      "I am the Cabinet Guide Agent. Ask me how the pipeline works, which button to press, how to configure models, or how to run a safe agent test."
+      guideWelcomeText(currentLanguage())
     );
-    renderGuideSuggestions(["Explain pipeline", "Show runtime", "Show ASTI connectors"]);
+    renderGuideSuggestions(guideDefaultSuggestions(currentLanguage()));
     return;
   }
   history.forEach((item) => {
@@ -551,6 +551,7 @@ function restoreGuideMessages() {
 
 function currentUiState() {
   return {
+    language: currentLanguage(),
     profile: $("profile")?.value,
     dialog_mode: $("dialogMode")?.value,
     agent: $("agent")?.value,
@@ -570,11 +571,27 @@ function currentUiState() {
   };
 }
 
+function guideWelcomeText(language) {
+  if (language === "ru") {
+    return "Я Cabinet Guide Agent. Спроси меня, как работает pipeline, какую кнопку нажать, как настроить модели или как запустить безопасный тест агента.";
+  }
+  if (language === "nl") {
+    return "Ik ben de Cabinet Guide Agent. Vraag mij hoe de pipeline werkt, welke knop je nodig hebt, hoe je modellen instelt of hoe je een veilige agenttest start.";
+  }
+  return "I am the Cabinet Guide Agent. Ask me how the pipeline works, which button to press, how to configure models, or how to run a safe agent test.";
+}
+
+function guideDefaultSuggestions(language) {
+  if (language === "ru") return ["Объясни pipeline", "Покажи runtime", "Покажи ASTI-коннекторы"];
+  if (language === "nl") return ["Leg pipeline uit", "Toon runtime", "Toon ASTI-connectors"];
+  return ["Explain pipeline", "Show runtime", "Show ASTI connectors"];
+}
+
 function panelButtonForSuggestion(suggestion) {
   const key = suggestion.toLowerCase();
   if (key.includes("runtime")) return "healthBtn";
-  if (key.includes("asti") || key.includes("connector")) return "pluginsBtn";
-  if (key.includes("local model")) return "localRuntimeBtn";
+  if (key.includes("asti") || key.includes("connector") || key.includes("коннектор")) return "pluginsBtn";
+  if (key.includes("local model") || key.includes("локальные модели") || key.includes("lokale modellen")) return "localRuntimeBtn";
   if (key.includes("routing")) return "routingBtn";
   if (key.includes("policy")) return "policyBtn";
   if (key.includes("audit")) return "auditBtn";
@@ -608,18 +625,19 @@ function renderGuideSuggestions(suggestions = []) {
 
 async function sendGuideMessage(message) {
   appendGuideMessage("user", message);
-  appendGuideMessage("agent", "Thinking inside AI Cabinet...");
+  const thinkingText = currentLanguage() === "ru" ? "Думаю внутри AI Cabinet..." : currentLanguage() === "nl" ? "Ik denk binnen AI Cabinet..." : "Thinking inside AI Cabinet...";
+  appendGuideMessage("agent", thinkingText);
   const data = await postJSON("/guide/chat", {
     message,
     ui_state: currentUiState()
   });
   const messages = $("guideMessages")?.querySelectorAll(".guide-message.agent");
   const last = messages?.[messages.length - 1];
-  if (last && last.textContent === "Thinking inside AI Cabinet...") {
+  if (last && last.textContent === thinkingText) {
     last.textContent = data.answer;
     const history = guideHistory();
     const lastHistory = history[history.length - 1];
-    if (lastHistory?.text === "Thinking inside AI Cabinet...") {
+    if (lastHistory?.text === thinkingText) {
       lastHistory.text = data.answer;
       saveGuideHistory(history);
     }

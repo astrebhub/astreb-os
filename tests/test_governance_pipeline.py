@@ -1,5 +1,6 @@
 from cabinet.classifier import DataClassifier
 from cabinet.connector_registry import ConnectorRegistry
+from cabinet.guide_agent import CabinetGuideAgent
 from cabinet.output_guard import OutputGuard
 from cabinet.pii import PiiDetector
 from cabinet.plugin_sandbox import PluginSandbox
@@ -141,3 +142,17 @@ def test_connector_registry_blocks_unsigned_external_actions(repo_root):
         "action_requires_approval",
         "connector_not_signed",
     }
+
+
+def test_guide_agent_uses_selected_interface_language():
+    agent = CabinetGuideAgent()
+    runtime = {"connectors_total": 11}
+
+    ru = agent.reply("pipeline", {"language": "ru"}, runtime)
+    en = agent.reply("pipeline", {"language": "en"}, runtime)
+    nl = agent.reply("pipeline", {"language": "nl"}, runtime)
+
+    assert "Микрокернель" in ru.answer
+    assert "microkernel" in en.answer or "Cabinet controls" in en.answer
+    assert "governed runtime" in nl.answer
+    assert ru.suggestions[0].startswith("Объясни")
