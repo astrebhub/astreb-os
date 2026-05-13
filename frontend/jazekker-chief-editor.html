@@ -91,9 +91,10 @@
         <h1>Пульт главного редактора</h1>
         <p>Управление лентой, проверкой и локальной публикацией. Голос превращается только в текстовую команду; аудио не сохраняется.</p>
       </div>
-      <div class="toolbar">
-        <input id="token" placeholder="Admin token" />
-        <select id="uiLang">
+        <div class="toolbar">
+          <input id="token" placeholder="Admin token" />
+          <button id="localToken" type="button">Локальный token</button>
+          <select id="uiLang">
           <option value="ru">RU</option>
           <option value="en">EN</option>
         </select>
@@ -189,18 +190,26 @@
     const navigatorBody = document.getElementById("navigatorBody");
     const navigatorText = document.getElementById("navigatorText");
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const LOCAL_DEV_TOKEN = "change-me-before-public-demo";
     let recognition = null;
     let objects = [];
     let selected = null;
-    token.value = localStorage.getItem("AI_CABINET_ADMIN_TOKEN") || "";
+    token.value = localStorage.getItem("AI_CABINET_ADMIN_TOKEN") || (location.hostname === "127.0.0.1" || location.hostname === "localhost" ? LOCAL_DEV_TOKEN : "");
     uiLang.value = localStorage.getItem("JAZEKKER_EDITOR_LANG") || "ru";
+    if (token.value) localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token.value);
     token.addEventListener("input", () => localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token.value));
     uiLang.addEventListener("change", () => {
       localStorage.setItem("JAZEKKER_EDITOR_LANG", uiLang.value);
       document.getElementById("lang").value = uiLang.value === "ru" ? "ru-RU" : "en-US";
       statusEl.textContent = uiLang.value === "ru" ? "Язык пульта: русский." : "Interface language: English.";
     });
-    function headers() { return {"Content-Type": "application/json", "X-AI-Cabinet-Admin-Token": token.value}; }
+    function requireToken() {
+      if (!token.value.trim()) throw new Error("Вставь admin token или нажми `Локальный token`.");
+    }
+    function headers() {
+      requireToken();
+      return {"Content-Type": "application/json", "X-AI-Cabinet-Admin-Token": token.value.trim()};
+    }
     function esc(value) { return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;"); }
     function chipClass(value) {
       if (["approved", "published_local", "published_external"].includes(value)) return "green";
@@ -410,6 +419,11 @@
     voiceBtn.onclick = () => { if (!recognition) setupVoice(); recognition.lang = document.getElementById("lang").value; recognition.start(); };
     document.getElementById("stopVoice").onclick = () => recognition?.stop();
     document.getElementById("runCommand").onclick = runCommand;
+    document.getElementById("localToken").onclick = () => {
+      token.value = LOCAL_DEV_TOKEN;
+      localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token.value);
+      statusEl.textContent = "Локальный token установлен. Кнопки пульта готовы к работе.";
+    };
     document.getElementById("refresh").onclick = () => loadObjects().catch(err => statusEl.textContent = `Error: ${err.message}`);
     document.getElementById("collectNews").onclick = () => collectNews().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
     document.getElementById("seedLocal").onclick = () => seedLocalArticles().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
