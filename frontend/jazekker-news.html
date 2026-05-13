@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JAZEKKER - Auto Signal Feed</title>
+  <title>JAZEKKER - Лента ориентации</title>
   <style>
     :root {
       color-scheme: dark;
@@ -48,7 +48,7 @@
       min-height: 40px; border: 1px solid var(--line); border-radius: 6px; background: #12283a; color: var(--text);
       padding: 0 13px; font: inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
     }
-    button.primary { background: #d8aa4b; border-color: #d8aa4b; color: #081019; }
+    button.primary, .button.primary { background: #d8aa4b; border-color: #d8aa4b; color: #081019; }
     .hero { display: flex; align-items: end; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
     h2 { margin: 0; font-size: 32px; letter-spacing: 0; }
     h3 { margin: 0; font-size: 17px; letter-spacing: 0; line-height: 1.3; }
@@ -76,6 +76,7 @@
     .brief-list, .signal-list, .topic-list { display: grid; gap: 10px; }
     .brief-item, .signal-item, .topic-item { border-top: 1px solid var(--line); padding-top: 10px; color: #d7e1e8; font-size: 14px; }
     .status { color: var(--muted); font-size: 13px; margin-top: 8px; min-height: 20px; }
+    .empty { border: 1px solid var(--line); border-radius: 8px; background: rgba(13, 27, 40, .88); padding: 22px; color: var(--muted); }
     .quote { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); color: #dfc98c; font-family: Georgia, serif; font-size: 20px; line-height: 1.45; }
     @media (max-width: 1120px) {
       .layout { grid-template-columns: 1fr; }
@@ -104,20 +105,18 @@
     <main>
       <div class="topbar">
         <input id="search" placeholder="Поиск по сигналам, темам, источникам..." />
-        <input id="token" placeholder="Admin token" />
-        <a class="button" href="/jazekker">JAZEKKER</a>
+        <a class="button" href="/jazekker">Главная</a>
+        <a class="button" href="/jazekker/chief-editor">Редактор</a>
       </div>
       <section class="hero">
         <div>
-          <h2>Автоматическая лента сигналов</h2>
-          <p>AI, Европа, геополитика, блокчейн, духовность, человеческая устойчивость и будущие траектории в одном управляемом потоке.</p>
+          <h2>Лента ориентации</h2>
+          <p>Опубликованные локальные материалы JAZEKKER: AI, Европа, геополитика, блокчейн, духовность, человеческая устойчивость и будущие траектории без лишнего шума.</p>
           <div class="toolbar">
-            <button id="autoCollect" class="primary">Собрать авто-ленту</button>
-            <button id="refresh">Обновить ленту</button>
-            <select id="channelSelect"></select>
-            <button id="collectChannel">Собрать канал</button>
+            <button id="refresh" class="primary">Обновить ленту</button>
+            <a class="button" href="/jazekker/chief-editor">Пульт главного редактора</a>
           </div>
-          <div id="status" class="status">Готово. Вставь admin token и нажми “Собрать авто-ленту”.</div>
+          <div id="status" class="status">Загружаю опубликованные материалы...</div>
         </div>
       </section>
       <div id="tabs" class="tabs"></div>
@@ -134,22 +133,19 @@
   <script>
     const fallbackTopics = [
       {id: "auto", label: "Все"},
-      {id: "ai_coordination", label: "AI & Coordination"},
-      {id: "europe_governance", label: "Europe & Governance"},
-      {id: "blockchain_trust", label: "Blockchain & Trust"},
-      {id: "consciousness_meaning", label: "Consciousness & Meaning"},
-      {id: "geopolitics", label: "Geopolitics"},
-      {id: "climate_energy", label: "Climate & Energy"},
-      {id: "future_work", label: "Future of Work"}
+      {id: "ai_coordination", label: "AI и координация"},
+      {id: "europe_governance", label: "Европа и управление"},
+      {id: "blockchain_trust", label: "Блокчейн и доверие"},
+      {id: "consciousness_meaning", label: "Духовность и смысл"},
+      {id: "human_sustainability", label: "Человеческая устойчивость"},
+      {id: "geopolitics", label: "Геополитика"},
+      {id: "climate_energy", label: "Климат и энергия"},
+      {id: "future_work", label: "Будущее работы"}
     ];
     let topics = fallbackTopics;
     let active = "auto";
     let items = [];
-    const token = document.getElementById("token");
     const status = document.getElementById("status");
-    token.value = localStorage.getItem("AI_CABINET_ADMIN_TOKEN") || "";
-    token.addEventListener("input", () => localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token.value));
-    function headers() { return {"Content-Type": "application/json", "X-AI-Cabinet-Admin-Token": token.value}; }
     function escapeHtml(value) { return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;"); }
     function normalize(item) { return item.record?.record || item.record || item; }
     function sourceOf(record, item) { return record.sources?.[0] || {publisher: item.source, url: item.url, confidence: "medium"}; }
@@ -163,8 +159,7 @@
     function renderChrome() {
       const nav = document.getElementById("channelNav");
       const tabs = document.getElementById("tabs");
-      const select = document.getElementById("channelSelect");
-      [nav, tabs, select].forEach(el => el.innerHTML = "");
+      [nav, tabs].forEach(el => el.innerHTML = "");
       topics.forEach(topic => {
         const b1 = document.createElement("button");
         b1.textContent = topic.label;
@@ -174,12 +169,6 @@
         const b2 = b1.cloneNode(true);
         b2.onclick = b1.onclick;
         tabs.appendChild(b2);
-        if (topic.id !== "auto") {
-          const opt = document.createElement("option");
-          opt.value = topic.id;
-          opt.textContent = topic.label;
-          select.appendChild(opt);
-        }
       });
     }
     function filtered() {
@@ -196,11 +185,16 @@
     function renderFeed() {
       const feed = document.getElementById("feed");
       feed.innerHTML = "";
-      filtered().slice(0, 24).forEach(item => {
+      const visible = filtered().slice(0, 24);
+      if (!visible.length) {
+        feed.innerHTML = `<div class="empty">Материалы не найдены. Попробуй другую рубрику или очисти поиск.</div>`;
+        return;
+      }
+      visible.forEach(item => {
         const record = normalize(item);
         const source = sourceOf(record, item);
         const readUrl = record.url || source.url || item.url || "";
-        const readLabel = record.status === "published_local" ? "Открыть и читать" : "Открыть источник";
+        const readLabel = record.status === "published_local" ? "Читать материал" : "Открыть источник";
         const story = document.createElement("article");
         story.className = record.status === "published_local" ? "story published" : "story";
         story.innerHTML = `
@@ -211,9 +205,9 @@
             <p>${escapeHtml(record.dek || record.signal?.summary || "")}</p>
             <div class="signals">
               <span class="chip ${impactClass(record)}">${escapeHtml(record.noise_level || "medium")} noise</span>
-              <span class="chip">${escapeHtml(record.impact_horizon || (record.reading_minutes ? `${record.reading_minutes} min` : "weeks"))}</span>
+              <span class="chip">${escapeHtml(record.impact_horizon || (record.reading_minutes ? `${record.reading_minutes} мин` : "недели"))}</span>
               <span class="chip">${escapeHtml(source.confidence || "medium")} confidence</span>
-              <span class="chip">${escapeHtml(record.status || "draft")}</span>
+              <span class="chip">${escapeHtml(record.status || "published_local")}</span>
             </div>
             <div class="next"><strong>Следующий шаг:</strong> ${escapeHtml(record.next_orientation_step || "Проверить источник и контекст.")}</div>
             ${readUrl ? `<a class="read-link" href="${escapeHtml(readUrl)}" ${record.status === "published_local" ? "" : 'target="_blank" rel="noreferrer"'}>${escapeHtml(readLabel)}</a>` : ""}
@@ -237,59 +231,18 @@
       document.getElementById("topics").innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([name, count]) => `<div class="topic-item">${escapeHtml(name)} <span class="chip">${count}</span></div>`).join("");
     }
     function renderAll() { renderChrome(); renderFeed(); renderSide(); }
-    async function loadSources() {
-      const res = await fetch("/jazekker/news/sources", {headers: headers()});
-      const data = await res.json();
-      if (res.ok && data.topics?.length) topics = [{id: "auto", label: "Все"}, ...data.topics.filter(t => t.source_count > 0)];
-      renderAll();
-    }
     async function refreshSaved() {
-      status.textContent = "Загружаю локальные статьи и draft-сигналы...";
+      status.textContent = "Загружаю опубликованные материалы...";
       const articleRes = await fetch("/jazekker/articles");
       const articleData = await articleRes.json();
       if (!articleRes.ok) throw new Error(articleData.detail || JSON.stringify(articleData));
-      let saved = [];
-      if (token.value) {
-        const signalRes = await fetch("/jazekker/news/signals", {headers: headers()});
-        const signalData = await signalRes.json();
-        if (signalRes.ok) saved = signalData;
-      }
-      items = [...(articleData.articles || []), ...saved];
-      status.textContent = `Загружено ${articleData.count || 0} локальных статей и ${saved.length} draft-сигналов.`;
+      items = [...(articleData.articles || [])];
+      status.textContent = `Загружено ${articleData.count || 0} опубликованных локальных материалов. Редакторский сбор доступен в пульте главного редактора.`;
       renderAll();
     }
-    async function localArticles() {
-      const articleRes = await fetch("/jazekker/articles");
-      const articleData = await articleRes.json();
-      return articleRes.ok ? (articleData.articles || []) : [];
-    }
-    async function collectAll() {
-      status.textContent = "Собираю авто-ленту по всем каналам...";
-      const res = await fetch("/jazekker/news/collect-all?limit_per_channel=3", {method: "POST", headers: headers()});
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-      items = [...await localArticles(), ...(data.orientation_object_drafts || [])];
-      status.textContent = `Собрано ${items.length} сигналов. Публикация: none, только draft.`;
-      renderAll();
-    }
-    async function collectChannel() {
-      const channel = document.getElementById("channelSelect").value;
-      const label = topics.find(t => t.id === channel)?.label || channel;
-      status.textContent = "Собираю выбранный канал...";
-      const res = await fetch("/jazekker/news/collect", {method: "POST", headers: headers(), body: JSON.stringify({topic: label, channel, limit_per_source: 4, max_total: 12})});
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-      items = [...await localArticles(), ...(data.orientation_object_drafts || [])];
-      active = channel;
-      status.textContent = `Канал ${label}: ${items.length} draft-сигналов.`;
-      renderAll();
-    }
-    document.getElementById("autoCollect").onclick = () => collectAll().catch(err => status.textContent = `Ошибка: ${err.message}`);
     document.getElementById("refresh").onclick = () => refreshSaved().catch(err => status.textContent = `Ошибка: ${err.message}`);
-    document.getElementById("collectChannel").onclick = () => collectChannel().catch(err => status.textContent = `Ошибка: ${err.message}`);
     document.getElementById("search").addEventListener("input", renderAll);
     renderAll();
-    loadSources().catch(() => {});
     refreshSaved().catch(() => {});
   </script>
 </body>

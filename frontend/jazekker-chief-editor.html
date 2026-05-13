@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JAZEKKER - Chief Editor Cabinet</title>
+  <title>JAZEKKER - Пульт главного редактора</title>
   <style>
     :root {
       color-scheme: dark;
@@ -88,8 +88,8 @@
   <div class="shell">
     <header>
       <div>
-        <h1>Cabinet of the Chief Editor</h1>
-        <p>Voice-supported editorial control. Transcript only enters the governed workflow. Audio storage is disabled.</p>
+        <h1>Пульт главного редактора</h1>
+        <p>Управление лентой, проверкой и локальной публикацией. Голос превращается только в текстовую команду; аудио не сохраняется.</p>
       </div>
       <div class="toolbar">
         <input id="token" placeholder="Admin token" />
@@ -97,30 +97,32 @@
           <option value="ru">RU</option>
           <option value="en">EN</option>
         </select>
-        <a class="button" href="/jazekker/editorial">Editorial</a>
-        <a class="button" href="/jazekker/news">Feed</a>
+        <a class="button" href="/jazekker/editorial">Редакция</a>
+        <a class="button" href="/jazekker/news">Лента</a>
       </div>
     </header>
 
     <main class="grid">
       <section class="panel">
-        <h2>Objects</h2>
+        <h2>Материалы</h2>
         <div class="toolbar">
-          <button id="refresh" class="primary">Refresh</button>
+          <button id="refresh" class="primary">Обновить</button>
+          <button id="collectNews">Собрать новости</button>
+          <button id="seedLocal">Загрузить статьи</button>
           <select id="statusFilter">
-            <option value="">all</option>
-            <option value="review_required">review</option>
-            <option value="approved">approved</option>
-            <option value="published_local">local</option>
-            <option value="blocked">blocked</option>
+            <option value="">все</option>
+            <option value="review_required">на проверке</option>
+            <option value="approved">одобрено</option>
+            <option value="published_local">локально</option>
+            <option value="blocked">заблокировано</option>
           </select>
         </div>
         <div id="objects" class="list"></div>
       </section>
 
       <section class="panel">
-        <h2>Command Console</h2>
-        <p>Examples: "approve this", "publish local", "block this", "archive", "send to review", "refresh objects".</p>
+        <h2>Командная консоль</h2>
+        <p>Примеры: “одобри”, “опубликуй локально”, “заблокируй”, “в архив”, “на проверку”, “обнови”.</p>
         <div class="toolbar">
           <button id="voiceBtn" class="safe">Голос</button>
           <button id="stopVoice">Стоп</button>
@@ -253,6 +255,24 @@
       renderList();
       if (selected) renderDetail(selected);
       statusEl.textContent = `Loaded ${objects.length} objects.`;
+    }
+    async function collectNews() {
+      statusEl.textContent = "Собираю RSS-источники в черновики. Публикация не выполняется.";
+      const res = await fetch("/jazekker/news/collect-all?limit_per_channel=3", {method: "POST", headers: headers()});
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      statusEl.textContent = `Собрано ${data.returned || data.collected || 0} сигналов. Загружаю список объектов...`;
+      log(`news collect: ${data.returned || data.collected || 0} draft signals`);
+      await loadObjects();
+    }
+    async function seedLocalArticles() {
+      statusEl.textContent = "Загружаю локальные статьи в редакционный workflow.";
+      const res = await fetch("/jazekker/orientation-objects/ingest-local", {method: "POST", headers: headers()});
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      statusEl.textContent = `Локальные статьи загружены: ${data.count || 0}.`;
+      log(`local articles seeded: ${data.count || 0}`);
+      await loadObjects();
     }
     async function selectObject(id) {
       const res = await fetch(`/jazekker/orientation-objects/${encodeURIComponent(id)}`, {headers: headers()});
@@ -391,6 +411,8 @@
     document.getElementById("stopVoice").onclick = () => recognition?.stop();
     document.getElementById("runCommand").onclick = runCommand;
     document.getElementById("refresh").onclick = () => loadObjects().catch(err => statusEl.textContent = `Error: ${err.message}`);
+    document.getElementById("collectNews").onclick = () => collectNews().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
+    document.getElementById("seedLocal").onclick = () => seedLocalArticles().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
     document.getElementById("openNavigator").onclick = () => {
       navigatorEl.classList.add("open");
       if (!navigatorBody.childElementCount) addMessage("agent", "Я навигатор главного редактора. Если голос не работает, пиши текстом. Команды: что требует внимания, объясни выбранный объект, одобри выбранный, опубликуй локально, блок, архив.");
