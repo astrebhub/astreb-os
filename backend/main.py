@@ -231,7 +231,7 @@ def render_jazekker_article(article: Dict[str, Any]) -> str:
       </div>
       <h1>{escape(article.get("title", ""))}</h1>
       <div class="dek">{escape(article.get("dek", ""))}</div>
-      <div class="lens"><strong>Orientation lens:</strong> {escape(article.get("orientation_lens", ""))}</div>
+      <div class="lens"><strong>Фокус материала:</strong> {escape(article.get("orientation_lens", ""))}</div>
       <div class="body">{paragraphs}</div>
       <div class="next"><strong>Следующий шаг:</strong> {escape(article.get("next_orientation_step", ""))}</div>
     </article>
