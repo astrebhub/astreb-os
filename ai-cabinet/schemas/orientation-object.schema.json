@@ -1,272 +1,90 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://jazekker.nl/schemas/orientation-object.schema.json",
-  "title": "JAZEKKER Orientation Object",
+  "$id": "https://jazekker.local/schemas/orientation-object.schema.json",
+  "title": "JAZEKKER Canonical Orientation Object",
   "type": "object",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "required": [
     "id",
     "title",
-    "status",
-    "language",
-    "created_at",
-    "updated_at",
+    "summary",
     "signal",
     "context",
-    "noise_level",
-    "impact_horizon",
-    "who_should_care",
-    "systemic_effects",
-    "next_orientation_step",
+    "impact",
+    "confidence_score",
+    "risk_level",
+    "orientation_score",
+    "recommended_action",
+    "rubric",
     "sources",
-    "confidence",
-    "governance"
+    "source_count",
+    "status",
+    "created_at",
+    "updated_at",
+    "review_required",
+    "governance_notes",
+    "human_approved",
+    "human_reviewer",
+    "publication_target"
   ],
   "properties": {
-    "id": {
-      "type": "string",
-      "pattern": "^oo-[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$"
+    "id": {"type": "string"},
+    "title": {"type": "string"},
+    "summary": {"type": "string"},
+    "signal": {"type": "string"},
+    "context": {"type": "string"},
+    "impact": {"type": "string"},
+    "confidence_score": {"type": "number", "minimum": 0, "maximum": 100},
+    "risk_level": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+    "orientation_score": {"type": "number", "minimum": 0, "maximum": 100},
+    "recommended_action": {"type": "string"},
+    "rubric": {"type": "string"},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url", "publisher", "timestamp", "confidence", "extraction_metadata"],
+        "properties": {
+          "url": {"type": "string"},
+          "publisher": {"type": "string"},
+          "title": {"type": "string"},
+          "timestamp": {"type": "string"},
+          "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+          "source_type": {"type": "string"},
+          "extraction_metadata": {"type": "object"}
+        }
+      }
     },
-    "title": {
-      "type": "string",
-      "minLength": 8,
-      "maxLength": 140
-    },
-    "slug": {
-      "type": "string",
-      "pattern": "^[a-z0-9-]+$"
-    },
+    "source_count": {"type": "integer"},
     "status": {
       "type": "string",
       "enum": [
-        "draft",
-        "needs_sources",
-        "needs_governance_review",
-        "reviewed",
+        "collected",
+        "classified",
+        "drafted",
+        "review_required",
         "approved",
         "scheduled",
-        "published",
+        "published_local",
+        "published_external",
         "blocked",
         "archived"
       ]
     },
-    "language": {
-      "type": "string",
-      "enum": ["en", "nl", "ru"]
-    },
-    "created_at": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "updated_at": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "signal": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["summary", "signal_type", "why_now"],
-      "properties": {
-        "summary": {
-          "type": "string",
-          "minLength": 20
-        },
-        "signal_type": {
-          "type": "string",
-          "enum": [
-            "policy",
-            "technology",
-            "market",
-            "social",
-            "infrastructure",
-            "research",
-            "governance",
-            "community",
-            "project"
-          ]
-        },
-        "why_now": {
-          "type": "string",
-          "minLength": 20
-        }
-      }
-    },
-    "context": {
-      "type": "string",
-      "minLength": 40
-    },
-    "noise_level": {
-      "type": "string",
-      "enum": ["low", "medium", "high"]
-    },
-    "impact_horizon": {
-      "type": "string",
-      "enum": ["now", "weeks", "months", "years"]
-    },
-    "who_should_care": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string"
-      }
-    },
-    "systemic_effects": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string"
-      }
-    },
-    "next_orientation_step": {
-      "type": "string",
-      "minLength": 20
-    },
-    "sources": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/source"
-      }
-    },
-    "confidence": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["level", "rationale", "last_checked"],
-      "properties": {
-        "level": {
-          "type": "string",
-          "enum": ["low", "medium", "high"]
-        },
-        "rationale": {
-          "type": "string",
-          "minLength": 20
-        },
-        "last_checked": {
-          "type": "string",
-          "format": "date"
-        }
-      }
-    },
-    "governance": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "risk_level",
-        "sensitive_domains",
-        "approval_required",
-        "approval_status",
-        "ai_assisted",
-        "human_reviewer",
-        "audit_ids"
-      ],
-      "properties": {
-        "risk_level": {
-          "type": "string",
-          "enum": ["low", "medium", "high", "critical"]
-        },
-        "sensitive_domains": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": ["political", "legal", "medical", "financial", "reputational", "privacy", "security"]
-          }
-        },
-        "approval_required": {
-          "type": "boolean"
-        },
-        "approval_status": {
-          "type": "string",
-          "enum": ["not_requested", "pending", "approved", "rejected", "blocked"]
-        },
-        "ai_assisted": {
-          "type": "boolean"
-        },
-        "human_reviewer": {
-          "type": ["string", "null"]
-        },
-        "audit_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "distribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "website": {
-          "$ref": "#/$defs/distributionDraft"
-        },
-        "newsletter": {
-          "$ref": "#/$defs/distributionDraft"
-        },
-        "linkedin": {
-          "$ref": "#/$defs/distributionDraft"
-        },
-        "telegram": {
-          "$ref": "#/$defs/distributionDraft"
-        },
-        "rss": {
-          "$ref": "#/$defs/distributionDraft"
-        }
-      }
-    },
-    "strategic_memory_note": {
-      "type": ["string", "null"]
-    }
-  },
-  "$defs": {
-    "source": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["title", "url", "source_type", "publisher", "published_at", "last_checked", "confidence"],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string",
-          "format": "uri"
-        },
-        "source_type": {
-          "type": "string",
-          "enum": ["primary", "official", "expert", "media", "community", "internal", "unknown"]
-        },
-        "publisher": {
-          "type": "string"
-        },
-        "published_at": {
-          "type": ["string", "null"],
-          "format": "date"
-        },
-        "last_checked": {
-          "type": "string",
-          "format": "date"
-        },
-        "confidence": {
-          "type": "string",
-          "enum": ["low", "medium", "high"]
-        },
-        "notes": {
-          "type": "string"
-        }
-      }
-    },
-    "distributionDraft": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["status", "draft_path"],
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": ["not_started", "draft", "approved", "scheduled", "published", "blocked"]
-        },
-        "draft_path": {
-          "type": ["string", "null"]
-        }
-      }
-    }
+    "created_at": {"type": "string"},
+    "updated_at": {"type": "string"},
+    "review_required": {"type": "boolean"},
+    "governance_notes": {"type": "string"},
+    "human_approved": {"type": "boolean"},
+    "human_reviewer": {"type": ["string", "null"]},
+    "publication_target": {"type": "string", "enum": ["local", "external", "none"]},
+    "governance_status": {"type": "string"},
+    "policy_applied": {"type": "string"},
+    "risk_reason": {"type": "string"},
+    "approval_required": {"type": "boolean"},
+    "approval_timestamp": {"type": ["string", "null"]},
+    "review_notes": {"type": "string"},
+    "generated_draft": {"type": "string"},
+    "rollback": {"type": "object"}
   }
 }

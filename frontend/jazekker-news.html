@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JAZEKKER - Auto Signal Feed</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --panel: #0d1a25;
+      --line: #203345;
+      --text: #edf4f7;
+      --muted: #98a9b7;
+      --blue: #73a8ff;
+      --gold: #e2b354;
+      --green: #6fd2a5;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: radial-gradient(circle at 70% 0%, #11243a 0, var(--bg) 34%); color: var(--text); }
+    a { color: inherit; }
+    .layout { display: grid; grid-template-columns: 280px 1fr 330px; min-height: 100vh; }
+    aside, .right { border-color: var(--line); background: rgba(8, 18, 29, .82); backdrop-filter: blur(14px); }
+    aside { border-right: 1px solid var(--line); padding: 22px 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
+    .right { border-left: 1px solid var(--line); padding: 20px 16px; position: sticky; top: 0; height: 100vh; overflow: auto; }
+    .brand { display: flex; gap: 12px; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .mark { width: 42px; height: 42px; border: 1px solid #7894aa; border-radius: 50%; display: grid; place-items: center; color: var(--gold); }
+    .brand h1 { margin: 0; font-size: 28px; letter-spacing: 0; }
+    .brand p, p { margin: 4px 0 0; color: var(--muted); line-height: 1.5; }
+    .side-title { margin: 24px 10px 10px; color: var(--muted); font-size: 12px; text-transform: uppercase; }
+    .nav button {
+      width: 100%; min-height: 38px; margin: 3px 0; border: 1px solid transparent; border-radius: 6px;
+      background: transparent; color: #cbd8e1; text-align: left; padding: 0 12px; font: inherit; cursor: pointer;
+    }
+    .nav button.active, .nav button:hover { background: #17304a; border-color: #244664; color: white; }
+    .interest, .signals, .tabs, .toolbar { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 6px; background: #13283a; color: #bfcdd9; font-size: 12px; }
+    .meter { height: 7px; background: #15283a; border-radius: 99px; overflow: hidden; margin-top: 8px; }
+    .meter span { display: block; width: 78%; height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); }
+    main { padding: 18px 24px 48px; }
+    .topbar { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; margin-bottom: 26px; }
+    input, select {
+      min-height: 42px; border: 1px solid var(--line); border-radius: 6px; background: #081521; color: var(--text);
+      padding: 0 12px; font: inherit;
+    }
+    button, .button {
+      min-height: 40px; border: 1px solid var(--line); border-radius: 6px; background: #12283a; color: var(--text);
+      padding: 0 13px; font: inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+    }
+    button.primary { background: #d8aa4b; border-color: #d8aa4b; color: #081019; }
+    .hero { display: flex; align-items: end; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+    h2 { margin: 0; font-size: 32px; letter-spacing: 0; }
+    h3 { margin: 0; font-size: 17px; letter-spacing: 0; line-height: 1.3; }
+    .toolbar { margin-top: 14px; }
+    .tabs { margin: 18px 0; }
+    .tabs button { min-height: 34px; color: var(--muted); }
+    .tabs button.active { color: white; border-color: #6b93bd; background: #143250; }
+    .feed { display: grid; gap: 12px; }
+    .story {
+      display: grid; grid-template-columns: 240px 1fr; gap: 18px; padding: 12px; min-height: 180px;
+      border: 1px solid var(--line); border-radius: 8px; background: rgba(13, 27, 40, .88);
+    }
+    .story.published { border-color: #5e7a57; background: rgba(17, 38, 31, .88); }
+    .visual { border-radius: 6px; background: linear-gradient(135deg, #173854, #071019); border: 1px solid #24445c; display: grid; place-items: center; color: var(--gold); font-size: 42px; }
+    .story-body { display: flex; flex-direction: column; gap: 10px; }
+    .meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 13px; }
+    .meta strong { color: var(--blue); text-transform: uppercase; font-size: 12px; }
+    .impact-high { color: #ff988c; background: #2f1718; }
+    .impact-medium { color: #ffd47a; background: #2a2415; }
+    .impact-low { color: #9fe8c4; background: #12271e; }
+    .next { margin-top: auto; color: #cfd9e1; font-size: 14px; }
+    .read-link { width: fit-content; min-height: 34px; border: 1px solid #385339; border-radius: 6px; padding: 0 11px; display: inline-flex; align-items: center; text-decoration: none; color: #dceadf; background: #173628; }
+    .panel { border: 1px solid var(--line); border-radius: 8px; background: rgba(15, 31, 45, .92); padding: 16px; margin-bottom: 14px; }
+    .panel h3 { margin-bottom: 10px; }
+    .brief-list, .signal-list, .topic-list { display: grid; gap: 10px; }
+    .brief-item, .signal-item, .topic-item { border-top: 1px solid var(--line); padding-top: 10px; color: #d7e1e8; font-size: 14px; }
+    .status { color: var(--muted); font-size: 13px; margin-top: 8px; min-height: 20px; }
+    .quote { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); color: #dfc98c; font-family: Georgia, serif; font-size: 20px; line-height: 1.45; }
+    @media (max-width: 1120px) {
+      .layout { grid-template-columns: 1fr; }
+      aside, .right { position: static; height: auto; border: 0; }
+      .story { grid-template-columns: 1fr; }
+      .visual { min-height: 160px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand"><div class="mark">*</div><div><h1>JAZEKKER</h1><p>портал спокойной ориентации</p></div></div>
+      <div class="side-title">Навигация</div>
+      <div id="channelNav" class="nav"></div>
+      <div class="side-title">Ваши интересы</div>
+      <div class="interest">
+        <span class="chip">AI</span><span class="chip">Европа</span><span class="chip">Блокчейн</span>
+        <span class="chip">Духовность</span><span class="chip">Геополитика</span><span class="chip">Будущее работы</span>
+      </div>
+      <div class="side-title">Уровень ориентации</div>
+      <p>Фокус высокий</p><div class="meter"><span></span></div>
+      <div class="quote">Не новости ради внимания.<br>А смыслы ради ориентации.</div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <input id="search" placeholder="Поиск по сигналам, темам, источникам..." />
+        <input id="token" placeholder="Admin token" />
+        <a class="button" href="/jazekker">JAZEKKER</a>
+      </div>
+      <section class="hero">
+        <div>
+          <h2>Автоматическая лента сигналов</h2>
+          <p>AI, Европа, геополитика, блокчейн, духовность, человеческая устойчивость и будущие траектории в одном управляемом потоке.</p>
+          <div class="toolbar">
+            <button id="autoCollect" class="primary">Собрать авто-ленту</button>
+            <button id="refresh">Обновить ленту</button>
+            <select id="channelSelect"></select>
+            <button id="collectChannel">Собрать канал</button>
+          </div>
+          <div id="status" class="status">Готово. Вставь admin token и нажми “Собрать авто-ленту”.</div>
+        </div>
+      </section>
+      <div id="tabs" class="tabs"></div>
+      <section id="feed" class="feed"></section>
+    </main>
+
+    <section class="right">
+      <div class="panel"><h3>Утренний брифинг</h3><div id="brief" class="brief-list"></div></div>
+      <div class="panel"><h3>Сигналы дня</h3><div id="signals" class="signal-list"></div></div>
+      <div class="panel"><h3>Актуальные темы</h3><div id="topics" class="topic-list"></div></div>
+    </section>
+  </div>
+
+  <script>
+    const fallbackTopics = [
+      {id: "auto", label: "Все"},
+      {id: "ai_coordination", label: "AI & Coordination"},
+      {id: "europe_governance", label: "Europe & Governance"},
+      {id: "blockchain_trust", label: "Blockchain & Trust"},
+      {id: "consciousness_meaning", label: "Consciousness & Meaning"},
+      {id: "geopolitics", label: "Geopolitics"},
+      {id: "climate_energy", label: "Climate & Energy"},
+      {id: "future_work", label: "Future of Work"}
+    ];
+    let topics = fallbackTopics;
+    let active = "auto";
+    let items = [];
+    const token = document.getElementById("token");
+    const status = document.getElementById("status");
+    token.value = localStorage.getItem("AI_CABINET_ADMIN_TOKEN") || "";
+    token.addEventListener("input", () => localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token.value));
+    function headers() { return {"Content-Type": "application/json", "X-AI-Cabinet-Admin-Token": token.value}; }
+    function escapeHtml(value) { return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;"); }
+    function normalize(item) { return item.record?.record || item.record || item; }
+    function sourceOf(record, item) { return record.sources?.[0] || {publisher: item.source, url: item.url, confidence: "medium"}; }
+    function iconFor(category) { return {ai_coordination: "AI", europe_governance: "EU", blockchain_trust: "B", consciousness_meaning: "M", human_sustainability: "H", geopolitics: "G", climate_energy: "E", future_work: "W", future_signals: "F"}[category] || "S"; }
+    function impactClass(record) {
+      const text = `${record.noise_level || ""} ${record.governance?.risk_level || ""}`.toLowerCase();
+      if (text.includes("high")) return "impact-high";
+      if (text.includes("low")) return "impact-low";
+      return "impact-medium";
+    }
+    function renderChrome() {
+      const nav = document.getElementById("channelNav");
+      const tabs = document.getElementById("tabs");
+      const select = document.getElementById("channelSelect");
+      [nav, tabs, select].forEach(el => el.innerHTML = "");
+      topics.forEach(topic => {
+        const b1 = document.createElement("button");
+        b1.textContent = topic.label;
+        b1.className = topic.id === active ? "active" : "";
+        b1.onclick = () => { active = topic.id; renderAll(); };
+        nav.appendChild(b1);
+        const b2 = b1.cloneNode(true);
+        b2.onclick = b1.onclick;
+        tabs.appendChild(b2);
+        if (topic.id !== "auto") {
+          const opt = document.createElement("option");
+          opt.value = topic.id;
+          opt.textContent = topic.label;
+          select.appendChild(opt);
+        }
+      });
+    }
+    function filtered() {
+      const q = document.getElementById("search").value.toLowerCase();
+      return items.filter(item => {
+        const record = normalize(item);
+        const source = sourceOf(record, item);
+        const category = record.category || item.topic || "future_signals";
+        const activeOk = active === "auto" || category === active || record.category_label === active;
+        const qOk = !q || `${record.title} ${record.dek || ""} ${record.signal?.summary || ""} ${record.category_label} ${source.publisher}`.toLowerCase().includes(q);
+        return activeOk && qOk;
+      });
+    }
+    function renderFeed() {
+      const feed = document.getElementById("feed");
+      feed.innerHTML = "";
+      filtered().slice(0, 24).forEach(item => {
+        const record = normalize(item);
+        const source = sourceOf(record, item);
+        const readUrl = record.url || source.url || item.url || "";
+        const readLabel = record.status === "published_local" ? "Открыть и читать" : "Открыть источник";
+        const story = document.createElement("article");
+        story.className = record.status === "published_local" ? "story published" : "story";
+        story.innerHTML = `
+          <div class="visual">${escapeHtml(iconFor(record.category))}</div>
+          <div class="story-body">
+            <div class="meta"><strong>${escapeHtml(record.category_label || item.topic || "Signal")}</strong><span>${escapeHtml(source.publisher || "")}</span></div>
+            <h3>${escapeHtml(record.title || item.title)}</h3>
+            <p>${escapeHtml(record.dek || record.signal?.summary || "")}</p>
+            <div class="signals">
+              <span class="chip ${impactClass(record)}">${escapeHtml(record.noise_level || "medium")} noise</span>
+              <span class="chip">${escapeHtml(record.impact_horizon || (record.reading_minutes ? `${record.reading_minutes} min` : "weeks"))}</span>
+              <span class="chip">${escapeHtml(source.confidence || "medium")} confidence</span>
+              <span class="chip">${escapeHtml(record.status || "draft")}</span>
+            </div>
+            <div class="next"><strong>Следующий шаг:</strong> ${escapeHtml(record.next_orientation_step || "Проверить источник и контекст.")}</div>
+            ${readUrl ? `<a class="read-link" href="${escapeHtml(readUrl)}" ${record.status === "published_local" ? "" : 'target="_blank" rel="noreferrer"'}>${escapeHtml(readLabel)}</a>` : ""}
+          </div>`;
+        feed.appendChild(story);
+      });
+    }
+    function renderSide() {
+      const visible = filtered();
+      document.getElementById("brief").innerHTML = visible.slice(0, 5).map(item => `<div class="brief-item">${escapeHtml(normalize(item).title)}</div>`).join("");
+      document.getElementById("signals").innerHTML = visible.slice(0, 4).map(item => {
+        const record = normalize(item);
+        return `<div class="signal-item"><span class="chip">${escapeHtml(record.category_label || "Signal")}</span><br>${escapeHtml(record.systemic_effects?.[0] || record.orientation_lens || record.context || record.dek || "")}</div>`;
+      }).join("");
+      const counts = {};
+      items.forEach(item => {
+        const record = normalize(item);
+        const label = record.category_label || record.category || item.topic || "Signal";
+        counts[label] = (counts[label] || 0) + 1;
+      });
+      document.getElementById("topics").innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([name, count]) => `<div class="topic-item">${escapeHtml(name)} <span class="chip">${count}</span></div>`).join("");
+    }
+    function renderAll() { renderChrome(); renderFeed(); renderSide(); }
+    async function loadSources() {
+      const res = await fetch("/jazekker/news/sources", {headers: headers()});
+      const data = await res.json();
+      if (res.ok && data.topics?.length) topics = [{id: "auto", label: "Все"}, ...data.topics.filter(t => t.source_count > 0)];
+      renderAll();
+    }
+    async function refreshSaved() {
+      status.textContent = "Загружаю локальные статьи и draft-сигналы...";
+      const articleRes = await fetch("/jazekker/articles");
+      const articleData = await articleRes.json();
+      if (!articleRes.ok) throw new Error(articleData.detail || JSON.stringify(articleData));
+      let saved = [];
+      if (token.value) {
+        const signalRes = await fetch("/jazekker/news/signals", {headers: headers()});
+        const signalData = await signalRes.json();
+        if (signalRes.ok) saved = signalData;
+      }
+      items = [...(articleData.articles || []), ...saved];
+      status.textContent = `Загружено ${articleData.count || 0} локальных статей и ${saved.length} draft-сигналов.`;
+      renderAll();
+    }
+    async function localArticles() {
+      const articleRes = await fetch("/jazekker/articles");
+      const articleData = await articleRes.json();
+      return articleRes.ok ? (articleData.articles || []) : [];
+    }
+    async function collectAll() {
+      status.textContent = "Собираю авто-ленту по всем каналам...";
+      const res = await fetch("/jazekker/news/collect-all?limit_per_channel=3", {method: "POST", headers: headers()});
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      items = [...await localArticles(), ...(data.orientation_object_drafts || [])];
+      status.textContent = `Собрано ${items.length} сигналов. Публикация: none, только draft.`;
+      renderAll();
+    }
+    async function collectChannel() {
+      const channel = document.getElementById("channelSelect").value;
+      const label = topics.find(t => t.id === channel)?.label || channel;
+      status.textContent = "Собираю выбранный канал...";
+      const res = await fetch("/jazekker/news/collect", {method: "POST", headers: headers(), body: JSON.stringify({topic: label, channel, limit_per_source: 4, max_total: 12})});
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      items = [...await localArticles(), ...(data.orientation_object_drafts || [])];
+      active = channel;
+      status.textContent = `Канал ${label}: ${items.length} draft-сигналов.`;
+      renderAll();
+    }
+    document.getElementById("autoCollect").onclick = () => collectAll().catch(err => status.textContent = `Ошибка: ${err.message}`);
+    document.getElementById("refresh").onclick = () => refreshSaved().catch(err => status.textContent = `Ошибка: ${err.message}`);
+    document.getElementById("collectChannel").onclick = () => collectChannel().catch(err => status.textContent = `Ошибка: ${err.message}`);
+    document.getElementById("search").addEventListener("input", renderAll);
+    renderAll();
+    loadSources().catch(() => {});
+    refreshSaved().catch(() => {});
+  </script>
+</body>
+</html>

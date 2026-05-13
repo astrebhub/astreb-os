@@ -257,6 +257,46 @@ class Database:
                 record TEXT
             )
             """)
+            conn.execute("""
+            CREATE TABLE IF NOT EXISTS jazekker_news_signals (
+                id TEXT PRIMARY KEY,
+                created_at INTEGER,
+                topic TEXT,
+                title TEXT,
+                url TEXT,
+                source TEXT,
+                status TEXT,
+                record TEXT
+            )
+            """)
+            conn.execute("""
+            CREATE TABLE IF NOT EXISTS orientation_objects (
+                id TEXT PRIMARY KEY,
+                created_at INTEGER,
+                updated_at INTEGER,
+                status TEXT,
+                rubric TEXT,
+                title TEXT,
+                publication_target TEXT,
+                risk_level TEXT,
+                confidence_score REAL,
+                orientation_score REAL,
+                record TEXT
+            )
+            """)
+            conn.execute("""
+            CREATE TABLE IF NOT EXISTS editorial_audit (
+                id TEXT PRIMARY KEY,
+                created_at INTEGER,
+                object_id TEXT,
+                stage TEXT,
+                actor TEXT,
+                action TEXT,
+                from_status TEXT,
+                to_status TEXT,
+                metadata TEXT
+            )
+            """)
             conn.commit()
 
     def _ensure_columns(self, conn: sqlite3.Connection, table: str, columns: Dict[str, str]) -> None:
@@ -668,3 +708,137 @@ class Database:
             )
             conn.commit()
         return record
+
+    def insert_news_signal(self, record: Dict[str, Any]) -> str:
+        with self.connect() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO jazekker_news_signals
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record["id"],
+                    record.get("created_at", int(time.time())),
+                    record.get("topic", ""),
+                    record.get("title", ""),
+                    record.get("url", ""),
+                    record.get("source", ""),
+                    record.get("status", "draft"),
+                    json.dumps(record, ensure_ascii=False),
+                ),
+            )
+            conn.commit()
+        return record["id"]
+
+    def upsert_orientation_object(self, record: Dict[str, Any]) -> str:
+        now = int(time.time())
+        with self.connect() as conn:
+            existing = conn.execute("SELECT created_at FROM orientation_objects WHERE id = ?", (record["id"],)).fetchone()
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO orientation_objects
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record["id"],
+                    existing["created_at"] if existing else record.get("created_at_epoch", now),
+                    record.get("updated_at_epoch", now),
+                    record.get("status", "collected"),
+                    record.get("rubric", ""),
+                    record.get("title", ""),
+                    record.get("publication_target", "local"),
+                    record.get("risk_level", "medium"),
+                    float(record.get("confidence_score", 0)),
+                    float(record.get("orientation_score", 0)),
+                    json.dumps(record, ensure_ascii=False),
+                ),
+            )
+            conn.commit()
+        return record["id"]
+
+    def list_orientation_objects(self, limit: int = 100, status: str = "", rubric: str = "") -> Iterable[Dict[str, Any]]:
+        query = "SELECT * FROM orientation_objects"
+        params: list[Any] = []
+        filters = []
+        if status:
+            filters.append("status = ?")
+            params.append(status)
+        if rubric:
+            filters.append("rubric = ?")
+            params.append(rubric)
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
+        query += " ORDER BY updated_at DESC LIMIT ?"
+        params.append(limit)
+        with self.connect() as conn:
+            rows = conn.execute(query, params).fetchall()
+        result = []
+        for row in rows:
+            item = dict(row)
+            item["record"] = json.loads(item["record"]) if item.get("record") else {}
+            result.append(item)
+        return result
+
+    def get_orientation_object(self, object_id: str) -> Optional[Dict[str, Any]]:
+        with self.connect() as conn:
+            row = conn.execute("SELECT * FROM orientation_objects WHERE id = ?", (object_id,)).fetchone()
+        if not row:
+            return None
+        item = dict(row)
+        item["record"] = json.loads(item["record"]) if item.get("record") else {}
+        return item
+
+    def find_orientation_object(self, title: str, source_url: str = "") -> Optional[Dict[str, Any]]:
+        with self.connect() as conn:
+            rows = conn.execute("SELECT * FROM orientation_objects").fetchall()
+        title_norm = " ".join((title or "").lower().split())
+        for row in rows:
+            item = dict(row)
+            record = json.loads(item["record"]) if item.get("record") else {}
+            if source_url:
+                for source in record.get("sources", []):
+                    if source.get("url") == source_url:
+                        item["record"] = record
+                        return item
+            if title_norm and " ".join(record.get("title", "").lower().split()) == title_norm:
+                item["record"] = record
+                return item
+        return None
+
+    def insert_editorial_audit(self, record: Dict[str, Any]) -> str:
+        with self.connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO editorial_audit
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record["id"],
+                    record.get("created_at", int(time.time())),
+                    record["object_id"],
+                    record.get("stage", ""),
+                    record.get("actor", ""),
+                    record.get("action", ""),
+                    record.get("from_status", ""),
+                    record.get("to_status", ""),
+                    json.dumps(record.get("metadata", {}), ensure_ascii=False),
+                ),
+            )
+            conn.commit()
+        return record["id"]
+
+    def list_editorial_audit(self, object_id: str = "", limit: int = 100) -> Iterable[Dict[str, Any]]:
+        if object_id:
+            query = "SELECT * FROM editorial_audit WHERE object_id = ? ORDER BY created_at DESC LIMIT ?"
+            params: tuple[Any, ...] = (object_id, limit)
+        else:
+            query = "SELECT * FROM editorial_audit ORDER BY created_at DESC LIMIT ?"
+            params = (limit,)
+        with self.connect() as conn:
+            rows = conn.execute(query, params).fetchall()
+        result = []
+        for row in rows:
+            item = dict(row)
+            item["metadata"] = json.loads(item["metadata"]) if item.get("metadata") else {}
+            result.append(item)
+        return result

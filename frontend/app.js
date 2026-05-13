@@ -1079,6 +1079,11 @@ $("agentCloudGrid").addEventListener("click", (event) => {
 });
 $("personalizationBtn").onclick = () => runPanel("personalizationBtn", "Personalization", () => getJSON("/runtime/personalization"));
 $("evidenceBtn").onclick = () => runPanel("evidenceBtn", "Evidence Sources", () => getJSON("/evidence"));
+$("collectNewsBtn").onclick = () => runPanel("collectNewsBtn", "Jazekker News Collector", () => postJSON("/jazekker/news/collect", {
+  topic: $("task").value || "AI governance",
+  limit_per_source: 5,
+  max_total: 12
+}));
 $("observabilityBtn").onclick = () => runPanel("observabilityBtn", "Observability Events", () => getJSON("/observability/events"));
 $("forecastsBtn").onclick = () => runPanel("forecastsBtn", "Forecast Records", () => getJSON("/forecasts"));
 $("calibrationBtn").onclick = () => runPanel("calibrationBtn", "Forecast Calibration", () => getJSON("/forecasts/calibration-profile"));

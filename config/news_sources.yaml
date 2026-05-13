@@ -1,0 +1,99 @@
+sources:
+  - id: openai-news
+    name: OpenAI News
+    url: https://openai.com/news/rss.xml
+    source_type: official
+    topic: ai_coordination
+    channels: [ai_coordination, governance]
+    confidence: high
+    enabled: true
+
+  - id: mit-technology-review-ai
+    name: MIT Technology Review AI
+    url: https://www.technologyreview.com/topic/artificial-intelligence/feed
+    source_type: media
+    topic: ai_coordination
+    channels: [ai_coordination, future_signals]
+    confidence: medium
+    enabled: true
+
+  - id: the-verge-ai
+    name: The Verge AI
+    url: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
+    source_type: media
+    topic: ai_coordination
+    channels: [ai_coordination, technology_culture]
+    confidence: medium
+    enabled: true
+
+  - id: ai-news
+    name: AI News
+    url: https://www.artificialintelligence-news.com/feed/
+    source_type: media
+    topic: ai_coordination
+    channels: [ai_coordination, enterprise]
+    confidence: medium
+    enabled: true
+
+  - id: politico-europe
+    name: POLITICO Europe
+    url: https://www.politico.eu/feed/
+    source_type: media
+    topic: europe_governance
+    channels: [europe_governance, geopolitics]
+    confidence: medium
+    enabled: true
+
+  - id: coindesk
+    name: CoinDesk
+    url: https://www.coindesk.com/arc/outboundfeeds/rss/
+    source_type: media
+    topic: blockchain_trust
+    channels: [blockchain_trust, finance]
+    confidence: medium
+    enabled: true
+
+  - id: cointelegraph
+    name: Cointelegraph
+    url: https://cointelegraph.com/rss
+    source_type: media
+    topic: blockchain_trust
+    channels: [blockchain_trust, finance]
+    confidence: medium
+    enabled: true
+
+  - id: aeon
+    name: Aeon
+    url: https://aeon.co/feed.rss
+    source_type: media
+    topic: consciousness_meaning
+    channels: [consciousness_meaning, human_sustainability, culture]
+    confidence: medium
+    enabled: true
+
+  - id: psypost
+    name: PsyPost
+    url: https://www.psypost.org/feed/
+    source_type: media
+    topic: consciousness_meaning
+    channels: [consciousness_meaning, human_sustainability]
+    confidence: medium
+    enabled: true
+
+  - id: un-climate-news
+    name: UN Climate News
+    url: https://news.un.org/feed/subscribe/en/news/topic/climate-change/feed/rss.xml
+    source_type: official
+    topic: climate_energy
+    channels: [climate_energy, governance]
+    confidence: high
+    enabled: true
+
+  - id: world-economic-forum
+    name: World Economic Forum
+    url: https://www.weforum.org/agenda/feed/
+    source_type: institution
+    topic: future_work
+    channels: [future_work, economy, ai_coordination]
+    confidence: medium
+    enabled: false
