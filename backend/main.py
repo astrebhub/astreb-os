@@ -102,7 +102,7 @@ def render_article(article: dict[str, Any]) -> str:
   <div class="shell">
     <header>
       <a class="brand" href="/jazekker" aria-label="JAZEKKER">
-        <img class="brand-logo" src="/jazekker/assets/jazekker-logo.svg" alt="JAZEKKER" />
+        <img class="brand-logo" src="/jazekker/assets/jazekker-logo.png" alt="JAZEKKER" />
       </a>
       <a class="back" href="/jazekker/news">Назад к ленте</a>
     </header>
