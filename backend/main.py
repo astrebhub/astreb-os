@@ -144,6 +144,11 @@ async def news_page():
     return FileResponse(FRONTEND_DIR / "jazekker-news.html", media_type="text/html")
 
 
+@app.get("/jazekker/banner")
+async def banner_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-banner.html", media_type="text/html")
+
+
 @app.get("/jazekker/assets/{asset_name}")
 async def asset(asset_name: str):
     asset_path = ASSET_DIR / asset_name
