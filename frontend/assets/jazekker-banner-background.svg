@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="calmGlow" cx="28%" cy="22%" r="58%">
+      <stop offset="0%" stop-color="#31485a" stop-opacity=".55"/>
+      <stop offset="45%" stop-color="#0d1a25" stop-opacity=".72"/>
+      <stop offset="100%" stop-color="#02070b" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="goldGlow" cx="78%" cy="70%" r="38%">
+      <stop offset="0%" stop-color="#a9782e" stop-opacity=".24"/>
+      <stop offset="55%" stop-color="#11202b" stop-opacity=".1"/>
+      <stop offset="100%" stop-color="#02070b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="horizon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#071019"/>
+      <stop offset="52%" stop-color="#0b1822"/>
+      <stop offset="100%" stop-color="#030609"/>
+    </linearGradient>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M72 0H0V72" fill="none" stroke="#dfe9ef" stroke-opacity=".055" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#horizon)"/>
+  <rect width="1600" height="900" fill="url(#calmGlow)"/>
+  <rect width="1600" height="900" fill="url(#goldGlow)"/>
+  <rect width="1600" height="900" fill="url(#grid)" opacity=".7"/>
+  <g fill="none" stroke="#c8d8e2" stroke-opacity=".095">
+    <circle cx="1170" cy="445" r="118"/>
+    <circle cx="1170" cy="445" r="205"/>
+    <circle cx="1170" cy="445" r="315"/>
+    <path d="M-70 705C240 570 428 582 650 652S1050 778 1680 540"/>
+    <path d="M-80 205C330 85 612 148 820 240S1190 408 1680 248"/>
+    <path d="M1040 195L1308 700M1398 282L930 602M1170 94V790M768 445H1570"/>
+  </g>
+  <g opacity=".42">
+    <circle cx="1220" cy="312" r="3" fill="#d9b76a"/>
+    <circle cx="1368" cy="398" r="2.4" fill="#d9b76a"/>
+    <circle cx="1112" cy="572" r="2.6" fill="#d9b76a"/>
+    <circle cx="890" cy="246" r="2.2" fill="#d9b76a"/>
+    <path d="M890 246L1220 312L1368 398L1112 572" fill="none" stroke="#d9b76a" stroke-opacity=".26"/>
+  </g>
+</svg>
