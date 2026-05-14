@@ -109,9 +109,7 @@
     .cabinet p { color: rgba(255,255,255,.76); }
     .pipeline { display: grid; gap: 8px; margin-top: 16px; }
     .step { padding: 10px 11px; border-radius: 6px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.9); font-size: 14px; }
-    .news-toolbar {
-      display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 10px; margin-bottom: 14px;
-    }
+    .news-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
     input { height: 42px; border: 1px solid #cbd4d4; border-radius: 6px; padding: 0 12px; font: inherit; background: white; }
     .news-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .small-card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-height: 180px; }
@@ -283,14 +281,12 @@
         <p>Собирает утверждённые RSS-источники в черновики сигналов. Публичная публикация остаётся под контролем редактора.</p>
       </div>
       <div class="panel">
+        <h3>Публичная часть показывает только опубликованные материалы.</h3>
+        <p>Сбор RSS, черновики, approval и audit находятся в пульте главного редактора. Так читатель видит спокойную ленту, а управление остаётся отдельно.</p>
         <div class="news-toolbar">
-          <input id="token" placeholder="Admin token" />
-          <input id="topic" value="AI governance" placeholder="Тема" />
-          <button id="collect" class="primary">Собрать новости</button>
-          <a class="button" href="/jazekker/news">Открыть ленту</a>
+          <a class="button primary" href="/jazekker/news">Открыть ленту</a>
+          <a class="button" href="/jazekker/chief-editor">Пульт главного редактора</a>
         </div>
-        <p id="newsStatus">Готово к сбору черновиков сигналов.</p>
-        <div id="newsList" class="news-list"></div>
       </div>
     </section>
 
@@ -324,40 +320,5 @@
     </footer>
   </main>
 
-  <script>
-    const token = document.getElementById("token");
-    const topic = document.getElementById("topic");
-    const newsList = document.getElementById("newsList");
-    const newsStatus = document.getElementById("newsStatus");
-    token.value = localStorage.getItem("AI_CABINET_ADMIN_TOKEN") || "";
-    token.addEventListener("input", () => localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token.value));
-    function escapeHtml(value) {
-      return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
-    }
-    function sourceOf(item) { return item.sources?.[0] || item.record?.record?.sources?.[0] || {publisher: item.source, url: item.url, confidence: ""}; }
-    function renderNews(items) {
-      newsList.innerHTML = "";
-      items.slice(0, 6).forEach((item) => {
-        const record = item.record?.record || item.record || item;
-        const source = sourceOf(record);
-        const card = document.createElement("article");
-        card.className = "small-card";
-        card.innerHTML = `<div class="chips"><span class="chip">${escapeHtml(record.status || "draft")}</span><span class="chip">${escapeHtml(source.confidence || "medium")}</span></div><h3>${escapeHtml(record.title || item.title)}</h3><p>${escapeHtml(record.signal?.summary || "")}</p><p><a href="${escapeHtml(source.url || item.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.publisher || item.source || "source")}</a></p>`;
-        newsList.appendChild(card);
-      });
-    }
-    document.getElementById("collect").addEventListener("click", async () => {
-      newsStatus.textContent = "Собираю утверждённые RSS-источники...";
-      try {
-        const res = await fetch("/jazekker/news/collect", {method: "POST", headers: {"Content-Type": "application/json", "X-AI-Cabinet-Admin-Token": token.value}, body: JSON.stringify({topic: topic.value || "AI governance", limit_per_source: 4, max_total: 6})});
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-        renderNews(data.orientation_object_drafts || []);
-        newsStatus.textContent = `Собрано ${data.collected}, показано ${data.returned}. Публикация: нет.`;
-      } catch (err) {
-        newsStatus.textContent = `Ошибка: ${err.message}`;
-      }
-    });
-  </script>
 </body>
 </html>

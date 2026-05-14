@@ -304,7 +304,7 @@
     }
     function navigatorReply(text) {
       const t = text.toLowerCase();
-      if (!objects.length) return {reply: "Сначала вставь admin token и нажми Refresh. Сейчас я не вижу объектов для навигации.", command: null};
+      if (!objects.length) return {reply: "Сначала нажми `Обновить` или `Загрузить статьи`. Сейчас я не вижу объектов для навигации.", command: null};
       if (t.includes("вниман") || t.includes("attention") || t.includes("важн")) {
         const priority = [...objects].sort((a, b) => {
           const score = (item) => (item.status === "review_required" ? 50 : 0) + (item.risk_level === "high" ? 35 : 0) + (item.risk_level === "medium" ? 15 : 0) - (item.confidence_score || 0) / 10;
@@ -317,7 +317,7 @@
         return {reply: `${selected.title}\n\nСтатус: ${selected.status}. Риск: ${selected.risk_level}. Confidence: ${selected.confidence_score}. Orientation: ${selected.orientation_score}.\n\nПочему важно: ${selected.context || selected.summary}\n\nСледующий шаг: ${selected.recommended_action || "review and decide"}`, command: null};
       }
       const parsed = parseCommand(text);
-      if (!parsed.error) return {reply: "Понял. Проведу команду через governed workflow. Если действие рискованное, система потребует notes/approval.", command: parsed.type === "refresh" ? "refresh" : parsed.action};
+      if (!parsed.error) return {reply: "Понял. Проведу команду через управляемый редакционный процесс. Если действие рискованное, система потребует заметку или одобрение.", command: parsed.type === "refresh" ? "refresh" : parsed.action};
       return {reply: "Я могу помочь: найти важное, объяснить выбранный объект, отправить на проверку, одобрить, опубликовать локально, заблокировать, архивировать или обновить список. Внешняя публикация только с отдельным approval.", command: null};
     }
     function addMessage(role, text) {
@@ -338,14 +338,14 @@
         try {
           commandEl.value = text;
           await executeCommand(result.command);
-          addMessage("agent", `Готово: ${result.command}. Запись ушла в audit trail.`);
+          addMessage("agent", `Готово: ${result.command}. Запись ушла в журнал аудита.`);
         } catch (err) {
           addMessage("agent", `Не выполнено: ${err.message}`);
         }
       }
     }
     async function executeCommand(action) {
-      if (!selected && action !== "refresh") throw new Error("Select an object first.");
+      if (!selected && action !== "refresh") throw new Error("Сначала выбери материал слева.");
       if (action === "refresh") { await loadObjects(); return; }
       const publicationTarget = action === "publish_external" ? "external" : action === "publish_local" ? "local" : null;
       const res = await fetch(`/jazekker/orientation-objects/${encodeURIComponent(selected.id)}/action`, {
@@ -366,9 +366,9 @@
       if (parsed.error) { statusEl.textContent = parsed.error; return; }
       try {
         await executeCommand(parsed.type === "refresh" ? "refresh" : parsed.action);
-        statusEl.textContent = "Command executed through governed workflow.";
+      statusEl.textContent = "Команда выполнена через управляемый редакционный процесс.";
       } catch (err) {
-        statusEl.textContent = `Error: ${err.message}`;
+        statusEl.textContent = `Ошибка: ${err.message}`;
       }
     }
     async function quick(action) {
@@ -424,7 +424,7 @@
       localStorage.setItem("AI_CABINET_ADMIN_TOKEN", token.value);
       statusEl.textContent = "Локальный token установлен. Кнопки пульта готовы к работе.";
     };
-    document.getElementById("refresh").onclick = () => loadObjects().catch(err => statusEl.textContent = `Error: ${err.message}`);
+    document.getElementById("refresh").onclick = () => loadObjects().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
     document.getElementById("collectNews").onclick = () => collectNews().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
     document.getElementById("seedLocal").onclick = () => seedLocalArticles().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
     document.getElementById("openNavigator").onclick = () => {
@@ -438,10 +438,10 @@
     navigatorText.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) sendNavigator();
     });
-    statusFilter.onchange = () => { selected = null; loadObjects().catch(err => statusEl.textContent = `Error: ${err.message}`); };
+    statusFilter.onchange = () => { selected = null; loadObjects().catch(err => statusEl.textContent = `Ошибка: ${err.message}`); };
     setupVoice();
     document.getElementById("lang").value = uiLang.value === "ru" ? "ru-RU" : "en-US";
-    loadObjects().catch(err => statusEl.textContent = `Error: ${err.message}`);
+    loadObjects().catch(err => statusEl.textContent = `Ошибка: ${err.message}`);
   </script>
 </body>
 </html>
