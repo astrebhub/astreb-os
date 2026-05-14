@@ -38,6 +38,14 @@ def load_articles() -> list[dict[str, Any]]:
     return sorted(public_articles, key=lambda item: item.get("published_at", ""), reverse=True)
 
 
+def article_categories(articles: list[dict[str, Any]]) -> list[dict[str, str]]:
+    categories: dict[str, str] = {}
+    for article in articles:
+        category = str(article.get("category") or "signals")
+        categories[category] = str(article.get("category_label") or category)
+    return [{"id": key, "label": value} for key, value in sorted(categories.items(), key=lambda item: item[1])]
+
+
 def article_url(article: dict[str, Any]) -> str:
     slug = article.get("slug") or article.get("id") or "article"
     return f"/jazekker/articles/{slug}"
@@ -47,22 +55,26 @@ def render_article(article: dict[str, Any]) -> str:
     paragraphs = "\n".join(
         f"<p>{escape(str(paragraph))}</p>" for paragraph in article.get("body", [])
     )
+    title = escape(article.get("title", "JAZEKKER"))
+    dek = escape(article.get("dek", ""))
+    category = escape(article.get("category_label", ""))
+    reading_minutes = escape(str(article.get("reading_minutes", 4)))
+    published_at = escape(article.get("published_at", ""))
+    lens = escape(article.get("orientation_lens", ""))
+    next_step = escape(article.get("next_orientation_step", ""))
     return f"""<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{escape(article.get("title", "JAZEKKER"))}</title>
+  <title>{title}</title>
   <style>
     :root {{
       color-scheme: dark;
       --bg: #071019;
-      --panel: #0d1a25;
       --line: #203345;
       --text: #edf4f7;
-      --muted: #9badba;
       --gold: #e2b354;
-      --green: #6fd2a5;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }}
     * {{ box-sizing: border-box; }}
@@ -71,7 +83,7 @@ def render_article(article: dict[str, Any]) -> str:
     header {{ display: flex; justify-content: space-between; gap: 18px; align-items: center; padding-bottom: 22px; border-bottom: 1px solid var(--line); }}
     a {{ color: inherit; }}
     .back {{ min-height: 38px; border: 1px solid var(--line); border-radius: 6px; padding: 0 12px; display: inline-flex; align-items: center; text-decoration: none; background: #12283a; }}
-    .brand {{ color: var(--gold); letter-spacing: 0; font-weight: 700; }}
+    .brand {{ color: var(--gold); font-weight: 700; }}
     article {{ margin-top: 42px; }}
     .meta {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }}
     .chip {{ display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 6px; background: #13283a; color: #c5d1db; font-size: 12px; }}
@@ -94,15 +106,15 @@ def render_article(article: dict[str, Any]) -> str:
     <article>
       <div class="meta">
         <span class="chip local">опубликовано</span>
-        <span class="chip">{escape(article.get("category_label", ""))}</span>
-        <span class="chip">{escape(str(article.get("reading_minutes", 4)))} мин</span>
-        <span class="chip">{escape(article.get("published_at", ""))}</span>
+        <span class="chip">{category}</span>
+        <span class="chip">{reading_minutes} мин</span>
+        <span class="chip">{published_at}</span>
       </div>
-      <h1>{escape(article.get("title", ""))}</h1>
-      <div class="dek">{escape(article.get("dek", ""))}</div>
-      <div class="lens"><strong>Фокус материала:</strong> {escape(article.get("orientation_lens", ""))}</div>
+      <h1>{title}</h1>
+      <div class="dek">{dek}</div>
+      <div class="lens"><strong>Фокус материала:</strong> {lens}</div>
       <div class="body">{paragraphs}</div>
-      <div class="next"><strong>Следующий шаг:</strong> {escape(article.get("next_orientation_step", ""))}</div>
+      <div class="next"><strong>Следующий шаг:</strong> {next_step}</div>
     </article>
   </div>
 </body>
@@ -139,12 +151,17 @@ async def asset(asset_name: str):
 
 @app.get("/jazekker/articles")
 async def articles():
+    loaded_articles = load_articles()
     items = []
-    for article in load_articles():
+    for article in loaded_articles:
         item = dict(article)
         item["url"] = article_url(article)
         items.append(item)
-    return {"articles": items, "count": len(items)}
+    return {
+        "articles": items,
+        "categories": article_categories(loaded_articles),
+        "count": len(items),
+    }
 
 
 @app.get("/jazekker/articles/{slug}", response_class=HTMLResponse)

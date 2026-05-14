@@ -1,51 +1,55 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JAZEKKER - Portal for Calm Orientation</title>
+  <title>JAZEKKER - портал спокойной ориентации</title>
+  <meta name="description" content="JAZEKKER превращает шум новостей в сигналы, контекст и ясные следующие шаги." />
   <style>
     :root {
       color-scheme: light;
       --ink: #111f25;
-      --muted: #5a6971;
-      --paper: #f6f7f4;
+      --muted: #607078;
+      --paper: #f5f6f2;
       --panel: #ffffff;
-      --line: #dbe2e0;
-      --forest: #23493f;
+      --line: #dbe2de;
+      --forest: #214a40;
       --river: #23516e;
       --clay: #8d4037;
       --gold: #9a782f;
       --mist: #edf1ef;
-      --shadow: 0 12px 34px rgba(17, 31, 37, .08);
+      --shadow: 0 14px 38px rgba(17, 31, 37, .08);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body { margin: 0; background: var(--paper); color: var(--ink); }
     a { color: inherit; }
     .topbar {
       position: sticky; top: 0; z-index: 20;
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 28px; border-bottom: 1px solid var(--line);
-      background: rgba(246, 247, 244, .92); backdrop-filter: blur(14px);
+      background: rgba(245, 246, 242, .92); backdrop-filter: blur(14px);
     }
-    .brand { display: grid; gap: 2px; }
+    .brand { display: grid; gap: 2px; text-decoration: none; }
     .brand strong { font-size: 20px; letter-spacing: 0; }
     .brand span { font-size: 12px; color: var(--muted); }
     nav { display: flex; align-items: center; gap: 18px; color: var(--muted); font-size: 14px; }
     nav a { text-decoration: none; }
+    nav a:hover { color: var(--ink); }
     .hero {
-      min-height: 86vh;
+      min-height: 84vh;
       display: grid;
       align-items: end;
       color: white;
       background:
-        linear-gradient(180deg, rgba(17,31,37,.10), rgba(17,31,37,.76)),
+        linear-gradient(180deg, rgba(17,31,37,.08), rgba(17,31,37,.82)),
         url("/jazekker/assets/jazekker-homepage-ecosystem-concept.png") center/cover no-repeat;
     }
-    .hero-inner { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 0 0 56px; }
-    h1 { max-width: 880px; margin: 0; font-size: 88px; line-height: .94; letter-spacing: 0; }
-    .hero p { max-width: 720px; margin: 22px 0 0; color: rgba(255,255,255,.86); font-size: 20px; line-height: 1.45; }
+    .hero-inner { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 0 0 58px; }
+    .eyebrow { margin: 0 0 14px; color: rgba(255,255,255,.72); text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
+    h1 { max-width: 890px; margin: 0; font-size: 82px; line-height: .96; letter-spacing: 0; }
+    .hero p { max-width: 760px; margin: 22px 0 0; color: rgba(255,255,255,.87); font-size: 20px; line-height: 1.48; }
     .hero-actions, .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
     .button, button {
       min-height: 42px; border: 1px solid var(--line); border-radius: 6px; padding: 0 14px;
@@ -54,93 +58,70 @@
       background: var(--panel); color: var(--ink);
     }
     .hero .button { border-color: rgba(255,255,255,.55); background: rgba(255,255,255,.12); color: white; }
-    .hero .button.primary, .button.primary, button.primary { background: var(--ink); border-color: var(--ink); color: white; }
-    .hero .button.primary { background: white; border-color: white; color: var(--ink); }
+    .hero .button.primary, .button.primary { background: white; border-color: white; color: var(--ink); }
     main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
-    section { padding: 46px 0; border-bottom: 1px solid var(--line); }
+    section { padding: 48px 0; border-bottom: 1px solid var(--line); }
     .section-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 18px; }
     h2 { margin: 0; font-size: 36px; letter-spacing: 0; }
-    h3 { margin: 0; font-size: 18px; line-height: 1.28; letter-spacing: 0; }
-    p { margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
-    .section-head p { max-width: 560px; }
-    .orientation-shell { display: grid; grid-template-columns: 1.08fr .92fr; gap: 16px; align-items: stretch; }
-    .panel, .object, .signal, .trust, .metric {
+    h3 { margin: 0; font-size: 18px; line-height: 1.3; letter-spacing: 0; }
+    p { margin: 8px 0 0; color: var(--muted); line-height: 1.56; }
+    .section-head p { max-width: 590px; }
+    .orientation-shell { display: grid; grid-template-columns: 1.04fr .96fr; gap: 16px; align-items: stretch; }
+    .panel, .signal, .object, .trust, .metric, .phase {
       background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow);
     }
-    .panel { padding: 20px; }
-    .daily-grid { display: grid; gap: 16px; }
-    .compass {
-      min-height: 260px; display: grid; place-items: center; padding: 18px;
-      background: radial-gradient(circle at 50% 45%, #ffffff 0, #ffffff 32%, #e7eeeb 33%, #e7eeeb 52%, #d8e3df 53%, #d8e3df 70%, transparent 71%);
-      border: 1px solid var(--line); border-radius: 8px;
-    }
-    .compass-map { width: min(330px, 90%); aspect-ratio: 1; position: relative; border: 1px solid #b8c7c2; border-radius: 50%; }
-    .axis { position: absolute; background: #9aada6; }
-    .axis.vertical { width: 1px; height: 100%; left: 50%; }
-    .axis.horizontal { height: 1px; width: 100%; top: 50%; }
-    .node {
-      position: absolute; transform: translate(-50%, -50%); width: 94px; min-height: 42px;
-      border-radius: 7px; background: white; border: 1px solid var(--line); padding: 7px;
-      display: grid; place-items: center; text-align: center; font-size: 12px; color: var(--ink);
-    }
-    .node.one { left: 50%; top: 14%; }
-    .node.two { left: 84%; top: 50%; }
-    .node.three { left: 50%; top: 86%; }
-    .node.four { left: 16%; top: 50%; }
-    .node.center { left: 50%; top: 50%; background: var(--forest); color: white; border-color: var(--forest); }
+    .panel { padding: 22px; }
+    .daily-grid { display: grid; gap: 18px; }
+    .brief-row { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .brief-row:last-child { padding-bottom: 0; border-bottom: 0; }
+    .label { color: var(--forest); font-weight: 700; font-size: 13px; text-transform: uppercase; }
     .signal-map { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .signal { padding: 16px; min-height: 168px; border-left: 4px solid var(--river); box-shadow: none; }
+    .signal { padding: 16px; min-height: 172px; border-left: 4px solid var(--river); box-shadow: none; }
     .signal:nth-child(2) { border-left-color: var(--forest); }
     .signal:nth-child(3) { border-left-color: var(--gold); }
     .signal:nth-child(4) { border-left-color: var(--clay); }
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .chip { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #eef2f2; color: #35484f; }
     .object-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .object { padding: 18px; min-height: 310px; display: flex; flex-direction: column; box-shadow: none; }
+    .object { padding: 18px; min-height: 292px; display: flex; flex-direction: column; box-shadow: none; }
     .object .field { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
     .object .next { margin-top: auto; color: var(--forest); font-size: 13px; }
-    .trust-grid, .sustainability-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .trust, .metric { padding: 16px; box-shadow: none; background: var(--mist); }
-    .pipeline { display: grid; gap: 8px; margin-top: 16px; }
-    .step { padding: 10px 11px; border-radius: 6px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.9); font-size: 14px; }
+    .trust-grid, .sustainability-grid, .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .trust, .metric, .phase { padding: 16px; box-shadow: none; background: var(--mist); }
+    .news-panel { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; align-items: center; }
     .news-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-    input { height: 42px; border: 1px solid #cbd4d4; border-radius: 6px; padding: 0 12px; font: inherit; background: white; }
-    .news-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .small-card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-height: 180px; }
-    .small-card a { color: #0b5cad; overflow-wrap: anywhere; }
-    .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .phase { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
     .test-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .test { padding: 11px; border-radius: 6px; background: #edf1ef; color: #294238; font-size: 14px; }
     footer { display: flex; justify-content: space-between; gap: 20px; padding: 26px 0 46px; color: var(--muted); }
     @media (max-width: 980px) {
+      .topbar { padding: 12px 18px; }
       nav { display: none; }
       h1 { font-size: 44px; }
       h2 { font-size: 28px; }
-      .orientation-shell { grid-template-columns: 1fr; }
-      .signal-map, .object-grid, .trust-grid, .sustainability-grid, .news-list, .roadmap, .test-list { grid-template-columns: 1fr; }
-      .news-toolbar { grid-template-columns: 1fr; }
+      .orientation-shell, .news-panel { grid-template-columns: 1fr; }
+      .signal-map, .object-grid, .trust-grid, .sustainability-grid, .roadmap, .test-list { grid-template-columns: 1fr; }
       .section-head { display: block; }
-      .section-head p { margin-top: 8px; }
+      .brief-row { grid-template-columns: 1fr; gap: 4px; }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><strong>JAZEKKER</strong><span>портал спокойной ориентации</span></div>
+    <a class="brand" href="/jazekker"><strong>JAZEKKER</strong><span>портал спокойной ориентации</span></a>
     <nav>
       <a href="#today">Сегодня</a>
       <a href="#map">Карта сигналов</a>
       <a href="#objects">Материалы</a>
-      <a href="#news">Лента</a>
       <a href="#trust">Доверие</a>
+      <a href="/jazekker/news">Лента</a>
     </nav>
   </header>
 
   <section class="hero">
     <div class="hero-inner">
+      <p class="eyebrow">Orientation-native civic intelligence</p>
       <h1>Портал спокойной ориентации в сложном мире.</h1>
-      <p>JAZEKKER собирает важные сигналы из технологий, общества, Европы, блокчейна, духовности и будущего работы, превращая шум в контекст и ясные следующие шаги.</p>
+      <p>JAZEKKER собирает важные сигналы из технологий, общества, Европы, блокчейна, смысла, климата и будущего работы, превращая информационный шум в контекст и ясные следующие шаги.</p>
       <div class="hero-actions">
         <a class="button primary" href="/jazekker/news">Открыть ленту</a>
         <a class="button" href="#today">Ориентация дня</a>
@@ -156,28 +137,18 @@
       </div>
       <div class="orientation-shell">
         <div class="panel daily-grid">
-          <article>
-            <h3>Главный сигнал</h3>
-            <p>AI перестаёт быть отдельным инструментом и становится инфраструктурой координации. Поэтому важнее становятся доверие, источники, управление и человеческое решение.</p>
-            <div class="chips"><span class="chip">средний риск</span><span class="chip">горизонт: недели</span><span class="chip">слой доверия</span></div>
-          </article>
-          <article>
-            <h3>Шум против значения</h3>
-            <p>Шум: громкие заявления и гонка моделей. Сигнал: обществу нужны понятные системы доверия, проверки и ответственности.</p>
-          </article>
-          <article>
-            <h3>Следующий шаг</h3>
-            <p>Смотреть не только на событие, а на то, какие новые зависимости, риски и возможности оно создаёт под поверхностью.</p>
-          </article>
+          <div class="brief-row"><div class="label">Сигнал</div><div><h3>AI становится средой координации</h3><p>Технологии переходят от отдельных инструментов к инфраструктуре принятия решений, доверия и рабочих процессов.</p></div></div>
+          <div class="brief-row"><div class="label">Контекст</div><div><h3>Главная ценность смещается к управляемости</h3><p>Важнее становятся источники, прозрачность, проверка, человеческое суждение и способность не терять ориентацию.</p></div></div>
+          <div class="brief-row"><div class="label">Шаг</div><div><h3>Смотреть под поверхность события</h3><p>Не только что произошло, а какие зависимости, риски и возможности это создаёт для общества и организаций.</p></div></div>
         </div>
-        <div class="compass">
-          <div class="compass-map" aria-label="Orientation compass">
-            <div class="axis vertical"></div><div class="axis horizontal"></div>
-            <div class="node one">AI и общество</div>
-            <div class="node two">Европа и управление</div>
-            <div class="node three">Человек и устойчивость</div>
-            <div class="node four">Сигналы будущего</div>
-            <div class="node center">Ориентация</div>
+        <div class="panel">
+          <h3>Редакционный принцип</h3>
+          <p>JAZEKKER не соревнуется за скорость реакции. Он отбирает материалы, которые помогают увидеть структуру под событиями.</p>
+          <div class="chips">
+            <span class="chip">меньше шума</span>
+            <span class="chip">больше контекста</span>
+            <span class="chip">ясный горизонт</span>
+            <span class="chip">спокойное чтение</span>
           </div>
         </div>
       </div>
@@ -186,13 +157,13 @@
     <section id="map">
       <div class="section-head">
         <h2>Карта сигналов</h2>
-        <p>Главная страница не должна быть стеной новостей. Это карта смыслов: темы, связи, риски и траектории.</p>
+        <p>Главная страница не является стеной новостей. Это карта смыслов: темы, связи, риски и траектории.</p>
       </div>
       <div class="signal-map">
-        <article class="signal"><h3>AI и общество</h3><p>Как AI меняет институты, труд, образование, медиа и доверие.</p><div class="chips"><span class="chip">контекст</span><span class="chip">общественный эффект</span></div></article>
+        <article class="signal"><h3>AI и общество</h3><p>Как AI меняет институты, труд, образование, медиа и доверие.</p><div class="chips"><span class="chip">координация</span><span class="chip">доверие</span></div></article>
         <article class="signal"><h3>Европа и управление</h3><p>Регулирование, цифровой суверенитет, публичная инфраструктура и устойчивость институтов.</p><div class="chips"><span class="chip">policy</span><span class="chip">governance</span></div></article>
-        <article class="signal"><h3>Блокчейн и доверие</h3><p>Идентичность, прозрачность, верификация, токенизация и новые механизмы координации.</p><div class="chips"><span class="chip">trust</span><span class="chip">verification</span></div></article>
-        <article class="signal"><h3>Духовность и смысл</h3><p>Культура, смысл, человеческая глубина и внутренний компас в эпоху ускорения.</p><div class="chips"><span class="chip">meaning</span><span class="chip">coherence</span></div></article>
+        <article class="signal"><h3>Блокчейн и доверие</h3><p>Идентичность, прозрачность, верификация и новые механизмы координации.</p><div class="chips"><span class="chip">trust</span><span class="chip">verification</span></div></article>
+        <article class="signal"><h3>Смысл и устойчивость</h3><p>Культура, внимание, человеческая глубина и внутренний компас в эпоху ускорения.</p><div class="chips"><span class="chip">meaning</span><span class="chip">attention</span></div></article>
       </div>
     </section>
 
@@ -203,25 +174,25 @@
       </div>
       <div class="object-grid">
         <article class="object">
-          <div class="chips"><span class="chip">draft</span><span class="chip">official source</span></div>
-          <h3>AI становится инфраструктурой координации</h3>
+          <div class="chips"><span class="chip">AI</span><span class="chip">высокий горизонт</span></div>
+          <h3>AI как инфраструктура координации</h3>
           <div class="field"><strong>Сигнал</strong><p>Организации переходят от экспериментов к рабочим AI-процессам.</p></div>
-          <div class="field"><strong>Контекст</strong><p>Рост создаёт требования к доверию, проверке, ответственности и человеческому контролю.</p></div>
-          <div class="next">Дальше: отделить реальный системный сдвиг от технологического шума.</div>
+          <div class="field"><strong>Контекст</strong><p>Растёт потребность в доверии, проверке и человеческом контроле.</p></div>
+          <div class="next">Дальше: отделить системный сдвиг от технологического шума.</div>
         </article>
         <article class="object">
-          <div class="chips"><span class="chip">review</span><span class="chip">reputational</span></div>
-          <h3>Европа строит язык доверенного AI</h3>
-          <div class="field"><strong>Уровень шума</strong><p>Много заявлений, но структурный сигнал в правилах и инфраструктуре.</p></div>
-          <div class="field"><strong>Системный эффект</strong><p>Регулирование начинает влиять на рынок, продукты и доверие граждан.</p></div>
+          <div class="chips"><span class="chip">Европа</span><span class="chip">управление</span></div>
+          <h3>Доверие становится инфраструктурой</h3>
+          <div class="field"><strong>Уровень шума</strong><p>Много заявлений, но структурный сигнал находится в правилах и процедурах.</p></div>
+          <div class="field"><strong>Эффект</strong><p>Регулирование влияет на рынок, продукты и доверие граждан.</p></div>
           <div class="next">Дальше: смотреть на практические механизмы, а не только на декларации.</div>
         </article>
         <article class="object">
-          <div class="chips"><span class="chip">draft</span><span class="chip">human layer</span></div>
-          <h3>Человеческое внимание становится узким местом</h3>
+          <div class="chips"><span class="chip">человек</span><span class="chip">внимание</span></div>
+          <h3>Внимание становится узким местом</h3>
           <div class="field"><strong>Кому важно</strong><p>Гражданам, редакторам, управленцам, командам и образовательным проектам.</p></div>
           <div class="field"><strong>Слой доверия</strong><p>Нужны источники, контекст и честные отметки неопределённости.</p></div>
-          <div class="next">Дальше: строить интерфейсы, которые снижают перегрузку, а не усиливают её.</div>
+          <div class="next">Дальше: строить интерфейсы, которые снижают перегрузку.</div>
         </article>
       </div>
     </section>
@@ -229,72 +200,40 @@
     <section id="trust">
       <div class="section-head">
         <h2>Доверие и прозрачность</h2>
-        <p>JAZEKKER должен показывать не только вывод, но и уровень уверенности, количество источников, статус проверки и риск.</p>
+        <p>Материал должен показывать не только вывод, но и рубрику, горизонт, уверенность, источник и следующий шаг.</p>
       </div>
       <div class="trust-grid">
-        <article class="trust"><h3>Уверенность</h3><p>Каждый сигнал получает понятную оценку уверенности.</p></article>
+        <article class="trust"><h3>Уверенность</h3><p>Каждый сигнал получает понятный уровень уверенности.</p></article>
         <article class="trust"><h3>Источники</h3><p>Издатель, ссылка и количество источников остаются видимыми.</p></article>
-        <article class="trust"><h3>Проверка</h3><p>Черновик, проверка, одобрение и публикация разделены.</p></article>
-        <article class="trust"><h3>Аудит</h3><p>Редакционные действия фиксируются и не смешиваются с публичной лентой.</p></article>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <h2>Человеческая устойчивость</h2>
-        <p>Цель не удержание внимания любой ценой. Цель - восстановление ориентации и снижение когнитивной перегрузки.</p>
-      </div>
-      <div class="sustainability-grid">
-        <article class="metric"><h3>Нагрузка</h3><p>Меньше одновременных сигналов, больше ясной иерархии.</p></article>
-        <article class="metric"><h3>Ритм</h3><p>Утренний обзор, дневная перенастройка, недельная память тем.</p></article>
-        <article class="metric"><h3>Внимание</h3><p>Без бесконечной прокрутки, кликбейта и искусственного напряжения.</p></article>
-        <article class="metric"><h3>Ясность</h3><p>Пользователь должен уходить спокойнее, чем пришёл.</p></article>
+        <article class="trust"><h3>Контекст</h3><p>Событие связывается с более широкой траекторией.</p></article>
+        <article class="trust"><h3>Ритм</h3><p>Без бесконечной прокрутки и искусственного напряжения.</p></article>
       </div>
     </section>
 
     <section id="news">
-      <div class="section-head">
-        <h2>Автоматическая лента</h2>
-        <p>Лента собирает опубликованные материалы по рубрикам и показывает их как спокойную карту сигналов: без гонки кликов, без бесконечной прокрутки и без перегрузки.</p>
-      </div>
-      <div class="panel">
-        <h3>Публичная часть показывает только готовые материалы.</h3>
-        <p>Каждый материал проходит путь от источника к сигналу, контексту и следующему шагу понимания. Читатель видит не внутреннюю механику, а ясную редакционную поверхность.</p>
-        <div class="news-toolbar">
-          <a class="button primary" href="/jazekker/news">Открыть ленту</a>
+      <div class="news-panel">
+        <div>
+          <h2>Автоматическая лента</h2>
+          <p>Лента показывает опубликованные материалы по рубрикам как спокойную карту сигналов: без гонки кликов, без перегрузки и без визуального шума.</p>
+          <div class="news-toolbar">
+            <a class="button" href="/jazekker/news">Перейти к ленте</a>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <h2>Путь к запуску</h2>
-        <p>Для запуска JAZEKKER нужен не объём контента, а стабильный цикл: источники, рубрики, проверка, публикация, доверие.</p>
-      </div>
-      <div class="roadmap">
-        <article class="phase"><h3>1. Публичная витрина</h3><p>Главная, рубрики, лента, читаемые материалы.</p></article>
-        <article class="phase"><h3>2. Редакционный цикл</h3><p>Сбор, классификация, проверка, одобрение, локальная публикация.</p></article>
-        <article class="phase"><h3>3. Источники</h3><p>Надёжные RSS-каналы, доверие, частота обновления, дедупликация.</p></article>
-        <article class="phase"><h3>4. Публичный релиз</h3><p>Cloudflare Pages, домен, простая навигация, безопасный admin token.</p></article>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <h2>Финальный тест</h2>
-        <p>Каждый экран должен проходить простой тест ориентации.</p>
-      </div>
-      <div class="test-list">
-        <div class="test">Снижает шум?</div><div class="test">Улучшает ориентацию?</div><div class="test">Сохраняет суждение?</div>
-        <div class="test">Даёт ясность?</div><div class="test">Укрепляет доверие?</div><div class="test">Помогает действовать спокойнее?</div>
+        <div class="panel">
+          <h3>Финальный тест</h3>
+          <div class="test-list">
+            <div class="test">Снижает шум?</div>
+            <div class="test">Улучшает ориентацию?</div>
+            <div class="test">Укрепляет доверие?</div>
+          </div>
+        </div>
       </div>
     </section>
 
     <footer>
       <span>JAZEKKER</span>
-      <span>Noise -> Signal -> Context -> Orientation -> Trust</span>
+      <span>Noise -> Signal -> Context -> Orientation</span>
     </footer>
   </main>
-
 </body>
 </html>

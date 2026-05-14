@@ -19,6 +19,18 @@ def test_jazekker_public_pages_hide_internal_controls():
 
         assert response.status_code == 200
         assert "/jazekker/news/collect" not in response.text
+        assert "AI Cabinet" not in response.text
+
+
+def test_jazekker_articles_api_exposes_launch_metadata():
+    response = client.get("/jazekker/articles")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["count"] >= 8
+    assert payload["categories"]
+    assert all("url" in article for article in payload["articles"])
+    assert all("orientation_score" in article for article in payload["articles"])
 
 
 def test_root_redirects_to_news_portal_homepage():
@@ -34,3 +46,4 @@ def test_jazekker_article_uses_reader_facing_language():
     assert response.status_code == 200
     assert "Фокус материала:" in response.text
     assert "Orientation lens:" not in response.text
+    assert "Р¤" not in response.text
