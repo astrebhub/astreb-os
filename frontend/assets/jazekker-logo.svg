@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-labelledby="title desc">
   <title id="title">JAZEKKER</title>
-  <desc id="desc">Compass logo with JAZEKKER and subtitle portal of calm orientation.</desc>
+  <desc id="desc">Compass logo with JAZEKKER and the phrase Ik ga het rustig aan doen.</desc>
   <defs>
     <radialGradient id="bg" cx="50%" cy="36%" r="62%">
       <stop offset="0%" stop-color="#151515"/>
@@ -55,5 +55,7 @@
   </g>
   <text x="450" y="385" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="96" font-weight="700" letter-spacing="2" fill="url(#steel)" stroke="#111" stroke-width="1.5">JAZEKKER</text>
   <path d="M198 413 H702 M370 421 H530 L450 456 Z" fill="none" stroke="url(#steel)" stroke-width="4" opacity=".92"/>
-  <text x="450" y="487" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="25" letter-spacing="4" fill="#d8c891">портал спокойной ориентации</text>
+  <line x1="168" y1="472" x2="240" y2="472" stroke="url(#steel)" stroke-width="3" opacity=".82"/>
+  <line x1="660" y1="472" x2="732" y2="472" stroke="url(#steel)" stroke-width="3" opacity=".82"/>
+  <text x="450" y="485" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="6" fill="url(#steel)">Ik ga het rustig aan doen</text>
 </svg>
