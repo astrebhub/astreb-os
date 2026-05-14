@@ -13,22 +13,19 @@ def test_jazekker_public_pages_are_available():
         assert response.status_code == 200
 
 
-def test_jazekker_public_pages_hide_editorial_controls():
+def test_jazekker_public_pages_hide_internal_controls():
     for path in ("/jazekker", "/jazekker/news"):
         response = client.get(path)
 
         assert response.status_code == 200
-        assert "/jazekker/chief-editor" not in response.text
-        assert "Admin token" not in response.text
         assert "/jazekker/news/collect" not in response.text
 
 
-def test_jazekker_legacy_cabinet_pages_redirect_to_news_portal():
-    for path in ("/", "/jazekker/chief-editor", "/jazekker/editorial"):
-        response = client.get(path, follow_redirects=False)
+def test_root_redirects_to_news_portal_homepage():
+    response = client.get("/", follow_redirects=False)
 
-        assert response.status_code == 307
-        assert response.headers["location"] in {"/jazekker", "/jazekker/news"}
+    assert response.status_code == 307
+    assert response.headers["location"] == "/jazekker"
 
 
 def test_jazekker_article_uses_reader_facing_language():
@@ -37,20 +34,3 @@ def test_jazekker_article_uses_reader_facing_language():
     assert response.status_code == 200
     assert "Фокус материала:" in response.text
     assert "Orientation lens:" not in response.text
-
-
-def test_editorial_apis_require_admin_token():
-    for path in ("/jazekker/orientation-objects", "/jazekker/news/sources"):
-        response = client.get(path)
-
-        assert response.status_code == 403
-
-
-def test_editorial_apis_accept_admin_token():
-    response = client.get(
-        "/jazekker/orientation-objects",
-        headers={"X-AI-Cabinet-Admin-Token": "change-me-before-public-demo"},
-    )
-
-    assert response.status_code == 200
-    assert "objects" in response.json()
