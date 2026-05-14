@@ -23,6 +23,14 @@ def test_jazekker_public_pages_hide_editorial_controls():
         assert "/jazekker/news/collect" not in response.text
 
 
+def test_jazekker_legacy_cabinet_pages_redirect_to_news_portal():
+    for path in ("/", "/jazekker/chief-editor", "/jazekker/editorial"):
+        response = client.get(path, follow_redirects=False)
+
+        assert response.status_code == 307
+        assert response.headers["location"] in {"/jazekker", "/jazekker/news"}
+
+
 def test_jazekker_article_uses_reader_facing_language():
     response = client.get("/jazekker/articles/ai-coordination-control-before-autonomy")
 

@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -242,8 +242,7 @@ def render_jazekker_article(article: Dict[str, Any]) -> str:
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
-    with (FRONTEND_DIR / "index.html").open("r", encoding="utf-8") as handle:
-        return handle.read()
+    return RedirectResponse(url="/jazekker", status_code=307)
 
 
 @app.get("/styles.css")
@@ -277,12 +276,12 @@ async def jazekker_news_page():
 
 @app.get("/jazekker/editorial")
 async def jazekker_editorial_page():
-    return FileResponse(FRONTEND_DIR / "jazekker-editorial.html", media_type="text/html")
+    return RedirectResponse(url="/jazekker/news", status_code=307)
 
 
 @app.get("/jazekker/chief-editor")
 async def jazekker_chief_editor_page():
-    return FileResponse(FRONTEND_DIR / "jazekker-chief-editor.html", media_type="text/html")
+    return RedirectResponse(url="/jazekker/news", status_code=307)
 
 
 @app.post("/submit", response_model=SubmitResponse)
