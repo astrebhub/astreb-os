@@ -13,6 +13,16 @@ def test_jazekker_public_pages_are_available():
         assert response.status_code == 200
 
 
+def test_jazekker_public_pages_hide_editorial_controls():
+    for path in ("/jazekker", "/jazekker/news"):
+        response = client.get(path)
+
+        assert response.status_code == 200
+        assert "/jazekker/chief-editor" not in response.text
+        assert "Admin token" not in response.text
+        assert "/jazekker/news/collect" not in response.text
+
+
 def test_jazekker_article_uses_reader_facing_language():
     response = client.get("/jazekker/articles/ai-coordination-control-before-autonomy")
 

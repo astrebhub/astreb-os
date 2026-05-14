@@ -106,7 +106,6 @@
       <div class="topbar">
         <input id="search" placeholder="Поиск по сигналам, темам, источникам..." />
         <a class="button" href="/jazekker">Главная</a>
-        <a class="button" href="/jazekker/chief-editor">Редактор</a>
       </div>
       <section class="hero">
         <div>
@@ -114,7 +113,6 @@
           <p>Опубликованные локальные материалы JAZEKKER: AI, Европа, геополитика, блокчейн, духовность, человеческая устойчивость и будущие траектории без лишнего шума.</p>
           <div class="toolbar">
             <button id="refresh" class="primary">Обновить ленту</button>
-            <a class="button" href="/jazekker/chief-editor">Пульт главного редактора</a>
           </div>
           <div id="status" class="status">Загружаю опубликованные материалы...</div>
         </div>
@@ -155,6 +153,26 @@
       if (text.includes("high")) return "impact-high";
       if (text.includes("low")) return "impact-low";
       return "impact-medium";
+    }
+    function labelNoise(value) {
+      const text = String(value || "medium").toLowerCase();
+      if (text.includes("high")) return "шум высокий";
+      if (text.includes("low")) return "шум низкий";
+      return "шум средний";
+    }
+    function labelConfidence(value) {
+      const text = String(value || "medium").toLowerCase();
+      if (text.includes("high")) return "уверенность высокая";
+      if (text.includes("low")) return "уверенность низкая";
+      return "уверенность средняя";
+    }
+    function labelStatus(value) {
+      return {
+        published_local: "опубликовано",
+        published_external: "внешняя публикация",
+        approved: "одобрено",
+        scheduled: "запланировано"
+      }[value] || "опубликовано";
     }
     function renderChrome() {
       const nav = document.getElementById("channelNav");
@@ -204,10 +222,10 @@
             <h3>${escapeHtml(record.title || item.title)}</h3>
             <p>${escapeHtml(record.dek || record.signal?.summary || "")}</p>
             <div class="signals">
-              <span class="chip ${impactClass(record)}">${escapeHtml(record.noise_level || "medium")} noise</span>
+              <span class="chip ${impactClass(record)}">${escapeHtml(labelNoise(record.noise_level))}</span>
               <span class="chip">${escapeHtml(record.impact_horizon || (record.reading_minutes ? `${record.reading_minutes} мин` : "недели"))}</span>
-              <span class="chip">${escapeHtml(source.confidence || "medium")} confidence</span>
-              <span class="chip">${escapeHtml(record.status || "published_local")}</span>
+              <span class="chip">${escapeHtml(labelConfidence(source.confidence))}</span>
+              <span class="chip">${escapeHtml(labelStatus(record.status || "published_local"))}</span>
             </div>
             <div class="next"><strong>Следующий шаг:</strong> ${escapeHtml(record.next_orientation_step || "Проверить источник и контекст.")}</div>
             ${readUrl ? `<a class="read-link" href="${escapeHtml(readUrl)}" ${record.status === "published_local" ? "" : 'target="_blank" rel="noreferrer"'}>${escapeHtml(readLabel)}</a>` : ""}
@@ -237,7 +255,7 @@
       const articleData = await articleRes.json();
       if (!articleRes.ok) throw new Error(articleData.detail || JSON.stringify(articleData));
       items = [...(articleData.articles || [])];
-      status.textContent = `Загружено ${articleData.count || 0} опубликованных локальных материалов. Редакторский сбор доступен в пульте главного редактора.`;
+      status.textContent = `Загружено ${articleData.count || 0} опубликованных материалов.`;
       renderAll();
     }
     document.getElementById("refresh").onclick = () => refreshSaved().catch(err => status.textContent = `Ошибка: ${err.message}`);
