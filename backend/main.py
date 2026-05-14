@@ -85,7 +85,6 @@ def render_article(article: dict[str, Any]) -> str:
     .back {{ min-height: 38px; border: 1px solid var(--line); border-radius: 6px; padding: 0 12px; display: inline-flex; align-items: center; text-decoration: none; background: #12283a; }}
     .brand {{ display: grid; gap: 7px; text-decoration: none; }}
     .brand-logo {{ display: block; width: 176px; height: auto; border-radius: 8px; background: #050505; box-shadow: 0 12px 28px rgba(0,0,0,.28); }}
-    .brand-caption {{ color: #b8c6d0; font-size: 13px; }}
     article {{ margin-top: 42px; }}
     .meta {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }}
     .chip {{ display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 6px; background: #13283a; color: #c5d1db; font-size: 12px; }}
@@ -102,9 +101,8 @@ def render_article(article: dict[str, Any]) -> str:
 <body>
   <div class="shell">
     <header>
-      <a class="brand" href="/jazekker" aria-label="JAZEKKER - портал спокойной ориентации">
-        <img class="brand-logo" src="/jazekker/assets/jazekker-logo.svg" alt="JAZEKKER - портал спокойной ориентации" />
-        <span class="brand-caption">портал спокойной ориентации</span>
+      <a class="brand" href="/jazekker" aria-label="JAZEKKER">
+        <img class="brand-logo" src="/jazekker/assets/jazekker-logo.svg" alt="JAZEKKER" />
       </a>
       <a class="back" href="/jazekker/news">Назад к ленте</a>
     </header>
