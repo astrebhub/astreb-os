@@ -55,7 +55,7 @@ controlled execution boundaries and security-baseline governance controls.
 | --- | --- | --- |
 | `docs/testbox-v0.3-situational-orientation-architecture.md` | Canonical | Active target architecture for TESTBOX/ASTI development. |
 | `docs/canonical-architecture-decision-2026-05-27.md` | Canonical | Current governed component and security boundary decision. |
-| `release/local-governed-mvp-v0.3` | Canonical | Local freeze branch for this gate; not yet published. |
+| `release/local-governed-mvp-v0.3` | Canonical | Published review snapshot for this gate; not a production deployment or release approval. |
 | JAZEKKER Foundation frontend surfaces | Active | Implemented locally and covered by tests. |
 | TESTBOX backend runtime | Active | Implemented locally; authenticated demo/runtime only. |
 | ASTI executor layer | Active | Implemented with external execution frozen by default. |

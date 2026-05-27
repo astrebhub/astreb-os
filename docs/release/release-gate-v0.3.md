@@ -10,8 +10,9 @@ Branch base commit at gate opening: `b8a62934fe4564484793cadf0382696c15c4fef2`
 
 This gate records a locally implemented and tested governed AI orientation
 prototype with controlled execution boundaries and security-baseline controls.
-It does not represent a production deployment, a live external-execution
-release or a confirmed GitHub publication of the current working tree.
+The controlled snapshot branch was subsequently published for review as
+commit `43ad6a08388f8931f89fd7095560ab8d9183c744`; this does not represent a
+production deployment or a live external-execution release.
 
 ## Repository State At Gate Opening
 
@@ -57,7 +58,7 @@ Not approved:
 - autonomous publication or distribution;
 - Telegram, WhatsApp or email execution;
 - self-modifying or self-approved runtime changes;
-- any claim that the current uncommitted state is already published.
+- any claim that the published review snapshot is a production release.
 
 ## Required Before Next Gate
 
