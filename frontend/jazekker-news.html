@@ -111,7 +111,10 @@
     <main>
       <div class="topbar">
         <input id="search" placeholder="Поиск по сигналам, темам, источникам..." />
-        <a class="button" href="/jazekker">Главная</a>
+        <div class="sort-row">
+          <a class="button primary" href="/jazekker/workspace">Кабинет</a>
+          <a class="button" href="/jazekker">Главная</a>
+        </div>
       </div>
       <section class="hero">
         <div>
@@ -119,8 +122,8 @@
           <p>Опубликованные материалы JAZEKKER: AI, Европа, геополитика, блокчейн, смысл, человеческая устойчивость, климат и будущие траектории без лишнего шума.</p>
           <div class="toolbar">
             <div class="sort-row">
-              <button id="sortRecent" class="active">Свежие</button>
-              <button id="sortOrientation">Сильный сигнал</button>
+              <button id="sortOrientation" class="active">Ясность решений</button>
+              <button id="sortRecent">Свежие</button>
               <button id="sortReading">Короткие</button>
             </div>
             <div id="status" class="status">Загружаю опубликованные материалы...</div>
@@ -141,7 +144,7 @@
   <script>
     let topics = [{id: "all", label: "Все"}];
     let active = "all";
-    let sortMode = "recent";
+    let sortMode = "orientation";
     let items = [];
     const status = document.getElementById("status");
 
@@ -168,6 +171,17 @@
       if (text === "high") return "уверенность высокая";
       if (text === "low") return "уверенность низкая";
       return "уверенность средняя";
+    }
+    function clarityDecisionScore(record) {
+      const impact = {high: 30, medium: 18, low: 8}[String(record.impact_level || "medium").toLowerCase()] || 18;
+      const confidence = {high: 12, medium: 7, low: 2}[String(record.confidence_level || "medium").toLowerCase()] || 7;
+      const hasDecisionStep = record.next_orientation_step ? 8 : 0;
+      const hasLens = record.orientation_lens ? 6 : 0;
+      const readingFit = Math.max(0, 8 - Math.max(0, Number(record.reading_minutes || 4) - 4));
+      return Math.round((Number(record.orientation_score) || 0) + impact + confidence + hasDecisionStep + hasLens + readingFit);
+    }
+    function labelClarityDecisionScore(record) {
+      return `ясность ${clarityDecisionScore(record)}`;
     }
     function setSort(mode) {
       sortMode = mode;
@@ -198,7 +212,10 @@
         return activeOk && qOk;
       });
       return visible.sort((a, b) => {
-        if (sortMode === "orientation") return (b.orientation_score || 0) - (a.orientation_score || 0);
+        if (sortMode === "orientation") {
+          return clarityDecisionScore(b) - clarityDecisionScore(a)
+            || String(b.published_at || "").localeCompare(String(a.published_at || ""));
+        }
         if (sortMode === "reading") return (a.reading_minutes || 99) - (b.reading_minutes || 99);
         return String(b.published_at || "").localeCompare(String(a.published_at || ""));
       });
@@ -222,6 +239,7 @@
             <p>${escapeHtml(record.dek || "")}</p>
             <div class="signals">
               <span class="chip ${impactClass(record)}">${escapeHtml(labelImpact(record.impact_level))}</span>
+              <span class="chip">${escapeHtml(labelClarityDecisionScore(record))}</span>
               <span class="chip">${escapeHtml(record.horizon || "средний горизонт")}</span>
               <span class="chip">${escapeHtml(labelConfidence(record.confidence_level))}</span>
               <span class="chip">${escapeHtml(record.reading_minutes || 4)} мин</span>

@@ -4,17 +4,33 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  governed-preview-gate:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install --upgrade pip
-      - run: python -m pip install -r requirements.txt
-      - run: python -m pytest ../tests
+      - name: Install dependencies and gate tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r backend/requirements.txt
+          python -m pip install ruff pip-audit
+      - name: Validate Python sources
+        run: python -m ruff check --select E9,F63,F7,F82 backend tests
+      - name: Run tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m pytest -p no:cacheprovider tests -q
+      - name: Scan Python dependencies
+        run: python -m pip_audit -r backend/requirements.txt
+      - name: Build governed preview artifact
+        run: tar -czf astreb-local-governed-mvp-v0.3.tgz backend frontend content docs README.md SECURITY.md .env.example
+      - uses: actions/upload-artifact@v4
+        with:
+          name: astreb-local-governed-mvp-v0.3
+          path: astreb-local-governed-mvp-v0.3.tgz

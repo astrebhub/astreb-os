@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Local Orientation | JAZEKKER</title><link rel="stylesheet" href="/static/foundation.css?v=foundation-2" /></head>
+<body>
+  <header class="site-header"><div class="header-inner">
+    <a class="foundation-brand" href="/jazekker"><img src="/jazekker/assets/jazekker-logo.png" alt="JAZEKKER" /><span class="brand-word"><strong>JAZEKKER</strong><span>Orientation infrastructure</span></span></a>
+    <nav class="primary-nav"><a href="/jazekker">Home</a><a href="/jazekker/orientation">Orientation</a><a class="active" href="/jazekker/local">Local</a><a href="/jazekker/research">Research</a><a href="/jazekker/ai-cabinet">AI Cabinet</a><a href="/jazekker/testbox">TESTBOX</a><a href="/jazekker/co-creation">Co-Creation</a></nav>
+    <a class="btn header-action mobile-nav" href="/jazekker">Home</a>
+  </div></header>
+  <div class="page">
+    <section class="page-hero"><div><span class="eyebrow">Local Orientation</span><h1>Place matters to orientation</h1><p>Adapt signals to local policy, research ecosystems and opportunities without turning context into advertising personalization.</p></div></section>
+    <div class="form-grid">
+      <form class="form-panel">
+        <h2>Orientation context</h2>
+        <div class="form-row"><label for="country">Country</label><select id="country" class="field"><option>Netherlands</option><option>Belgium</option><option>Germany</option></select></div>
+        <div class="form-row"><label for="city">City</label><select id="city" class="field"></select></div>
+        <div class="form-row"><label>Environment</label><div class="toggle-group"><button class="toggle selected" type="button">AI</button><button class="toggle selected" type="button">Energy</button><button class="toggle selected" type="button">Research</button><button class="toggle" type="button">Governance</button><button class="toggle" type="button">Learning</button></div></div>
+        <div class="form-row"><label for="domain">Professional domain</label><select id="domain" class="field"><option>Research & innovation</option><option>Public administration</option><option>Education</option><option>Energy transition</option></select></div>
+        <div class="form-row"><label>Orientation mode</label><div class="segmented"><button type="button" class="mode-btn active" data-mode="Calm">Calm</button><button type="button" class="mode-btn" data-mode="Professional">Professional</button><button type="button" class="mode-btn" data-mode="Strategic">Strategic</button></div></div>
+      </form>
+      <section class="preview-panel" aria-live="polite">
+        <div class="brief-header"><div><span class="eyebrow">Local briefing</span><strong id="briefLocation">Den Haag, Netherlands</strong></div><div class="chips"><span id="localMode" class="pill">Calm mode</span><span class="pill confidence">Contextual, not promotional</span></div></div>
+        <div class="brief-section"><h3>Active context</h3><p id="localContext">AI, Energy, Research</p></div>
+        <div class="brief-section"><h3>Local signal</h3><p id="localSignal"></p></div>
+        <div class="brief-section"><h3>Policy update to monitor</h3><p id="localPolicy"></p></div>
+        <div class="brief-section"><h3>Coordination opportunity</h3><p id="localOpportunity"></p></div>
+      </section>
+    </div>
+    <footer class="footer"><span>Local signals remain user-controlled.</span><a href="/jazekker/co-creation">Explore local coordination -></a></footer>
+  </div>
+  <script src="/static/foundation.js?v=foundation-2"></script>
+</body>
+</html>

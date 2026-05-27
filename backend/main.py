@@ -7,6 +7,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
+from asti import create_asti_router
+from asti.service import AstiService
+from asti.store import ActionQueue, AstiAuditLog
+from testbox_runtime.api import create_testbox_router
+
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = BASE_DIR / "frontend"
@@ -15,6 +20,12 @@ ASSET_DIR = FRONTEND_DIR / "assets"
 
 app = FastAPI(title="JAZEKKER News Portal")
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+asti_service = AstiService(
+    ActionQueue(BASE_DIR / "action_queue" / "asti_actions.json"),
+    AstiAuditLog(BASE_DIR / "audit" / "asti_events.jsonl"),
+)
+app.include_router(create_testbox_router(BASE_DIR, asti_service))
+app.include_router(create_asti_router(BASE_DIR, asti_service))
 
 
 def load_articles() -> list[dict[str, Any]]:
@@ -134,14 +145,80 @@ async def root():
     return RedirectResponse(url="/jazekker", status_code=307)
 
 
+@app.get("/testbox")
+@app.get("/testbox/cockpit")
+@app.get("/testbox/orchestration")
+@app.get("/testbox/legal")
+@app.get("/testbox/legalbox")
+@app.get("/testbox/legal-demo")
+@app.get("/testbox/user")
+@app.get("/testbox/audit")
+@app.get("/testbox/routing")
+@app.get("/testbox/memory")
+@app.get("/testbox/settings")
+@app.get("/testbox/training")
+@app.get("/testbox/hackathon")
+async def testbox():
+    return FileResponse(
+        FRONTEND_DIR / "testbox.html",
+        media_type="text/html",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
 @app.get("/jazekker")
 async def homepage():
+    return FileResponse(FRONTEND_DIR / "jazekker-foundation.html", media_type="text/html")
+
+
+@app.get("/jazekker/legacy")
+async def legacy_homepage():
     return FileResponse(FRONTEND_DIR / "jazekker.html", media_type="text/html")
+
+
+@app.get("/jazekker/orientation")
+async def orientation_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-orientation.html", media_type="text/html")
+
+
+@app.get("/jazekker/local")
+async def local_orientation_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-local.html", media_type="text/html")
+
+
+@app.get("/jazekker/research")
+async def research_desk_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-research.html", media_type="text/html")
+
+
+@app.get("/jazekker/ai-cabinet")
+async def ai_cabinet_demo_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-cabinet-demo.html", media_type="text/html")
+
+
+@app.get("/jazekker/testbox")
+async def testbox_demo_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-testbox-preview.html", media_type="text/html")
+
+
+@app.get("/jazekker/co-creation")
+async def co_creation_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-co-creation.html", media_type="text/html")
 
 
 @app.get("/jazekker/news")
 async def news_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-workspace.html", media_type="text/html")
+
+
+@app.get("/jazekker/public-news")
+async def public_news_page():
     return FileResponse(FRONTEND_DIR / "jazekker-news.html", media_type="text/html")
+
+
+@app.get("/jazekker/workspace")
+async def workspace_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-workspace.html", media_type="text/html")
 
 
 @app.get("/jazekker/banner")
