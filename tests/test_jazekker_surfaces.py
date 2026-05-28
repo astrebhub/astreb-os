@@ -55,7 +55,7 @@ def test_jazekker_public_pages_hide_internal_controls():
 
         assert response.status_code == 200
         assert "/jazekker/news/collect" not in response.text
-        assert "change-me-before-public-demo" not in response.text
+        assert "X-AI-Cabinet-Admin-Token" not in response.text
 
 
 def test_foundation_mvp_routes_are_available():

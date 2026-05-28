@@ -29,6 +29,7 @@ from .policy_engine import (
     HUMAN_REVIEW_POLICY,
     LIMITATION_REPORTING_POLICY,
 )
+from .quality_layer import LearningRepository, QualityInput, QualityLayer
 from .roles import role_assignment_for
 from .session_store import JsonSessionContextStore
 
@@ -219,13 +220,15 @@ def human_review_reason(
 
 
 class LegalBoxRuntime:
-    def __init__(self, audit_path: Path) -> None:
+    def __init__(self, audit_path: Path, quality_learning_path: Path | None = None) -> None:
         self.events = RuntimeEventBus(audit_path)
         self.session_context = JsonSessionContextStore(
             audit_path.parent / "testbox_session_context.json"
         )
         self.answer_composer = GroundedAnswerComposer()
         self.orientation_core = OrientationCore()
+        learning_path = quality_learning_path or audit_path.with_name("qms_learning_records.jsonl")
+        self.quality_layer = QualityLayer(LearningRepository(learning_path))
 
     def _event(
         self,
@@ -624,7 +627,7 @@ class LegalBoxRuntime:
                 )
             )
 
-        if domain != "general":
+        if classification.source_required:
             emitted.append(
                 self._event(
                     request,
@@ -638,7 +641,7 @@ class LegalBoxRuntime:
                         "domain": domain,
                         "domain_candidates": classification.domain_candidates,
                         "confidence": classification.confidence,
-                        "sources_required": True,
+                        "sources_required": classification.source_required,
                     },
                 )
             )
@@ -754,6 +757,21 @@ class LegalBoxRuntime:
         )
         if classification.uncertain and missing_source_domains:
             final_response = self._uncertainty_notice(language, missing_source_domains) + final_response
+        quality_assessment, final_response, learning_records = self.quality_layer.evaluate(
+            QualityInput(
+                user_session=request.user_session,
+                scenario=f"{domain}:{answer_strategy}",
+                domain=domain,
+                intent=answer_strategy,
+                route=route,
+                risk_level=risk,
+                approval_state=approval_state,
+                source_required=classification.source_required,
+                source_count=len(sources),
+                policies=policies,
+                final_response=final_response,
+            )
+        )
         emitted.append(
             self._event(
                 request,
@@ -767,6 +785,69 @@ class LegalBoxRuntime:
                 payload={"strategy": answer_strategy, "mode": orientation.mode},
             )
         )
+        emitted.append(
+            self._event(
+                request,
+                EventType.QUALITY_SKILLS_LOADED,
+                route="Quality Layer",
+                policies=policies,
+                risk=risk,
+                jurisdiction=jurisdiction,
+                source_refs=[source.id for source in sources],
+                approval_state=approval_state,
+                payload={
+                    "skills": quality_assessment.loaded_skills,
+                    "scenario": quality_assessment.scenario,
+                },
+            )
+        )
+        emitted.append(
+            self._event(
+                request,
+                EventType.QUALITY_EVALUATED,
+                route="Quality Layer",
+                policies=policies,
+                risk=risk,
+                jurisdiction=jurisdiction,
+                source_refs=[source.id for source in sources],
+                approval_state=approval_state,
+                payload={
+                    "assessment_id": quality_assessment.id,
+                    "quality_score": quality_assessment.quality_score,
+                    "deviation_count": len(quality_assessment.deviations),
+                    "release_allowed": quality_assessment.release_allowed,
+                    "final_output_modified": quality_assessment.final_output_modified,
+                },
+            )
+        )
+        for deviation in quality_assessment.deviations:
+            emitted.append(
+                self._event(
+                    request,
+                    EventType.QUALITY_INTERVENTION_APPLIED,
+                    route="Quality Layer -> Intervention",
+                    policies=policies,
+                    risk=risk,
+                    jurisdiction=jurisdiction,
+                    source_refs=[source.id for source in sources],
+                    approval_state=approval_state,
+                    payload=deviation.model_dump(mode="json"),
+                )
+            )
+        for learning_record in learning_records:
+            emitted.append(
+                self._event(
+                    request,
+                    EventType.LEARNING_CAPTURED,
+                    route="Quality Layer -> Learning Repository",
+                    policies=policies,
+                    risk=risk,
+                    jurisdiction=jurisdiction,
+                    source_refs=[source.id for source in sources],
+                    approval_state=approval_state,
+                    payload=learning_record.model_dump(mode="json"),
+                )
+            )
         if ACTIVE_TASK_EXECUTION_POLICY in policies:
             readable_text_available = document_processing.extraction_status == "readable_text_received"
             result = "output_produced"
@@ -954,6 +1035,7 @@ class LegalBoxRuntime:
                 if answer_strategy == "review_document" or request.attachment_names
                 else None
             ),
+            quality_assessment=quality_assessment.model_dump(mode="json"),
             final_response=final_response,
             events=emitted,
         )
@@ -976,6 +1058,8 @@ class LegalBoxRuntime:
             return "DocumentBox -> Analysis Attempt"
         if domain == "event_collaboration":
             return "Orientation -> Coordination Planning"
+        if domain == "testbox_product":
+            return "Orientation -> Strategic Positioning"
         if intent in {"build_action_plan", "assess_situation"}:
             return "Orientation -> Active Analysis"
         if domain == "general":

@@ -1,0 +1,13 @@
+id: procedural_integrity
+name: Procedural Integrity
+version: 1.0.0
+purpose: Keep outputs aligned with detected intent, route, risk, and process state.
+constraints:
+  - Non-general domains must not receive generic intake fallback.
+evaluation_rules:
+  - Flag route/output divergence.
+  - Flag empty outputs.
+intervention_rules:
+  - Require domain-specific answer before release.
+improvement_history:
+  - 1.0.0 initial runtime skill.

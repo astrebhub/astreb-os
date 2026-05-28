@@ -42,6 +42,8 @@ class GroundedAnswerComposer:
             "review_document": self._document_intake,
             "build_action_plan": self._plan_intake,
             "prepare_event_participation": self._event_preparation,
+            "forecast_event_challenges": self._event_challenge_forecast,
+            "strategic_positioning": self._strategic_positioning,
             "assess_situation": self._situation_intake,
             "request_external_action": self._external_action_intake,
             "request_unapproved_external_execution": self._external_action_blocked,
@@ -65,6 +67,8 @@ class GroundedAnswerComposer:
             "review_document",
             "build_action_plan",
             "prepare_event_participation",
+            "forecast_event_challenges",
+            "strategic_positioning",
             "assess_situation",
             "request_external_action",
             "request_unapproved_external_execution",
@@ -915,6 +919,87 @@ class GroundedAnswerComposer:
             "challenge questions. During the event, focus on up to two challenges, "
             "state your contribution and agree roles and a next step. Afterward, confirm "
             "your first contribution and the next meeting with the selected team."
+        )
+
+    def _event_challenge_forecast(self, context: AnswerContext) -> str:
+        if context.language == "ru":
+            return (
+                "Ориентировочный прогноз заданий для OneGov #2\n\n"
+                "Я не могу знать закрытый список challenge до публикации организаторами. "
+                "Но по названию OneGov и формату pre-hackathon наиболее вероятны не случайные задачи, "
+                "а civic-tech задания вокруг государства, сервисов, данных и доверия.\n\n"
+                "Вероятные направления\n\n"
+                "1. Цифровые государственные услуги: как сделать понятнее путь гражданина через несколько ведомств.\n"
+                "2. AI для публичного сектора: ассистенты, triage запросов, объяснимые решения, контроль качества ответов.\n"
+                "3. Данные и интероперабельность: объединение разрозненных данных без потери приватности и контроля.\n"
+                "4. Прозрачность и доверие: audit trail, explainability, проверяемые источники, понятные правила ответственности.\n"
+                "5. Инклюзивный доступ: сервисы для мигрантов, пожилых, предпринимателей или людей с низкой цифровой грамотностью.\n"
+                "6. Командная координация: как быстро собрать роль, процесс, прототип и демонстрацию результата.\n\n"
+                "Что подготовить заранее\n\n"
+                "1. Один короткий кейс: какую проблему гражданина или организации вы хотите упростить.\n"
+                "2. Карточку навыков: AI/governance, research, UX, backend, data, policy, presentation.\n"
+                "3. Три вопроса к каждому challenge: кто пользователь, какой результат измеряется, какие ограничения по данным/закону.\n"
+                "4. Мини-шаблон решения: проблема -> пользователь -> данные -> риск -> прототип -> как доказать пользу.\n\n"
+                "Мой прогноз по лучшей позиции для вас: заходить не как просто участник, а как человек, который умеет "
+                "соединять AI, governance и понятный пользовательский сценарий. Это даст ценность почти в любом OneGov challenge.\n\n"
+                "Следующий практический шаг: пришлите ваши 3 навыка и язык участия, и я соберу вам короткий pitch "
+                "под наиболее вероятные задания хакатона."
+            )
+        if context.language == "nl":
+            return (
+                "Voorlopige challenge-voorspelling voor OneGov #2\n\n"
+                "Ik ken de gesloten challenge-lijst niet, maar verwacht civic-tech opdrachten rond "
+                "digitale publieke dienstverlening, AI in de overheid, data-interoperabiliteit, "
+                "transparantie, inclusieve toegang en teamcoordinatie. Bereid een korte pitch, "
+                "uw drie vaardigheden en drie vragen per challenge voor: gebruiker, meetbaar resultaat "
+                "en data/juridische beperkingen."
+            )
+        return (
+            "Provisional challenge forecast for OneGov #2\n\n"
+            "I cannot know the closed challenge list before organizers publish it. The likely areas are "
+            "digital public services, AI for government, data interoperability, transparency and trust, "
+            "inclusive access, and rapid team coordination. Prepare a short pitch, three contribution "
+            "skills, and questions about user, measurable outcome, and data/legal constraints."
+        )
+
+    def _strategic_positioning(self, context: AnswerContext) -> str:
+        if context.language == "ru":
+            return (
+                "Аудит качества ответа\n\n"
+                "Предыдущий ответ был ошибкой runtime: запрос про позиционирование ASTREB TESTBOX "
+                "не должен уходить в общий intake. Это не ваша ошибка. Системе не хватало явного "
+                "навыка стратегического позиционирования и правила: если контекст неполный, сначала "
+                "дать рабочую гипотезу и задать уточняющие вопросы.\n\n"
+                "Корректирующее действие\n\n"
+                "Позиционировать ASTREB TESTBOX лучше не как чатбот и не как демо, а как:\n\n"
+                "ASTREB TESTBOX - governance and quality runtime for AI-assisted public-sector and operational workflows.\n\n"
+                "Короткая русская формула:\n\n"
+                "ASTREB TESTBOX - среда управления качеством и governance для AI-процессов: она показывает, "
+                "как AI принимает решения, где возникают отклонения, какие вмешательства применяются и чему система учится.\n\n"
+                "Что важно подчеркнуть\n\n"
+                "1. Не чатбот: TESTBOX не просто отвечает, а наблюдает процесс.\n"
+                "2. Не dashboard: он не только показывает метрики, а фиксирует отклонения и вмешательства.\n"
+                "3. Не автономный агент: human authority остается границей для approvals, сроков, официальных действий и внешней отправки.\n"
+                "4. Не proof-of-concept без следа: каждый существенный шаг пишет audit и learning record.\n"
+                "5. Ценность для организаций: меньше слепой автоматизации, больше управляемого качества, объяснимости и ответственности.\n\n"
+                "Рекомендуемая внешняя формула\n\n"
+                "Controlled AI Governance Runtime for Quality, Auditability and Continuous Improvement.\n\n"
+                "Для Нидерландов / public sector можно мягче:\n\n"
+                "A controlled environment for testing, governing and improving AI-assisted administrative processes.\n\n"
+                "Предупреждающее действие\n\n"
+                "В таких вопросах TESTBOX должен всегда уточнять контекст, если его не хватает. Поэтому дальше я бы задал 4 вопроса:\n\n"
+                "1. Для кого позиционируем: инвесторы, муниципалитеты, госорганизации, партнеры или хакатон-жюри?\n"
+                "2. Что показываем первым: governance, QMS, audit, AI Cabinet, ASTI или public-sector workflow?\n"
+                "3. Формат нужен какой: one-liner, pitch на 30 секунд, сайт, презентация или demo script?\n"
+                "4. Язык и рынок: русский, английский, нидерландский; Европа, Нидерланды или международно?\n\n"
+                "Мой первичный выбор: для запуска позиционировать как QMS/governance runtime, а не как AI assistant. "
+                "Это сильнее, взрослее и точнее отличает ASTREB TESTBOX от обычных AI-инструментов."
+            )
+        return (
+            "Quality audit: the previous response was a runtime miss, not a user error. "
+            "ASTREB TESTBOX should be positioned as a governance and quality runtime, not as a chatbot or demo. "
+            "Suggested line: Controlled AI Governance Runtime for Quality, Auditability and Continuous Improvement. "
+            "Clarifying questions: audience, first proof point, format, language and market."
         )
 
     def _situation_intake(self, context: AnswerContext) -> str:

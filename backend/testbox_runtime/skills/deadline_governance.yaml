@@ -1,0 +1,12 @@
+id: deadline_governance
+name: Deadline Governance
+version: 1.0.0
+purpose: Prevent automatic changes to procedural deadlines.
+constraints:
+  - No procedural deadline may be modified by AI.
+evaluation_rules:
+  - Flag deadline modification, filing, or extension claims.
+intervention_rules:
+  - Convert execution claims into human-review next steps.
+improvement_history:
+  - 1.0.0 initial runtime skill.

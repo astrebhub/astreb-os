@@ -16,7 +16,7 @@ GOVERNANCE_BALANCE_POLICY = "governance_balance_policy"
 CONTEXT_CONTINUITY_POLICY = "context_continuity_policy"
 MISSION_FACT_INTEGRITY_POLICY = "mission_fact_integrity_policy"
 ASTI_EXECUTION_POLICY = "governed_external_execution_policy"
-NON_REGULATED_ORIENTATION_DOMAINS = {"event_collaboration"}
+NON_REGULATED_ORIENTATION_DOMAINS = {"event_collaboration", "testbox_product"}
 
 HIGH_RISK_DOMAINS = {
     "immigration",

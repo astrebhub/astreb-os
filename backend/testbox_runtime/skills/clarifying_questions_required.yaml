@@ -1,0 +1,12 @@
+id: clarifying_questions_required
+name: Clarifying Questions Required
+version: 1.0.0
+purpose: Ensure strategic or ambiguous tasks ask for context needed to improve the next answer.
+constraints:
+  - Do not pretend missing audience, format, or deployment context is known.
+evaluation_rules:
+  - Flag strategic positioning answers that contain no clarifying questions.
+intervention_rules:
+  - Ask concise questions about audience, format, market, and proof points.
+improvement_history:
+  - 1.0.0 added after ASTREB TESTBOX positioning fallback deviation.

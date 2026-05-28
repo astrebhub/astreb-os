@@ -26,6 +26,7 @@ from .models import (
     UserMessageRequest,
 )
 from .orchestration import TestboxOrchestrator
+from .quality_layer import SkillEvolutionDecisionRequest, SkillEvolutionRequest
 from .roles import CORE_ROLES
 
 
@@ -33,7 +34,9 @@ def create_testbox_router(base_dir: Path, asti_service: AstiService) -> APIRoute
     validate_privileged_runtime_configuration()
     router = APIRouter(prefix="/api/testbox", tags=["testbox-runtime"])
     runtime = TestboxOrchestrator(
-        base_dir / "audit" / "testbox_runtime_events.jsonl", asti_service
+        base_dir / "audit" / "testbox_runtime_events.jsonl",
+        asti_service,
+        base_dir / "audit" / "qms_learning_records.jsonl",
     )
     meta_qms = MetaQmsService(
         EvolutionProposalStore(base_dir / "audit" / "meta_qms_evolution_proposals.json"),
@@ -71,6 +74,91 @@ def create_testbox_router(base_dir: Path, asti_service: AstiService) -> APIRoute
     async def list_constitution(x_ai_cabinet_admin_token: str | None = Header(default=None)):
         require_admin_token(x_ai_cabinet_admin_token)
         return {"instructions": constitution_registry()}
+
+    @router.get("/runtime/qms/skills")
+    async def qms_skill_library(x_ai_cabinet_admin_token: str | None = Header(default=None)):
+        require_admin_token(x_ai_cabinet_admin_token)
+        return runtime.quality_layer.skill_library()
+
+    @router.get("/runtime/qms/scenarios")
+    async def qms_scenarios(x_ai_cabinet_admin_token: str | None = Header(default=None)):
+        require_admin_token(x_ai_cabinet_admin_token)
+        return runtime.quality_layer.scenario_catalog()
+
+    @router.get("/runtime/qms/learning")
+    async def qms_learning_repository(x_ai_cabinet_admin_token: str | None = Header(default=None)):
+        require_admin_token(x_ai_cabinet_admin_token)
+        return runtime.quality_layer.observation()
+
+    @router.get("/runtime/qms/meta")
+    async def qms_meta_recommendations(x_ai_cabinet_admin_token: str | None = Header(default=None)):
+        require_admin_token(x_ai_cabinet_admin_token)
+        return runtime.quality_layer.meta_qms_recommendations()
+
+    @router.post("/runtime/qms/skills/{skill_id}/evolution")
+    async def propose_skill_evolution(
+        skill_id: str,
+        request: SkillEvolutionRequest,
+        x_ai_cabinet_admin_token: str | None = Header(default=None),
+    ):
+        require_admin_token(x_ai_cabinet_admin_token)
+        try:
+            proposal = runtime.quality_layer.propose_skill_evolution(skill_id, request)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="skill_not_found") from exc
+        event = runtime.events.publish(
+            RuntimeEvent(
+                user_session=request.user_session,
+                role=request.role,
+                route="QMS -> Skill Evolution",
+                action=EventType.SKILL_EVOLUTION_PROPOSED,
+                approval_state=ApprovalState.REQUIRES_HUMAN_REVIEW,
+                payload={
+                    "proposal_id": proposal.id,
+                    "skill_id": proposal.skill_id,
+                    "current_version": proposal.current_version,
+                    "proposed_version": proposal.proposed_version,
+                    "automatic_execution": False,
+                },
+            )
+        )
+        return {"proposal": proposal, "event": event, "skills": runtime.quality_layer.skill_library()}
+
+    @router.post("/runtime/qms/skills/evolution/{proposal_id}/decision")
+    async def decide_skill_evolution(
+        proposal_id: str,
+        request: SkillEvolutionDecisionRequest,
+        x_ai_cabinet_admin_token: str | None = Header(default=None),
+    ):
+        require_admin_token(x_ai_cabinet_admin_token)
+        try:
+            proposal = runtime.quality_layer.decide_skill_evolution(proposal_id, request)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="skill_evolution_proposal_not_found") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        event = runtime.events.publish(
+            RuntimeEvent(
+                user_session=request.user_session,
+                role=request.role,
+                route="QMS -> Skill Evolution Decision",
+                action=(
+                    EventType.SKILL_EVOLUTION_APPROVED
+                    if request.decision == "approve"
+                    else EventType.SKILL_EVOLUTION_REJECTED
+                ),
+                approval_state=(
+                    ApprovalState.APPROVED if request.decision == "approve" else ApprovalState.DENIED
+                ),
+                payload={
+                    "proposal_id": proposal.id,
+                    "skill_id": proposal.skill_id,
+                    "status": proposal.status,
+                    "automatic_execution": False,
+                },
+            )
+        )
+        return {"proposal": proposal, "event": event, "skills": runtime.quality_layer.skill_library()}
 
     @router.get("/runtime/meta-qms")
     async def meta_qms_overview(x_ai_cabinet_admin_token: str | None = Header(default=None)):

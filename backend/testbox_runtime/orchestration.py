@@ -12,10 +12,16 @@ from .models import EventType, GovernedActionRequest, RuntimeEvent, RuntimeRespo
 class TestboxOrchestrator:
     """Central governed runtime that dispatches orientation decisions to bounded tools."""
 
-    def __init__(self, audit_path: Path, asti_service: AstiService) -> None:
-        self.orientation_runtime = LegalBoxRuntime(audit_path)
+    def __init__(
+        self,
+        audit_path: Path,
+        asti_service: AstiService,
+        quality_learning_path: Path | None = None,
+    ) -> None:
+        self.orientation_runtime = LegalBoxRuntime(audit_path, quality_learning_path)
         self.asti_service = asti_service
         self.events = self.orientation_runtime.events
+        self.quality_layer = self.orientation_runtime.quality_layer
 
     def process_message(self, request: UserMessageRequest) -> RuntimeResponse:
         response = self.orientation_runtime.process_message(request)

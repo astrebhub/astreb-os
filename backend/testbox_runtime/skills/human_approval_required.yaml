@@ -1,0 +1,14 @@
+id: human_approval_required
+name: Human Approval Required
+version: 1.0.0
+purpose: Prevent AI from creating legal effect, final approval, dispatch, or irreversible execution.
+constraints:
+  - No final approval may occur automatically.
+  - No official response may be dispatched by answer generation.
+evaluation_rules:
+  - Flag high-risk output without human review.
+  - Flag claims that something was sent, approved, filed, or executed.
+intervention_rules:
+  - Require human decision before release or execution.
+improvement_history:
+  - 1.0.0 initial runtime skill.

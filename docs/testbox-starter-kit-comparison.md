@@ -5,7 +5,7 @@ Date: 2026-05-22
 Source archive:
 
 ```text
-C:/Users/Viacheslav/Downloads/TESTBOX_STARTER_KIT (1).zip
+local source archive, not committed
 ```
 
 Integrated location:

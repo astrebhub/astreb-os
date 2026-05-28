@@ -7,7 +7,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from asti import create_asti_router
 from asti.service import AstiService
 from asti.store import ActionQueue, AstiAuditLog
 from testbox_runtime.api import create_testbox_router
@@ -25,7 +24,6 @@ asti_service = AstiService(
     AstiAuditLog(BASE_DIR / "audit" / "asti_events.jsonl"),
 )
 app.include_router(create_testbox_router(BASE_DIR, asti_service))
-app.include_router(create_asti_router(BASE_DIR, asti_service))
 
 
 def load_articles() -> list[dict[str, Any]]:

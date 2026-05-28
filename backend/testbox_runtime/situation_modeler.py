@@ -4,6 +4,12 @@ from .models import OrientationClassification, SituationModel
 
 
 SITUATION_PROFILES = {
+    "testbox_product": {
+        "type": "product_positioning_decision",
+        "concerns": ["category clarity", "buyer understanding", "governance value"],
+        "risks": ["positioning as a chatbot or demo instead of a quality runtime"],
+        "missing": ["target audience", "deployment context", "proof points"],
+    },
     "event_collaboration": {
         "type": "pre_hackathon_team_orientation",
         "concerns": ["challenge fit", "team discovery", "useful introduction"],
@@ -55,6 +61,7 @@ SITUATION_PROFILES = {
 }
 
 SITUATION_PROFILE_PRIORITY = (
+    "testbox_product",
     "event_collaboration",
     "battery_manufacturing",
     "consulting_services",

@@ -64,6 +64,7 @@ def test_orientation_registry_contains_governed_acceptance_domains_and_terms():
     term_map = {term.variant: term.canonical for term in TERM_REGISTRY}
 
     assert {
+        "testbox_product",
         "event_collaboration",
         "business_formation",
         "consulting_services",
@@ -243,6 +244,8 @@ def test_runtime_emits_observable_legal_events():
         "ROUTE_SELECTED",
         "ROUTING_SELECTED",
         "ANSWER_STRATEGY_SELECTED",
+        "QUALITY_SKILLS_LOADED",
+        "QUALITY_EVALUATED",
         "ACTIVE_TASK_EXECUTION_ATTEMPTED",
         "ANSWER_GENERATED",
         "DISCLAIMER_ATTACHED",
@@ -265,6 +268,17 @@ def test_user_console_is_wired_to_backend_runtime():
     assert "message-attachments" in response.text
     assert 'state.documentName = "sample-employment-contract.pdf"' in response.text
     assert "Backend runtime не работает из отдельно открытого HTML-файла." in response.text
+
+
+def test_user_console_does_not_embed_public_demo_token():
+    response = surface_client.get("/testbox/user")
+
+    assert response.status_code == 200
+    assert "function ensureLocalRuntimeToken(force = false)" in response.text
+    assert 'return window.__TESTBOX_DEMO_TOKEN || "";' in response.text
+    assert 'if (response.status === 401 && retryAfterAuthRefresh && localRuntimeDemoToken())' in response.text
+    assert "return requestRuntimeAnswer(text, false);" in response.text
+    assert "public demo token" not in response.text.casefold()
 
 
 def test_user_console_offers_explicit_clipboard_paste_without_intercepting_native_paste():
@@ -990,6 +1004,7 @@ def test_pre_hackathon_action_plan_produces_team_preparation_instead_of_generic_
 
     payload = response.json()
     text = payload["final_response"]
+    actions = {event["action"] for event in payload["events"]}
     assert payload["classification"]["primary_domain"] == "event_collaboration"
     assert payload["orientation"]["intent"] == "action_plan"
     assert payload["orientation"]["situation"]["situation_type"] == "pre_hackathon_team_orientation"
@@ -1000,6 +1015,62 @@ def test_pre_hackathon_action_plan_produces_team_preparation_instead_of_generic_
     assert "ваши 3 навыка" in text
     assert "Начальный план действий" not in text
     assert "официальные источники" not in text
+
+
+def test_pre_hackathon_forecast_question_returns_challenge_scenarios():
+    response = client.post(
+        "/api/testbox/runtime/message",
+        json={
+            "message": "ты можешь спрогнозировать какие будут задания, задачи в этом выпуске хакатона",
+            "user_session": "runtime-test-onegov-forecast",
+            "role": "Operator",
+            "language": "ru",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    text = payload["final_response"]
+    actions = {event["action"] for event in payload["events"]}
+    assert payload["classification"]["primary_domain"] == "event_collaboration"
+    assert payload["orientation"]["intent"] == "forecast_event_challenges"
+    assert payload["route"] == "Orientation -> Coordination Planning"
+    assert payload["risk_level"] == "low"
+    assert "Ориентировочный прогноз заданий для OneGov #2" in text
+    assert "Цифровые государственные услуги" in text
+    assert "AI для публичного сектора" in text
+    assert "SOURCE_REQUIRED" not in actions
+    assert "LEGAL_RETRIEVAL_COMPLETED" not in actions
+    assert "Я получил ваш запрос" not in text
+    assert "Напишите, какой результат вам нужен" not in text
+
+
+def test_astreb_testbox_positioning_runs_strategic_orientation_with_questions():
+    response = client.post(
+        "/api/testbox/runtime/message",
+        json={
+            "message": "ASTREB TESTBOX как лучше позиционировать",
+            "user_session": "runtime-test-positioning",
+            "role": "Operator",
+            "language": "ru",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    text = payload["final_response"]
+    assert payload["classification"]["primary_domain"] == "testbox_product"
+    assert payload["orientation"]["intent"] == "strategic_positioning"
+    assert payload["orientation"]["mode"] == "Strategic Orientation Mode"
+    assert payload["route"] == "Orientation -> Strategic Positioning"
+    assert payload["risk_level"] == "low"
+    assert payload["sources"] == []
+    assert payload["quality_assessment"]["release_allowed"] is True
+    assert "governance and quality runtime" in text
+    assert "Это не ваша ошибка" in text
+    assert "Для кого позиционируем" in text
+    assert "Я получил ваш запрос" not in text
+    assert "Напишите, какой результат вам нужен" not in text
 
 
 def test_qa_salary_not_paid_phrase_retrieves_sources_and_orients_next_steps():

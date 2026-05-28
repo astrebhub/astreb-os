@@ -2628,10 +2628,29 @@
         : `TESTBOX runtime сейчас недоступен (${detail}). Ответ не был подменен локальным шаблоном.`;
     }
 
-    async function requestRuntimeAnswer(text) {
+    function isLocalRuntimeHost() {
+      return ["127.0.0.1", "localhost"].includes(window.location.hostname);
+    }
+
+    function localRuntimeDemoToken() {
+      return window.__TESTBOX_DEMO_TOKEN || "";
+    }
+
+    function ensureLocalRuntimeToken(force = false) {
+      const configured = window.sessionStorage.getItem("astreb.admin_token");
+      const localToken = localRuntimeDemoToken();
+      if (localToken && (force || !configured)) {
+        window.sessionStorage.setItem("astreb.admin_token", localToken);
+        return localToken;
+      }
+      return configured || localToken;
+    }
+
+    async function requestRuntimeAnswer(text, retryAfterAuthRefresh = true) {
       if (window.location.protocol === "file:") {
         throw new Error("file mode");
       }
+      ensureLocalRuntimeToken();
       const response = await fetch("/api/testbox/runtime/message", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...privilegedRuntimeHeaders() },
@@ -2650,6 +2669,10 @@
             .slice(-3)
         })
       });
+      if (response.status === 401 && retryAfterAuthRefresh && localRuntimeDemoToken()) {
+        ensureLocalRuntimeToken(true);
+        return requestRuntimeAnswer(text, false);
+      }
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     }
@@ -2733,7 +2756,7 @@
     }
 
     function privilegedRuntimeHeaders() {
-      const token = window.sessionStorage.getItem("astreb.admin_token");
+      const token = ensureLocalRuntimeToken();
       return token ? { "X-AI-Cabinet-Admin-Token": token } : {};
     }
 

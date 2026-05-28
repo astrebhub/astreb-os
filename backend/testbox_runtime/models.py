@@ -56,6 +56,13 @@ class EventType(str, Enum):
     EVOLUTION_PROPOSED = "EVOLUTION_PROPOSED"
     EVOLUTION_APPROVED = "EVOLUTION_APPROVED"
     EVOLUTION_REJECTED = "EVOLUTION_REJECTED"
+    QUALITY_SKILLS_LOADED = "QUALITY_SKILLS_LOADED"
+    QUALITY_EVALUATED = "QUALITY_EVALUATED"
+    QUALITY_INTERVENTION_APPLIED = "QUALITY_INTERVENTION_APPLIED"
+    LEARNING_CAPTURED = "LEARNING_CAPTURED"
+    SKILL_EVOLUTION_PROPOSED = "SKILL_EVOLUTION_PROPOSED"
+    SKILL_EVOLUTION_APPROVED = "SKILL_EVOLUTION_APPROVED"
+    SKILL_EVOLUTION_REJECTED = "SKILL_EVOLUTION_REJECTED"
 
 
 class ApprovalState(str, Enum):
@@ -247,6 +254,7 @@ class RuntimeResponse(BaseModel):
     behavioral_instructions: ActiveInstructionSet | None = None
     governed_action: dict[str, Any] | None = None
     document_extraction: DocumentProcessingState | None = None
+    quality_assessment: dict[str, Any] | None = None
     final_response: str
     events: list[RuntimeEvent]
 

@@ -28,10 +28,22 @@ class OperationalIntentDefinition:
 
 DOMAIN_REGISTRY: tuple[DomainDefinition, ...] = (
     DomainDefinition(
+        "testbox_product",
+        (
+            "astreb testbox", "testbox", "meta-qms", "qms runtime",
+            "quality management", "governance runtime", "governance and quality",
+            "позиционировать", "позиционирование", "как лучше позиционировать",
+            "качество", "управление качеством", "система качества",
+        ),
+        "strategic_positioning",
+    ),
+    DomainDefinition(
         "event_collaboration",
         (
             "pre-hackathon", "pre hackathon", "hackathon", "onegov",
             "leer de challenges kennen", "vind je team", "find your team",
+            "хакатон", "хакатона", "хакатоне", "челлендж", "челленджи",
+            "задания хакатона", "задачи хакатона", "выпуске хакатона",
             "найти команду", "познакомиться с challenge", "познакомиться с челлендж",
         ),
         "prepare_event_participation",
@@ -192,6 +204,33 @@ OPERATIONAL_INTENT_REGISTRY: tuple[OperationalIntentDefinition, ...] = (
         ("разбор ситуации", "оценить ситуацию", "situation assessment", "situatie beoordelen"),
     ),
     OperationalIntentDefinition(
+        "forecast_event_challenges",
+        (
+            "спрогнозировать",
+            "спрогнозируй",
+            "прогноз",
+            "какие будут задания",
+            "какие будут задачи",
+            "какие задания",
+            "какие задачи",
+            "forecast",
+            "predict",
+        ),
+    ),
+    OperationalIntentDefinition(
+        "strategic_positioning",
+        (
+            "позиционировать",
+            "позиционирование",
+            "как лучше позиционировать",
+            "positioning",
+            "position",
+            "market positioning",
+            "как представить",
+            "как объяснить",
+        ),
+    ),
+    OperationalIntentDefinition(
         "request_external_action",
         (
             "отправь сообщение", "отправь это сообщение", "отправить сообщение", "отправь письмо",
@@ -233,7 +272,7 @@ REGULATED_GUARD_SIGNALS = (
     "поставщик", "клиент", "обязан", "право", "штраф", "лиценз", "разрешен",
 )
 
-NON_REGULATED_DOMAINS = {"event_collaboration"}
+NON_REGULATED_DOMAINS = {"event_collaboration", "testbox_product"}
 
 
 def signal_matches(value: str, signal: str) -> bool:

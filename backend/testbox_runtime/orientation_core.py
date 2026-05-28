@@ -25,6 +25,11 @@ from .situation_modeler import build_situation_model
 
 
 DOMAIN_GRAPH_EXPANSIONS = {
+    "testbox_product": [
+        "quality_management_runtime",
+        "governance_observability",
+        "public_sector_ai_readiness",
+    ],
     "event_collaboration": [
         "challenge_discovery",
         "team_matching",
@@ -141,6 +146,7 @@ class OrientationCore:
                 "regulated_business_creation",
                 "legal_orientation",
                 "event_preparation",
+                "strategic_positioning",
             }
             or (intent == "explanation" and classification.primary_domain != "general")
         )
@@ -196,6 +202,10 @@ class OrientationCore:
             return "document_review"
         if strategy == "build_action_plan":
             return "action_plan"
+        if strategy == "forecast_event_challenges":
+            return "forecast_event_challenges"
+        if strategy == "strategic_positioning":
+            return "strategic_positioning"
         if strategy == "prepare_event_participation":
             return "event_preparation"
         if strategy == "request_external_action":
@@ -231,6 +241,8 @@ class OrientationCore:
             return "ASTI Action Mode"
         if classification.primary_domain == "event_collaboration":
             return "Orientation Planning Mode"
+        if classification.primary_domain == "testbox_product":
+            return "Strategic Orientation Mode"
         if intent == "regulated_business_creation":
             return "Human Review Mode" if risk == RiskLevel.HIGH else "BusinessBox Mode"
         if classification.primary_domain in {"business_formation", "zzp_intermediary_contract", "consulting_services"}:
@@ -252,6 +264,8 @@ class OrientationCore:
             return "regulated_manufacturing"
         if classification.primary_domain == "event_collaboration":
             return "coordination_planning"
+        if classification.primary_domain == "testbox_product":
+            return "strategic_positioning"
         if classification.primary_domain == "employment_contract":
             return "employment_contract"
         if classification.primary_domain in {"business_formation", "zzp_intermediary_contract", "consulting_services"}:
