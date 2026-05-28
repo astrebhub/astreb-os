@@ -12,9 +12,11 @@ boundaries, managed secrets, and deployment hardening.
 - ASTI administrative endpoints and all TESTBOX runtime API endpoints require
   `X-AI-Cabinet-Admin-Token`; when `ADMIN_API_TOKEN` is absent these
   endpoints are disabled rather than unauthenticated.
-- In `AI_CABINET_ENV=prod`, ASTI refuses startup without `ADMIN_API_TOKEN`.
-- Real Telegram delivery is frozen by default and remains blocked until
-  `ASTI_EXTERNAL_EXECUTION_ENABLED=true` is set after security review.
+- In `AI_CABINET_ENV=prod`, the runtime refuses startup without
+  `ADMIN_API_TOKEN`.
+- The read-only production preview refuses startup if
+  `ASTI_EXTERNAL_EXECUTION_ENABLED=true` is configured. Real Telegram delivery
+  requires a separate future release line and governance decision.
 - Telegram ASTI webhooks require `X-Telegram-Bot-Api-Secret-Token` matching
   `TELEGRAM_WEBHOOK_SECRET`, in addition to owner-chat validation.
 

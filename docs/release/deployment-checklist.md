@@ -8,6 +8,8 @@ Target: future first production preview; not yet authorized
 - [x] Local freeze branch created: `release/local-governed-mvp-v0.3`.
 - [x] External execution remains off by default.
 - [x] Local canonical boundaries and open risks documented.
+- [x] Repository classification, inventory, trust boundary, state model,
+  incident response and public-claims policy documented.
 - [x] Controlled snapshot remote selected: `origin` (`astrebhub/astreb-os`) after access verification.
 - [ ] Human integration decision recorded before merging the review branch.
 - [ ] Controlled commit reviewed and approved.
@@ -21,6 +23,7 @@ Target: future first production preview; not yet authorized
 - [x] `.env` and `.env.production` are excluded from Git.
 - [x] Raw runtime stores are excluded from Git.
 - [x] Local CI workflow includes validation, tests, dependency audit and artifact build.
+- [x] CI workflow includes read-only production-preview config validation.
 - [ ] Workflow executes successfully on the selected remote branch.
 - [ ] Build artifact is retained with commit SHA and test evidence.
 
@@ -38,6 +41,7 @@ Target: future first production preview; not yet authorized
 - [x] ASTI administrative API fails closed without an admin token locally.
 - [x] META-QMS decisions require authorization locally.
 - [x] Auth denials are logged without tokens locally.
+- [x] Production-preview startup rejects enabled external execution in config.
 - [ ] Implement rate limiting and abuse monitoring.
 - [ ] Configure HTTPS and hardened ingress.
 - [ ] Move secrets to managed production configuration.

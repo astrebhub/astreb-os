@@ -22,6 +22,13 @@ jobs:
           python -m pip install ruff pip-audit
       - name: Validate Python sources
         run: python -m ruff check --select E9,F63,F7,F82 backend tests
+      - name: Validate read-only production preview configuration
+        env:
+          PYTHONPATH: backend
+          AI_CABINET_ENV: prod
+          ADMIN_API_TOKEN: ci-validation-placeholder
+          ASTI_EXTERNAL_EXECUTION_ENABLED: "false"
+        run: python -c "from runtime_auth import validate_privileged_runtime_configuration; validate_privileged_runtime_configuration()"
       - name: Run tests
         env:
           PYTHONDONTWRITEBYTECODE: "1"

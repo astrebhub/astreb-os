@@ -221,10 +221,12 @@ sessionStorage.setItem("astreb.admin_token", "<ADMIN_API_TOKEN>");
 ```
 
 Real Telegram execution is frozen by default. Keep
-`ASTI_EXTERNAL_EXECUTION_ENABLED=false` until security review is closed; set it
-to `true` only as an explicit operational release decision. Raw runtime state
-in `audit/` is local-only and ignored by Git; retain only anonymized audit
-reports as repository evidence.
+`ASTI_EXTERNAL_EXECUTION_ENABLED=false` for the read-only governed production
+preview. In `AI_CABINET_ENV=prod`, startup refuses
+`ASTI_EXTERNAL_EXECUTION_ENABLED=true`; enabling a real external executor
+requires a separate future release line and governance decision. Raw runtime
+state in `audit/` is local-only and ignored by Git; retain only anonymized
+audit reports as repository evidence.
 
 Execution moves through:
 

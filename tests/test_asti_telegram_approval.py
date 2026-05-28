@@ -325,3 +325,12 @@ def test_prod_mode_requires_admin_api_token_at_router_startup(tmp_path, monkeypa
 
     with pytest.raises(RuntimeError, match="admin_api_token_required_in_prod"):
         create_asti_router(tmp_path)
+
+
+def test_prod_preview_refuses_external_execution_flag_at_router_startup(tmp_path, monkeypatch):
+    monkeypatch.setenv("AI_CABINET_ENV", "prod")
+    monkeypatch.setenv("ADMIN_API_TOKEN", "production-placeholder")
+    monkeypatch.setenv("ASTI_EXTERNAL_EXECUTION_ENABLED", "true")
+
+    with pytest.raises(RuntimeError, match="external_execution_forbidden_in_production_preview"):
+        create_asti_router(tmp_path)
