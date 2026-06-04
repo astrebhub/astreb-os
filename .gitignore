@@ -12,10 +12,24 @@ backend/*.db-*
 logs/
 runtime/reports/*
 !runtime/reports/README.md
+action_queue/asti_actions.json
+action_queue/asti_actions.json.tmp
+action_queue/telegram_processed_updates.json
+action_queue/telegram_processed_updates.json.tmp
+audit/asti_events.jsonl
+audit/testbox_session_context.json
+audit/testbox_session_context.json.tmp
+audit/testbox_runtime_events.jsonl
+audit/testbox_runtime_events.jsonl.tmp
+audit/meta_qms_evolution_proposals.json
+audit/meta_qms_evolution_proposals.json.tmp
+audit/qms_learning_records.jsonl
+audit/qms_learning_records.jsonl.tmp
 
 # Secrets
 backend/.env
 .env
+.env.production
 *.pem
 *.key
 
@@ -31,6 +45,12 @@ build/
 *.zip
 *.b64.part*
 github_bundle/
+_incoming/
+distribution/TESTBOX_PORTABLE_v0.5/
+distribution/Разработка_ТБ_v0.5/
+
+# Non-canonical local preview helpers
+scripts/local_jazekker_server.mjs
 
 # Local model artifacts
 local_runtime/models/*

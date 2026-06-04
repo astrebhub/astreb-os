@@ -1,354 +1,228 @@
-# AI Cabinet
+# ASTREB TESTBOX
 
-![AI Cabinet concept visualization](docs/assets/ai-cabinet-concept.png)
+AI Operations & Governance Console
 
-AI Cabinet is a governed hybrid AI control plane: a microkernel runtime for
-policy-bound, auditable, local-first AI execution with controlled agents and
-ASTI signed connector governance.
+TESTBOX is a QMS-driven governance runtime for observing, evaluating and improving AI-assisted processes.
 
-It is not a chatbot, prompt wrapper, or automation script. AI Cabinet is the
-trusted control layer between users, agents, models, tools, memory, budgets,
-and external actions.
+It is not a chatbot, a dashboard, a workflow engine, or an autonomous agent. It is a public demo and developer baseline for:
 
-```text
-CONTROL BEFORE AUTONOMY
-```
+- scenario execution
+- governance skill evaluation
+- deviation detection
+- quality interventions
+- audit events
+- learning records
+- human approval boundaries
+- skill evolution proposals
 
-## Why It Exists
+## Public Demo Scope
 
-Modern AI systems can generate, automate, and act faster than most organizations
-can govern them. AI Cabinet addresses the missing layer between AI capability
-and operational control: a runtime that classifies work, applies policy, routes
-models, protects sensitive data, records audit evidence, and separates drafts
-from approved actions.
-
-## Execution Pipeline
+This branch is prepared as:
 
 ```text
-INPUT
-  -> MULTIMODAL NORMALIZER
-  -> STATE ENGINE
-  -> PII DETECTOR
-  -> DATA CLASSIFIER
-  -> POLICY ENGINE
-  -> TOKEN / COST GOVERNOR
-  -> MODEL / VOICE / TOOL ROUTER
-  -> LOCAL OR CLOUD RUNTIME
-  -> PLUGIN SANDBOX
-  -> PROVIDER ADAPTER
-  -> OUTPUT GUARD
-  -> ACTION QUEUE
-  -> APPROVAL CENTER
-  -> AUDIT LOG
-  -> MEMORY UPDATE PROPOSAL
-  -> HUMAN APPROVAL IF REQUIRED
+TESTBOX v0.1 public demo + developer release
 ```
 
-## Platform Capabilities
+Included:
 
-| Subsystem | Purpose |
-| --- | --- |
-| Gateway | Accepts governed text, voice, image, file, browser, email, calendar, and plugin tasks. |
-| PII Layer | Detects and masks personal data, secrets, phone numbers, emails, names, and IBAN-like values. |
-| Classifier | Determines data class, risk level, task type, and routing implications. |
-| Policy Engine | Enforces YAML governance before model calls or action proposals. |
-| Cost Governor | Estimates tokens and cost, enforces per-request, daily, monthly, user, and agent limits. |
-| Model Router | Routes work across OpenAI, Gemini, Ollama/local, manual mode, and enterprise adapter slots. |
-| Free Model Layer | Supports Ollama local models, OpenRouter free routing, Gemini slots, and local-safe fallback when keys are missing. |
-| Local Runtime | Supports local-first execution paths for Llama 3, Mistral, Phi, Qwen, Gemma, and DeepSeek families through Ollama/local inventory and offline fallback. |
-| Output Guard | Scans model output for PII leakage, dangerous instructions, and unauthorized action claims. |
-| Action Queue | Converts external actions into drafts, approval records, no-op execution records, or rollback states. |
-| Approval Center | Separates model/agent proposals from human authority. |
-| Audit Layer | Records request, risk, data class, policy, provider, model, token, cost, status, and action metadata. |
-| Memory Engine | Stores governed operational memory and learning proposals that require approval. |
-| Plugin Sandbox | Validates plugin manifests, permissions, forbidden actions, and allowed data classes. |
-| ASTI Connector Layer | Registers governed connector hands, signature state, allowed actions, data classes, and execution gates. |
-| Agent Registry | Defines controlled agents with roles, instructions, permissions, budgets, tools, memory scope, and risk level. |
-| Evidence Layer | Stores source metadata, confidence, verification status, URL, timestamp, and citation. |
-| Observability | Records latency, runtime health events, blocked actions, policy violations, and provider decisions. |
+- TESTBOX UI: `/testbox`
+- TESTBOX user console: `/testbox/user`
+- QMS runtime endpoints: `/api/testbox/runtime/qms/*`
+- governed runtime message API: `/api/testbox/runtime/message`
+- AI Cabinet demo shell as ecosystem context
+- local-only audit and learning stores
 
-## Governance Contract
+Not included as full public modules:
 
-AI Cabinet does not treat AI autonomy as the default.
+- JAZEKKER product portal
+- ASTI external execution fabric
+- Telegram execution
+- real external providers
+- production secret management
 
-Agents may draft, analyze, classify, route, critique, and propose. They may not
-publish, delete, send, merge, release, alter durable memory, change policy, or
-execute external actions without an approval record.
+JAZEKKER and ASTI may be mentioned as ecosystem context, but this release focuses on TESTBOX.
 
-## ASTI Connector Layer
+## Positioning
 
-ASTI means **Agentic Secure Tool Interface**.
-
-It is the AI Cabinet-native connector layer for governed agent capabilities.
-Instead of giving a model direct access to email, calendar, files, browser,
-GitHub, Microsoft 365, Telegram, WhatsApp, Notion, or the local computer, AI
-Cabinet exposes connector manifests and policy gates.
+Recommended one-liner:
 
 ```text
-Agent proposes
-  -> Policy checks
-  -> Connector manifest restricts
-  -> Approval required
-  -> Audit records
-  -> Executor only after signature
+ASTREB TESTBOX is a QMS-driven AI governance runtime for observing, correcting and improving AI-assisted processes.
 ```
 
-Current ASTI connectors include:
+Short public description:
 
 ```text
-email_plugin
-calendar_plugin
-telegram_plugin
-whatsapp_plugin
-browser_plugin
-files_plugin
-paperclip_plugin
-notion_plugin
-github_connector
-microsoft_365_connector
-computer_control_plugin
+TESTBOX shows how AI-assisted workflows can be routed, governed, evaluated, audited and improved without giving AI autonomous authority.
 ```
 
-In the public MVP all real-world connector execution is disabled until a
-connector is signed and an action is explicitly approved. Drafts, proposals,
-dry-runs, queue records, audit records, and local report artifacts are enabled.
+## Architecture
 
-See [ASTI Connector Layer](docs/asti-connector-layer.md).
+```text
+Scenario
+-> Governance Skills
+-> Runtime Processing
+-> Quality Evaluation
+-> Deviation Detection
+-> Intervention
+-> Learning Repository
+-> Skill Evolution Proposal
+-> Human Decision
+```
 
-Sensitive work is local-first. Public and low-risk tasks may use cloud models
-when policy permits. Personal, confidential, secret-bearing, or high-risk work
-is masked, blocked, routed local-only, or converted into an approval-gated draft
-depending on policy.
+Core backend modules:
 
-## Current Release Status
+```text
+backend/main.py
+backend/runtime_auth.py
+backend/testbox_runtime/
+  api.py
+  legalbox.py
+  orchestration.py
+  orientation_core.py
+  quality_layer.py
+  meta_qms.py
+  skills/
+```
 
-This repository is a public MVP of the AI Cabinet control-plane architecture. It
-is suitable for developer review, governance architecture discussion, local
-demos, and early open-source collaboration.
+Core frontend:
 
-It is not yet a hardened enterprise deployment. Before production use, replace
-the development secrets vault with a managed KMS, add production AuthN/AuthZ,
-deploy an append-only audit store, and run connector workers inside hardened
-runtime isolation.
+```text
+frontend/testbox.html
+```
 
-## Quick Start
+Supporting documentation:
 
-### Windows
+```text
+docs/testbox-qms-quality-runtime.md
+docs/testbox-operations-guide.md
+docs/testbox-v0.3-situational-orientation-architecture.md
+docs/ai-runtime-constitution-v2.md
+docs/publication-audit-testbox-v0.1.md
+```
 
-```powershell
+## Run Locally
+
+Create a local environment and install dependencies:
+
+```bash
 cd backend
 python -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
-copy .env.example .env
-python -m uvicorn main:app --reload --port 8000
+.venv/Scripts/python -m pip install -r requirements.txt
 ```
 
-### macOS / Ubuntu
+Set a local admin token:
 
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-python -m uvicorn main:app --reload --port 8000
+set ADMIN_API_TOKEN=replace-with-local-secret
+```
+
+Start the server:
+
+```bash
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
 Open:
 
 ```text
-http://127.0.0.1:8000
+http://127.0.0.1:8000/testbox
+http://127.0.0.1:8000/testbox/user
 ```
 
-Set `ADMIN_API_TOKEN` in `backend/.env` before using administrative Control
-Center panels such as audit, actions, memory, secrets, config, agents, evidence,
-and observability. The browser UI includes an Admin token field.
+For protected runtime calls from the browser, set the token in the current tab only:
 
-## Docker
-
-```bash
-cp backend/.env.example backend/.env
-docker compose up --build
+```javascript
+sessionStorage.setItem("astreb.admin_token", "<ADMIN_API_TOKEN>");
 ```
 
-Open:
-
-```text
-http://127.0.0.1:8000
-```
-
-## Environment
-
-```env
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4.1-mini
-GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.0-flash
-APP_NAME=AI CABINET v0.2
-ADMIN_API_TOKEN=change-me-before-public-demo
-TOKEN_LIMIT_PER_REQUEST=8000
-SESSION_COST_LIMIT=1.00
-DAILY_COST_LIMIT=5.00
-MONTHLY_COST_LIMIT=100.00
-DAILY_TOKEN_LIMIT_PER_USER=50000
-LOCAL_ONLY_MODE=false
-EMERGENCY_STOP=false
-OLLAMA_BASE_URL=http://127.0.0.1:11434
-OLLAMA_MODEL=qwen2.5:0.5b
-LOCAL_GENERAL_MODEL=llama3:latest
-LOCAL_CODER_MODEL=qwen2.5-coder:latest
-LOCAL_REASONING_MODEL=deepseek-r1:latest
-OPENROUTER_API_KEY=
-OPENROUTER_MODEL=openrouter/free
-OPENROUTER_SITE_URL=http://127.0.0.1:8000
-OPENROUTER_APP_TITLE=AI Cabinet
-```
-
-## Repository Structure
-
-```text
-backend/
-  main.py
-  cabinet/
-    actions.py
-    agent_registry.py
-    approval_center.py
-    budget_governor.py
-    classifier.py
-    connector_registry.py
-    config.py
-    database.py
-    evidence.py
-    forecasting.py
-    identity.py
-    local_runtime.py
-    memory_engine.py
-    multimodal.py
-    observability.py
-    output_guard.py
-    pii.py
-    pipeline.py
-    plugin_sandbox.py
-    policy.py
-    providers.py
-    router.py
-    secrets_vault.py
-    schemas.py
-    state_engine.py
-    tokens.py
-config/
-  policy.yaml
-  model_routing.yaml
-  dialog_modes.yaml
-  user_profiles.yaml
-frontend/
-  index.html
-  app.js
-  styles.css
-plugins/
-  */manifest.yaml
-docs/
-  asti-connector-layer.md
-  free-models-setup.md
-  agent-action-test-scenario.md
-  repository-presentation-architecture.md
-scripts/
-  Windows, Ubuntu, and macOS autostart helpers
-tests/
-  governance pipeline tests
-```
+No token is embedded in the public HTML.
 
 ## API Surface
 
-| Area | Endpoints |
-| --- | --- |
-| Runtime | `POST /submit`, `GET /health`, `GET /state/{request_id}` |
-| Governance | `GET /config/policy`, `GET /config/model-routing`, `GET /approvals`, `GET /actions` |
-| Audit | `GET /audit`, `GET /observability/events` |
-| Memory | `GET /memory/layers`, `POST /memory/proposals/{id}/approve`, `POST /vector-memory/search` |
-| Agents | `GET /agents`, `POST /agents` |
-| Plugins / ASTI | `GET /plugins`, `GET /connectors/status`, `GET /connectors/{name}`, `POST /connectors/{name}/dry-run` |
-| Local Runtime | `GET /local-runtime/status`, `POST /local-runtime/models/{model}/load` |
-| Forecasting | `POST /forecasts`, `GET /forecasts`, `POST /forecasts/{id}/outcome` |
-| Voice / Multimodal | `GET /voice/status`, `GET /multimodal/status` |
+Protected TESTBOX endpoints:
 
-Administrative endpoints require `X-AI-Cabinet-Admin-Token` when
-`ADMIN_API_TOKEN` is configured.
-
-## GitHub Manager Agent
-
-`github_manager_agent` is registered by default for governed repository work.
-It may prepare issues, pull request plans, review summaries, CI diagnostics,
-branch plans, and release notes. It may not push, merge, delete branches,
-publish releases, close issues, change repository settings, or handle secrets
-without an approval record.
-
-## Built-In Governed Agents
-
-AI Cabinet registers controlled agents by default:
-
-| Agent | Purpose |
-| --- | --- |
-| `cabinet_operator` | Runtime status, operational steps, and safe configuration help. |
-| `governance_architect` | Governance architecture, policy gates, and risk control. |
-| `github_manager_agent` | Issues, PR plans, CI summaries, release notes, and repository proposals. |
-| `computer_control_agent` | Local computer operation planning and local report artifacts only. |
-| `microsoft_365_agent` | Outlook, Calendar, Teams, Planner, OneDrive, and SharePoint drafts/proposals only. |
-| `editorial_agent` | Editorial structure, tone, and claim discipline. |
-| `research_agent` | Evidence packs, source confidence, and uncertainty separation. |
-| `risk_sentinel` | Privacy, legal, operational, and reputational risk checks. |
-
-These agents operate behind the same Gateway, Policy Engine, Router, Approval
-Center, Audit Layer, and Memory Layer.
-
-## Testing
-
-```bash
-cd backend
-python -m pytest ../tests
+```text
+POST /api/testbox/runtime/message
+GET  /api/testbox/runtime/events
+GET  /api/testbox/runtime/roles
+GET  /api/testbox/runtime/constitution
+GET  /api/testbox/runtime/qms/skills
+GET  /api/testbox/runtime/qms/scenarios
+GET  /api/testbox/runtime/qms/learning
+GET  /api/testbox/runtime/qms/meta
+POST /api/testbox/runtime/qms/skills/{skill_id}/evolution
+POST /api/testbox/runtime/qms/skills/evolution/{proposal_id}/decision
+GET  /api/testbox/runtime/meta-qms
+POST /api/testbox/runtime/meta-qms/assess
+POST /api/testbox/runtime/meta-qms/proposals/{proposal_id}/decision
 ```
 
-CI runs the same governance test suite through GitHub Actions.
+All protected endpoints require:
 
-## Autostart
-
-Windows:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File .\scripts\install_autostart.ps1
+```text
+X-AI-Cabinet-Admin-Token: <ADMIN_API_TOKEN>
 ```
 
-Ubuntu:
+## Safety Boundaries
 
-```bash
-chmod +x scripts/*.sh
-./scripts/deploy_unix.sh
-./scripts/install_ubuntu_autostart.sh
+This public demo must not:
+
+- create legal effects
+- approve decisions autonomously
+- modify procedural deadlines
+- dispatch official responses
+- execute Telegram or other external actions
+- store real credentials in Git
+- publish local audit logs or memory
+
+Human authority remains mandatory for approvals, skill evolution and any future external execution.
+
+## Smoke Test Summary
+
+Current local verification:
+
+```text
+111 passed
 ```
 
-macOS:
+Covered areas:
 
-```bash
-chmod +x scripts/*.sh
-./scripts/deploy_unix.sh
-./scripts/install_macos_autostart.sh
-```
+- TESTBOX runtime routing
+- QMS Quality Layer
+- Scenario Layer
+- Skill Evolution Layer
+- Meta-QMS review loop
+- privileged admin-token boundaries
+- public UI token hygiene
+- governed action safety boundaries
 
-## Roadmap
+## Public Limitations
 
-| Layer | Direction |
-| --- | --- |
-| Runtime | Managed local model workers, GGUF serving, GPU scheduling, and offline profiles. |
-| Data | PostgreSQL, pgvector, retention policies, and append-only audit storage. |
-| Governance | Policy tests, signed policies, dual-control approvals, and governance review UI. |
-| Connectors | Signed connector workers for GitHub, email, calendar, CRM, Teams, Slack, and Notion. |
-| Security | KMS-backed secrets, RBAC, session auth, connector isolation, and supply-chain scanning. |
-| Observability | OpenTelemetry, SIEM export, budget dashboards, and policy violation reporting. |
-| Enterprise | SSO, tenant isolation, compliance retention, model risk management, and eval pipelines. |
+This is a public demo/developer release, not production infrastructure.
 
-## Open Source
+Known limitations:
 
-AI Cabinet is released under the MIT License. See `CONTRIBUTING.md`,
-`SECURITY.md`, and `CODE_OF_CONDUCT.md` before opening public issues or pull
-requests.
+- local JSON/JSONL storage only
+- no managed production secret service
+- no multi-worker transactional action claims
+- no real external execution enabled
+- no production identity provider
+- no public hosting configuration yet
+- no deployment approval granted
+
+## Roadmap v0.2
+
+- split TESTBOX into a smaller standalone package
+- replace local stores with durable transactional storage
+- add proper identity and scoped operator roles
+- add a public read-only demo mode
+- add deployment-grade secret management
+- add CI publication gate
+- add scenario authoring UI
+- add anonymized demo audit dataset
+- add more governance skills and skill version migration rules
+
+## License
+
+MIT. See `LICENSE`.

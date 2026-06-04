@@ -1,0 +1,3178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASTREB TESTBOX - AI Operations & Governance Console</title>
+  <meta name="description" content="ASTREB TESTBOX is a dynamic AI governance and demonstration environment for orchestration, routing, audit, quality, approvals, and explainability." />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071018;
+      --surface: #0d1822;
+      --panel: #111f2b;
+      --panel-2: #152735;
+      --line: #294153;
+      --line-strong: #3d6078;
+      --text: #edf5f7;
+      --muted: #9eb3c0;
+      --blue: #81b7ff;
+      --green: #78d7a6;
+      --amber: #e6be66;
+      --red: #ff8d7d;
+      --violet: #b6a4ff;
+      --ink: #071018;
+      --shadow: 0 18px 44px rgba(0, 0, 0, .24);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, rgba(13, 31, 43, .96), rgba(7, 16, 24, 1) 54%),
+        radial-gradient(circle at 74% 0%, rgba(75, 118, 145, .24), transparent 34%);
+      color: var(--text);
+    }
+    button, textarea, select, input { font: inherit; }
+    button { cursor: pointer; }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 286px minmax(0, 1fr);
+    }
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 18px 14px;
+      border-right: 1px solid var(--line);
+      background: rgba(7, 15, 23, .92);
+      backdrop-filter: blur(14px);
+    }
+    main {
+      min-width: 0;
+      padding: 18px 22px 46px;
+    }
+    .brand {
+      display: grid;
+      gap: 8px;
+      padding: 4px 6px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: linear-gradient(145deg, #172b3a, #0a151f);
+      color: var(--amber);
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+    .brand h1, h2, h3, p { margin: 0; letter-spacing: 0; }
+    .brand h1 { font-size: 18px; line-height: 1.2; }
+    .brand p, .muted, .explain, .small { color: var(--muted); }
+    .small { font-size: 12px; line-height: 1.45; }
+    .nav-section { margin-top: 18px; }
+    .nav-title {
+      margin: 0 8px 8px;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .layer-list, .role-list, .skill-list { display: grid; gap: 7px; }
+    .layer-card, .role-button, .skill-button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0c1924;
+      color: var(--text);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .layer-card strong { display: block; font-size: 13px; }
+    .layer-card span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .role-button.active, .skill-button.active {
+      border-color: var(--amber);
+      background: #2b2618;
+      color: #fff3cc;
+    }
+    .skill-button {
+      min-height: 32px;
+      padding: 6px 9px;
+      font-size: 12px;
+    }
+    .sidebar-metrics {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(17, 31, 43, .78);
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+      color: #dce8ee;
+      font-size: 13px;
+    }
+    .metric-row:first-child { border-top: 0; }
+    .route-nav {
+      display: grid;
+      gap: 6px;
+      margin-top: 16px;
+    }
+    .route-link {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 0 10px;
+      background: #0c1924;
+      color: #cbdbe3;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    .route-link.active {
+      border-color: var(--amber);
+      background: #272514;
+      color: #fff3cc;
+    }
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .title-block {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+    .eyebrow {
+      color: var(--amber);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .state-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 16px;
+    }
+    .state-cell {
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0d1d2a;
+      padding: 10px;
+    }
+    .state-cell span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .state-cell strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+    .playbook {
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(14, 27, 38, .92);
+      box-shadow: var(--shadow);
+    }
+    .playbook-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .playbook-title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+    .playbook-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 12px;
+      padding: 14px;
+    }
+    .playbook-steps {
+      display: grid;
+      gap: 8px;
+    }
+    .playbook-step {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 54px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0d1d2a;
+    }
+    .playbook-step.active {
+      border-color: var(--amber);
+      background: #272514;
+    }
+    .playbook-step.done {
+      border-color: #336b55;
+      background: #10291f;
+    }
+    .playbook-index {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: #172c3d;
+      color: var(--blue);
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .playbook-step.done .playbook-index { background: #173a2a; color: var(--green); }
+    .playbook-step.active .playbook-index { background: #403719; color: var(--amber); }
+    .playbook-step strong { display: block; font-size: 13px; }
+    .playbook-step span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .playbook-panel {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #091721;
+    }
+    .runtime-model {
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(14, 27, 38, .92);
+      box-shadow: var(--shadow);
+    }
+    .runtime-model-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .formula {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+      color: #dce9ef;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      overflow-x: auto;
+    }
+    .runtime-model-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      padding: 14px;
+    }
+    .runtime-token {
+      min-height: 76px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0d1d2a;
+    }
+    .runtime-token strong { display: block; font-size: 12px; color: #dce9ef; }
+    .runtime-token span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .page-title {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.08;
+    }
+    .top-actions, .button-row, .chips, .approval-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .button, .icon-button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #122637;
+      color: var(--text);
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      text-decoration: none;
+    }
+    .button.primary {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .button.danger {
+      background: #37201f;
+      border-color: #8a4b43;
+      color: #ffd2ca;
+    }
+    .icon-button { width: 38px; padding: 0; }
+    .cockpit-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, .85fr) minmax(420px, 1.35fr);
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(14, 27, 38, .92);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      padding: 14px 14px 0;
+    }
+    .panel-title { font-size: 15px; line-height: 1.25; }
+    .panel-body { padding: 14px; }
+    .static-map {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .component {
+      min-height: 74px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--blue);
+      border-radius: 7px;
+      background: #0d1d2a;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+    }
+    .component:nth-child(3n) { border-left-color: var(--green); }
+    .component:nth-child(4n) { border-left-color: var(--amber); }
+    .component strong { display: block; font-size: 13px; }
+    .component span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .component:hover, .component.active {
+      border-color: var(--amber);
+      border-left-color: var(--amber);
+      background: #272514;
+    }
+    .runtime-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 230px;
+      gap: 12px;
+    }
+    .flow {
+      display: grid;
+      gap: 8px;
+    }
+    .flow-step {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 56px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0d1c28;
+    }
+    .flow-step.active {
+      border-color: var(--amber);
+      background: #242617;
+    }
+    .flow-step.done {
+      border-color: #336b55;
+      background: #10291f;
+    }
+    .step-index {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: #172c3d;
+      color: var(--blue);
+      font-weight: 800;
+    }
+    .flow-step.done .step-index { background: #173a2a; color: var(--green); }
+    .flow-step.active .step-index { background: #403719; color: var(--amber); }
+    .step-name { font-weight: 700; }
+    .step-note { margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .status-pill, .chip {
+      min-height: 24px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      padding: 3px 8px;
+      background: #182c3b;
+      color: #cfe0e8;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .status-pill.high, .chip.high { background: #3a211e; color: #ffd1ca; }
+    .status-pill.medium, .chip.medium { background: #342917; color: #ffdf99; }
+    .status-pill.low, .chip.low { background: #143429; color: #bff2d3; }
+    .routing-stack, .audit-list, .quality-list, .explain-list { display: grid; gap: 8px; }
+    .route-card, .audit-item, .quality-item, .explain-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0d1d2a;
+      color: var(--text);
+      text-align: left;
+    }
+    .route-card { cursor: pointer; width: 100%; }
+    .route-card.selected { border-color: var(--amber); background: #282415; }
+    .route-card strong, .audit-item strong, .quality-item strong, .explain-item strong {
+      display: block;
+      font-size: 13px;
+    }
+    .route-card span, .audit-item span, .quality-item span, .explain-item span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .lower-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, .72fr);
+      gap: 12px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 138px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+      color: var(--text);
+      padding: 11px;
+      line-height: 1.5;
+    }
+    .mask-output {
+      min-height: 138px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+      color: #d9e7ed;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .source-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .source-item {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0b1a26;
+    }
+    .source-item strong {
+      display: block;
+      font-size: 12px;
+      color: #dce9ef;
+    }
+    .source-item span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .approval-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #73593a;
+      border-radius: 8px;
+      background: #211d13;
+    }
+    .voice-diagram {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+    .voice-node {
+      min-height: 70px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0d1d2a;
+      color: #dce9ef;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    .voice-command {
+      width: 100%;
+      min-height: 38px;
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+      color: var(--text);
+      padding: 0 10px;
+    }
+    .memory-log {
+      display: grid;
+      gap: 8px;
+      max-height: 180px;
+      overflow: auto;
+    }
+    .operator-output {
+      min-height: 116px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 12px;
+      background: #091721;
+      color: #d9e8ef;
+      line-height: 1.55;
+    }
+    .user-console {
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(14, 27, 38, .92);
+      box-shadow: var(--shadow);
+    }
+    body.user-mode .state-strip,
+    body.user-mode .runtime-model,
+    body.user-mode .playbook,
+    body.user-mode .cockpit-grid,
+    body.user-mode .lower-grid {
+      display: none;
+    }
+    body.user-mode .top-actions,
+    body.user-mode .layer-section,
+    body.user-mode .route-section,
+    body.user-mode .skills-section,
+    body.user-mode .sidebar-metrics {
+      display: none;
+    }
+    body.user-mode .roles-section {
+      margin-top: 16px;
+    }
+    body.user-mode .title-block .muted {
+      display: none;
+    }
+    body.user-mode .brand p,
+    body.user-mode .user-console-head p {
+      display: none;
+    }
+    body.user-mode .user-console-head {
+      padding: 10px 14px;
+    }
+    body.user-mode .user-console-head .panel-title {
+      font-size: 14px;
+    }
+    body.user-mode .user-console {
+      min-height: calc(100vh - 128px);
+    }
+    body.user-mode .user-console-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    body.user-mode .intake-panel {
+      display: none;
+    }
+    body.user-mode .chat-window {
+      min-height: 46vh;
+    }
+    .user-console-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .user-console-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 12px;
+      padding: 14px;
+    }
+    .chat-window {
+      min-height: 260px;
+      max-height: 420px;
+      overflow: auto;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+    }
+    .message {
+      max-width: 86%;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0d1d2a;
+      color: #dce9ef;
+      line-height: 1.45;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+    .message.user {
+      margin-left: auto;
+      border-color: #345f80;
+      background: #102a3e;
+    }
+    .message.admin {
+      margin-right: auto;
+      border-color: #456146;
+      background: #10291f;
+    }
+    .message strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .composer { display: grid; gap: 8px; margin-top: 10px; }
+    .composer textarea { min-height: 92px; }
+    .file-input {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+      color: var(--text);
+      padding: 7px;
+    }
+    .language-toggle {
+      display: inline-flex;
+      gap: 4px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+    }
+    .language-toggle button {
+      min-height: 30px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      padding: 0 10px;
+    }
+    .language-toggle button.active {
+      border-color: var(--amber);
+      background: #272514;
+      color: #fff3cc;
+    }
+    .clipboard-feedback {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .clipboard-feedback[hidden] { display: none; }
+    .clipboard-feedback.success { color: var(--green); }
+    .clipboard-feedback.error { color: var(--red); }
+    .attachment-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .attachment-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 9px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #0d1d2a;
+    }
+    .attachment-preview {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: #08141e;
+      color: var(--amber);
+      font-size: 11px;
+      overflow: hidden;
+    }
+    .attachment-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .document-viewer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #345f80;
+      border-radius: 8px;
+      background: #0b1c29;
+    }
+    .document-viewer.empty {
+      grid-template-columns: 1fr;
+      border-style: dashed;
+    }
+    .document-viewer.empty .document-preview {
+      min-height: 84px;
+    }
+    .document-viewer.empty .document-text {
+      display: none;
+    }
+    .document-viewer-head {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .document-viewer-title {
+      display: grid;
+      gap: 3px;
+    }
+    .document-viewer-title strong {
+      color: #f7d778;
+      font-size: 13px;
+    }
+    .document-viewer-title span {
+      color: #dce9ef;
+      font-size: 12px;
+    }
+    .document-preview, .document-text {
+      min-height: 220px;
+      max-height: 360px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #08141e;
+    }
+    .document-preview {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .document-preview iframe, .document-preview img {
+      width: 100%;
+      height: 360px;
+      border: 0;
+      object-fit: contain;
+      background: #08141e;
+    }
+    .document-text {
+      padding: 10px;
+      color: #dce9ef;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .message-attachments {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .message-file {
+      padding: 3px 7px;
+      border: 1px solid #345f80;
+      border-radius: 999px;
+      color: #dce9ef;
+      background: #081b29;
+      font-size: 11px;
+    }
+    .intake-panel {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #091721;
+    }
+    .qms-meter {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 9px 0;
+      border-top: 1px solid var(--line);
+    }
+    .qms-meter:first-child { border-top: 0; }
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #0a151d;
+      overflow: hidden;
+    }
+    .bar span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+    }
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 1120px) {
+      .app { grid-template-columns: 1fr; }
+      aside { position: static; height: auto; }
+      .cockpit-grid, .lower-grid, .scenario-grid, .runtime-layout, .split, .user-console-grid { grid-template-columns: 1fr; }
+      .voice-diagram { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .topbar { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      main { padding: 14px 14px 38px; }
+      .page-title { font-size: 25px; }
+      .static-map { grid-template-columns: 1fr; }
+      .state-strip { grid-template-columns: 1fr; }
+      .flow-step { grid-template-columns: 32px minmax(0, 1fr); }
+      .flow-step .status-pill { grid-column: 2; width: fit-content; }
+      .voice-diagram { grid-template-columns: 1fr; }
+      .playbook-head, .playbook-grid, .user-console-head { grid-template-columns: 1fr; }
+      .runtime-model-grid { grid-template-columns: 1fr; }
+      .playbook-step { grid-template-columns: 30px minmax(0, 1fr); }
+      .playbook-step .status-pill { grid-column: 2; width: fit-content; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <div class="brand-mark">AT</div>
+        <div>
+          <h1>ASTREB TESTBOX</h1>
+          <p class="small">Dynamic AI Governance & Demonstration Environment</p>
+        </div>
+      </div>
+
+      <div class="nav-section layer-section">
+        <div class="nav-title">Architecture layers</div>
+        <div class="layer-list">
+          <div class="layer-card"><strong>Static Layer</strong><span>Roles, policies, skills, memory, audit, connectors, UI config.</span></div>
+          <div class="layer-card"><strong>Dynamic Layer</strong><span>Orchestration, triggers, routing, execution, approvals, memory updates.</span></div>
+          <div class="layer-card"><strong>Observation Layer</strong><span>Cockpit visibility across routing, audit, quality, policies, explainability.</span></div>
+        </div>
+      </div>
+
+      <div class="nav-section route-section">
+        <div class="nav-title">TESTBOX routes</div>
+        <nav class="route-nav" id="routeNav" aria-label="TESTBOX route map"></nav>
+      </div>
+
+      <div class="nav-section roles-section">
+        <div class="nav-title">Administrator roles</div>
+        <div class="role-list" id="roleList"></div>
+      </div>
+
+      <div class="nav-section skills-section">
+        <div class="nav-title">Active skills</div>
+        <div class="skill-list" id="skillList"></div>
+      </div>
+
+      <div class="sidebar-metrics">
+        <div class="metric-row"><span>AI Cabinet</span><strong>static</strong></div>
+        <div class="metric-row"><span>TESTBOX</span><strong>dynamic</strong></div>
+        <div class="metric-row"><span>LLM usage rule</span><strong>needed only</strong></div>
+        <div class="metric-row"><span>Oversight</span><strong>human first</strong></div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div class="title-block">
+          <div class="eyebrow">TESTBOX COCKPIT</div>
+          <h2 class="page-title">AI Operations & Governance Console</h2>
+          <p class="muted">A demonstration runtime for orchestration, routing, legal governance, PII masking, human oversight, audit, quality, and explainability.</p>
+        </div>
+        <div class="top-actions">
+          <button class="button primary" id="runDemo">Run Legal Demo</button>
+          <button class="button" id="replayDemo">Replay</button>
+          <button class="button danger" id="emergencyStop">Emergency Stop</button>
+        </div>
+      </div>
+
+      <section class="state-strip" aria-label="Live TESTBOX state">
+        <div class="state-cell"><span>Active Role</span><strong id="activeRoleState">Governance Operator</strong></div>
+        <div class="state-cell"><span>Active Scenario</span><strong id="activeScenarioState">Legal AI Demo</strong></div>
+        <div class="state-cell"><span>System Status</span><strong id="systemStatusState">Operational</strong></div>
+      </section>
+
+      <section class="runtime-model" aria-label="TESTBOX runtime model">
+        <div class="runtime-model-head">
+          <div>
+            <h3 class="panel-title">Runtime Model</h3>
+            <p class="small">The active TESTBOX skeleton: who controls, what mode is active, what can run, what explains, what constrains, what is happening, and what is recorded.</p>
+            <div class="formula">TESTBOX Runtime = Role + Mode + Capabilities + Skills + Policies + State + Audit</div>
+          </div>
+          <span class="status-pill low" id="runtimeModelStatus">runtime-aware</span>
+        </div>
+        <div class="runtime-model-grid" id="runtimeModelGrid"></div>
+      </section>
+
+      <section class="user-console" id="userConsole" aria-label="User interaction console" hidden>
+        <div class="user-console-head">
+          <div>
+            <h3 class="panel-title" id="chatTitle">Chat</h3>
+            <p class="small" id="chatSubtitle">Governed intake for text, voice fallback, photos, and documents. Administrator answers with routing, policy, risk, and audit context.</p>
+          </div>
+          <div class="button-row">
+            <div class="language-toggle" aria-label="Language">
+              <button id="langRu" class="active" type="button">RU</button>
+              <button id="langNl" type="button">NL</button>
+              <button id="langEn" type="button">EN</button>
+            </div>
+            <button class="button primary" id="sendUserMessage">Send</button>
+            <button class="button" id="pasteUserText" type="button">Paste</button>
+            <span class="clipboard-feedback" id="clipboardStatus" aria-live="polite" hidden></span>
+            <button class="button" id="userVoiceCommand">Use Text as Voice</button>
+            <button class="button" id="clearUserChat">Clear</button>
+          </div>
+        </div>
+      <div class="user-console-grid">
+          <div>
+            <div class="chat-window" id="chatWindow" aria-live="polite"></div>
+            <div class="composer">
+              <div class="document-viewer empty" id="documentViewer">
+                <div class="document-viewer-head">
+                  <div class="document-viewer-title">
+                    <strong id="documentPanelLabel">Прикреплённый документ</strong>
+                    <span id="documentFileName">Документ не выбран</span>
+                  </div>
+                  <a class="button" id="documentOpenLink" target="_blank" rel="noopener" hidden>Открыть документ</a>
+                </div>
+                <div class="document-preview" id="documentPreview">Загрузите PDF, фото или нажмите «Пример документа».</div>
+                <div class="document-text" id="documentText">Extracted text will appear here.</div>
+              </div>
+              <textarea id="userInput" aria-label="User message"></textarea>
+              <input class="file-input" id="userFiles" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt,.md,.json" aria-label="Upload photos or documents" />
+              <div class="button-row">
+                <button class="button" id="attachSampleImage">Sample Photo</button>
+                <button class="button" id="attachSampleDoc">Sample Document</button>
+              </div>
+            </div>
+          </div>
+          <div class="intake-panel">
+            <span class="chip medium">governed intake</span>
+            <div class="explain-item"><strong>Risk</strong><span id="userRisk">low</span></div>
+            <div class="explain-item"><strong>Route</strong><span id="userRoute">Local AI</span></div>
+            <div class="explain-item"><strong>Policy Triggers</strong><span id="userPolicies">none</span></div>
+            <div class="explain-item"><strong>Attachments</strong><span id="userAttachmentSummary">none</span></div>
+            <div class="attachment-list" id="attachmentList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="playbook" aria-label="Scenario playbook">
+        <div class="playbook-head">
+          <div>
+            <h3 class="playbook-title" id="playbookTitle">Scenario Playbook</h3>
+            <p class="small" id="playbookSummary">Guided operating steps for the active TESTBOX route.</p>
+          </div>
+          <div class="button-row">
+            <button class="button primary" id="playbookNext">Next Step</button>
+            <button class="button" id="playbookReset">Reset Guide</button>
+          </div>
+        </div>
+        <div class="playbook-grid">
+          <div class="playbook-steps" id="playbookSteps"></div>
+          <div class="playbook-panel">
+            <span class="chip medium" id="playbookMode">guided</span>
+            <strong id="playbookCurrent">Ready</strong>
+            <p class="small" id="playbookInstruction">Use Next Step to let TESTBOX guide the operator through this scenario.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cockpit-grid" aria-label="TESTBOX cockpit">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">Static Setup</h3>
+              <p class="small">AI Cabinet is configuration and governance substrate.</p>
+            </div>
+            <span class="status-pill low">configured</span>
+          </div>
+          <div class="panel-body">
+            <div class="static-map" id="staticMap"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">Dynamic Execution</h3>
+              <p class="small">Runtime flow shows decisions, agents, policies, checks, and approvals.</p>
+            </div>
+            <span class="status-pill medium" id="runtimeStatus">standby</span>
+          </div>
+          <div class="panel-body runtime-layout">
+            <div class="flow" id="flow"></div>
+            <div>
+              <div class="routing-stack" id="routingStack"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lower-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">Audit Stream</h3>
+              <p class="small">Every runtime action is explainable and replayable.</p>
+            </div>
+            <span class="status-pill low" id="auditCount">0 events</span>
+          </div>
+          <div class="panel-body">
+            <div class="audit-list" id="auditList"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">Quality Monitoring</h3>
+              <p class="small">QMS validates citations, risk, consistency, governance, and explainability.</p>
+            </div>
+            <span class="status-pill medium">QMS online</span>
+          </div>
+          <div class="panel-body">
+            <div id="qualityMeters"></div>
+            <div class="quality-list" id="qualityList" style="margin-top:10px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lower-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">Legal AI Governance Scenario</h3>
+              <p class="small">Legal question to jurisdiction, PII masking, retrieval, drafting, validation, approval, rehydration, audit.</p>
+            </div>
+          </div>
+          <div class="panel-body scenario-grid">
+            <div>
+              <textarea id="legalInput" aria-label="Legal demo input">My name is Maria Janssen, email maria.janssen@example.nl, phone +31 6 12345678. I live at Keizersgracht 123, Amsterdam. My BSN is 123456782. Can my employer store meeting transcripts from our AI assistant under Dutch law?</textarea>
+              <div class="button-row" style="margin-top:10px">
+                <button class="button" id="maskButton">Mask PII</button>
+                <button class="button" id="rehydrateButton">Rehydrate Locally</button>
+              </div>
+            </div>
+            <div>
+              <div class="mask-output" id="maskOutput"></div>
+              <div class="source-list" id="legalSources"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">Human-In-The-Loop Control</h3>
+              <p class="small">Approval levels: low auto, medium suggested, high mandatory, critical override only.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="approval-card">
+              <div class="chips">
+                <span class="chip high" id="approvalLevel">High risk</span>
+                <span class="chip">PII masked</span>
+                <span class="chip">Legal domain</span>
+              </div>
+              <strong id="approvalTitle">Pending legal answer approval</strong>
+              <p class="small" id="approvalText">The Administrator will request human approval before rehydrating PII or presenting the final answer.</p>
+              <div class="approval-actions">
+                <button class="button primary" id="approveButton">Approve</button>
+                <button class="button" id="pauseButton">Pause</button>
+                <button class="button" id="overrideButton">Override Routing</button>
+                <button class="button danger" id="rejectButton">Reject</button>
+              </div>
+            </div>
+            <div class="explain-list" id="explainList" style="margin-top:10px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lower-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">TESTBOX Administrator</h3>
+              <p class="small">AI operator, orchestration supervisor, governance assistant, runtime controller, demo presenter.</p>
+            </div>
+          </div>
+          <div class="panel-body split">
+            <div>
+              <div class="operator-output" id="adminOutput"></div>
+              <div class="button-row" style="margin-top:10px">
+                <button class="button" id="selfPresentation">Present TESTBOX</button>
+                <button class="button" id="explainRouting">Explain Routing</button>
+                <button class="button" id="explainPolicies">Explain Policies</button>
+              </div>
+            </div>
+            <div class="explain-list" id="adminStack"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 class="panel-title">Voice Meeting Mode</h3>
+              <p class="small">Anker speakerphone to local node, STT, Administrator, AI/CRM/workflow, TTS, speakerphone.</p>
+            </div>
+            <span class="status-pill low">ready</span>
+          </div>
+          <div class="panel-body">
+            <div class="voice-diagram">
+              <div class="voice-node">Anker speakerphone</div>
+              <div class="voice-node">Laptop local node</div>
+              <div class="voice-node">Speech to text</div>
+              <div class="voice-node">TESTBOX Administrator</div>
+              <div class="voice-node">AI / CRM / Workflow</div>
+              <div class="voice-node">Text to speech</div>
+            </div>
+            <input class="voice-command" id="voiceCommand" value="explain routing" aria-label="Voice command fallback" />
+            <div class="button-row" style="margin-top:10px">
+              <button class="button" id="startVoice">Start Voice</button>
+              <button class="button" id="stopVoice">Stop Voice</button>
+              <button class="button" id="sendVoiceCommand">Run Voice Fallback</button>
+              <button class="button" id="speakAdmin">Speak Administrator</button>
+            </div>
+            <p class="small" id="voiceStatus" style="margin-top:10px">Voice runtime is ready. Browser STT/TTS is used when available; text command fallback always works.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const roles = [
+      "Operator",
+      "Instructor",
+      "Legal Assistant",
+      "Governance Officer",
+      "Project Architect",
+      "Demo Presenter",
+      "Hackathon Mentor",
+      "CRM Dispatcher"
+    ];
+
+    const skills = [
+      "Self Presentation",
+      "Workflow Explanation",
+      "Legal Citation",
+      "Audit Narration",
+      "Risk Analysis",
+      "Quality Review",
+      "Routing Explanation",
+      "Policy Explanation",
+      "Demo Narration",
+      "Voice Meeting Mode",
+      "CRM Routing",
+      "Memory Explanation"
+    ];
+
+    const testboxRoutes = [
+      ["/testbox", "Cockpit", "live shell"],
+      ["/testbox/cockpit", "Cockpit", "operations"],
+      ["/testbox/orchestration", "Orchestration", "runtime"],
+      ["/testbox/user", "User", "intake"],
+      ["/testbox/legalbox", "LegalBox", "legal workflow"],
+      ["/testbox/legal-demo", "Legal Demo", "scenario"],
+      ["/testbox/legal", "Legal", "sources"],
+      ["/testbox/audit", "Audit", "replay"],
+      ["/testbox/routing", "Routing", "decisions"],
+      ["/testbox/memory", "Memory", "local"],
+      ["/testbox/settings", "Settings", "control"],
+      ["/testbox/training", "Training", "operator"],
+      ["/testbox/hackathon", "Hackathon", "mentor"]
+    ];
+
+    const playbooks = {
+      "default": {
+        title: "TESTBOX Cockpit Walkthrough",
+        summary: "A guided path for understanding the operating environment.",
+        steps: [
+          ["Orient", "Read live role, scenario, and system status.", "self"],
+          ["Inspect static layer", "Click Gateway and Policy Engine self-tests.", "static"],
+          ["Explain routing", "Show the LLM-only-when-needed routing principle.", "routing"],
+          ["Run legal demo", "Execute the governed legal workflow.", "run"],
+          ["Review audit", "Open audit mode and inspect activity stream.", "audit"]
+        ]
+      },
+      "user": {
+        title: "User Intake Mode",
+        summary: "A guided path for receiving text, voice, images, and documents through governed TESTBOX routing.",
+        steps: [
+          ["Receive input", "User writes, speaks, or uploads files.", "user-focus"],
+          ["Detect sensitivity", "TESTBOX checks text and attachment metadata for risk.", "user-risk"],
+          ["Select route", "Administrator explains local / legal / LLM / approval routing.", "user-route"],
+          ["Generate response", "Administrator returns a governed answer with audit.", "user-answer"],
+          ["Review audit", "Operator checks intake events and policy triggers.", "audit"]
+        ]
+      },
+      "legalbox": {
+        title: "LegalBox Workflow",
+        summary: "A governed legal orientation workflow with classification, risk, source checks, safety review, and audit.",
+        steps: [
+          ["Intake", "Receive the legal question and identify missing context.", "legalbox-intake"],
+          ["Classify", "Detect language, jurisdiction, legal domain, and risk.", "legalbox-classify"],
+          ["Check sources", "Require reliable legal/source basis before final orientation.", "legalbox-sources"],
+          ["Review safety", "Remove guarantees, unsafe advice, and overclaims.", "legalbox-safety"],
+          ["Answer", "Return structured legal orientation with disclaimer and next steps.", "user-answer"]
+        ]
+      },
+      "legal-demo": {
+        title: "Legal AI Governance Demo",
+        summary: "Voice/text input, PII masking, retrieval, approval, audit, and governed response.",
+        steps: [
+          ["Set legal role", "Switch Administrator context to Legal Assistant.", "legal-role"],
+          ["Mask PII", "Detect and replace email, phone, BSN, address, and name.", "mask"],
+          ["Inspect sources", "Review locally retrieved EU/Dutch legal sources.", "sources"],
+          ["Run workflow", "Execute orchestration through policy, routing, QMS, and approval.", "run"],
+          ["Approve", "Record human approval for the high-risk legal path.", "approve"],
+          ["Rehydrate locally", "Restore original PII only inside the local node.", "rehydrate"],
+          ["Review audit", "Switch to audit route and replay governance evidence.", "audit"]
+        ]
+      },
+      "routing": {
+        title: "Routing Philosophy Demo",
+        summary: "Demonstrates why TESTBOX uses LLMs only when needed.",
+        steps: [
+          ["Set governance role", "Switch to Governance Officer.", "governance-role"],
+          ["Local first", "Inspect Local AI for sensitive data handling.", "route-local"],
+          ["Legal retrieval", "Inspect Legal DB for source-grounded answers.", "route-legal"],
+          ["Skip CRM", "Show CRM/API is skipped unless factual records are needed.", "route-crm"],
+          ["Masked LLM", "Show cloud LLM is only allowed after masking.", "route-llm"],
+          ["Human gate", "Show high-risk decisions require human approval.", "route-human"]
+        ]
+      },
+      "audit": {
+        title: "Audit Replay",
+        summary: "Shows TESTBOX as an evidence surface for governed runtime behavior.",
+        steps: [
+          ["Set operator role", "Switch to Operator.", "operator-role"],
+          ["Inspect audit block", "Run Audit component self-test.", "audit-component"],
+          ["Narrate audit", "Use Administrator to explain traceability.", "audit-narrate"],
+          ["Replay workflow", "Replay the legal demo and confirm audit growth.", "replay"],
+          ["Check memory", "Confirm workflow memory count is visible.", "memory"]
+        ]
+      },
+      "hackathon": {
+        title: "Hackathon Mentor Mode",
+        summary: "A guided challenge path for teams learning TESTBOX architecture.",
+        steps: [
+          ["Introduce TESTBOX", "Administrator presents the environment and its purpose.", "self"],
+          ["Set mentor role", "Switch to Hackathon Mentor.", "mentor-role"],
+          ["Identify layers", "Click Gateway, Routing, Audit, and Quality blocks.", "layers"],
+          ["Run challenge demo", "Execute the Legal AI Demo as the shared challenge.", "run"],
+          ["Ask routing question", "Inspect Cloud LLM and Human Approval decisions.", "challenge-routing"],
+          ["Open audit replay", "Move to audit route and show evidence trail.", "audit-hackathon"],
+          ["Define v0.2 task", "Administrator gives teams the backend integration challenge.", "v02"]
+        ]
+      },
+      "training": {
+        title: "Operator Training",
+        summary: "A guided drill for learning approvals, pause, override, reject, and replay.",
+        steps: [
+          ["Set instructor role", "Switch to Instructor.", "instructor-role"],
+          ["Activate skills", "Enable workflow, audit, risk, and policy explanation.", "training-skills"],
+          ["Run workflow", "Start the legal governance workflow.", "run"],
+          ["Pause", "Pause workflow and explain operator control.", "pause"],
+          ["Override routing", "Request routing override review.", "override"],
+          ["Reject", "Reject the draft and block final delivery.", "reject"],
+          ["Replay", "Replay the workflow after the intervention.", "replay"]
+        ]
+      }
+    };
+
+    const staticComponents = [
+      ["Gateway", "Ingress, normalization, request identity."],
+      ["Policy Engine", "Risk thresholds, allowed routes, approval rules."],
+      ["Router Config", "Local AI, CRM/API, Legal DB, cloud LLM, human."],
+      ["Role System", "Operator capabilities are explicit and switchable."],
+      ["Skill System", "Skills are independent from roles."],
+      ["Memory", "Local memory with explainable reads and writes."],
+      ["Audit", "Append-only event trail for replay and review."],
+      ["Quality Rules", "Citation, consistency, hallucination, governance checks."],
+      ["CRM Connectors", "Factual business data via APIs when needed."],
+      ["Legal Sources", "Jurisdiction-aware source retrieval."],
+      ["LLM Connectors", "OpenAI, Claude, Ollama, local models."],
+      ["UI Configuration", "Observation views, operator controls, demo presets."],
+      ["Starter Kit", "Governance baseline imported from roles, policies, runtime config, and ontology."]
+    ];
+
+    const flowSteps = [
+      ["Request", "Legal question enters TESTBOX runtime."],
+      ["Intent Detection", "Classified as legal governance question."],
+      ["Jurisdiction Detection", "Netherlands / EU context detected from the question."],
+      ["PII Detection", "Names, address, email, phone, BSN are detected."],
+      ["PII Masking", "Sensitive data is replaced with local placeholders."],
+      ["Legal Source Retrieval", "Relevant Dutch and EU governance sources are retrieved locally."],
+      ["Policy Evaluation", "Legal + PII triggers high-risk approval path."],
+      ["Routing", "Legal DB and local AI first, cloud LLM only for drafting."],
+      ["LLM Drafting", "Legal Assistant drafts from retrieved sources using masked input."],
+      ["Citation Validation", "Draft claims are checked against retrieved legal sources."],
+      ["Quality Check", "Citation and hallucination checks are applied."],
+      ["Human Approval", "Operator must approve before finalization."],
+      ["PII Rehydration", "Original values are restored locally only."],
+      ["Audit Logging", "Full trace is written to audit stream."]
+    ];
+
+    const routes = [
+      ["Local AI", "Sensitive data present. PII detection and masking stay local."],
+      ["Legal DB", "Need legal retrieval. Jurisdiction-aware source lookup."],
+      ["CRM/API", "Skipped. No factual customer record requested."],
+      ["Cloud LLM", "Allowed only after masking, used for reasoning and drafting."],
+      ["Human Approval", "High-risk legal answer requires mandatory approval."]
+    ];
+
+    const qms = [
+      ["Citation", 88],
+      ["Consistency", 82],
+      ["Risk", 74],
+      ["Governance", 91],
+      ["Explainability", 94]
+    ];
+
+    const legalKnowledge = [
+      {
+        id: "gdpr-art-5",
+        title: "GDPR Article 5",
+        jurisdiction: "EU / Netherlands",
+        summary: "Personal data processing must be lawful, fair, transparent, purpose-limited, data-minimized, accurate, storage-limited, and secure."
+      },
+      {
+        id: "gdpr-art-6",
+        title: "GDPR Article 6",
+        jurisdiction: "EU / Netherlands",
+        summary: "Employers need a lawful basis before processing meeting transcripts that contain personal data."
+      },
+      {
+        id: "gdpr-art-32",
+        title: "GDPR Article 32",
+        jurisdiction: "EU / Netherlands",
+        summary: "Controllers and processors must apply appropriate technical and organizational security measures."
+      },
+      {
+        id: "uavg-context",
+        title: "Dutch GDPR Implementation Act context",
+        jurisdiction: "Netherlands",
+        summary: "Dutch implementation context is relevant for local employment and supervisory authority expectations."
+      },
+      {
+        id: "wetten-wvw-article-185",
+        title: "Wetten.overheid.nl - Wegenverkeerswet 1994, article 185",
+        url: "https://wetten.overheid.nl/cgi-bin/deeplink/law1/bwbid=BWBR0006622/article=185",
+        jurisdiction: "Netherlands",
+        domains: ["traffic", "liability", "compensation", "vulnerable road user"],
+        keywords: ["article 185", "artikel 185", "wegenverkeerswet", "wvw", "traffic accident", "verkeersongeval", "accident", "aanrijding", "fiets", "fietser", "bicycle", "cyclist", "bike", "car", "auto", "motor vehicle", "motorrijtuig", "liability", "aansprakelijkheid", "compensation", "schadevergoeding", "damage", "schade", "велосипед", "велосипедист", "авто", "машина", "дтп", "авария", "компенсация", "ущерб", "ответственность", "страховка"],
+        text: "Article 185 of the Dutch Road Traffic Act 1994 states that if a motor vehicle on the road is involved in a traffic accident causing damage to persons or property not transported by that motor vehicle, the owner or holder must compensate that damage unless it is plausible that the accident was due to force majeure."
+      },
+      {
+        id: "rijksoverheid-wa-insurance",
+        title: "Rijksoverheid - WA-verzekering voor voertuigen",
+        url: "https://www.rijksoverheid.nl/vraag-en-antwoord/auto/wa-verzekering-voertuig",
+        jurisdiction: "Netherlands",
+        domains: ["traffic", "insurance", "liability"],
+        keywords: ["wa-verzekering", "wam", "third-party liability", "liability insurance", "verzekering", "insurance", "auto", "car", "motorrijtuig", "schade", "damage", "aansprakelijkheid", "страховка", "автострахование", "ущерб"],
+        text: "Rijksoverheid states that owners of cars and other motor vehicles must have WA liability insurance under the Motor Insurance Liability Act. If a motor vehicle causes damage, WA insurance usually covers that damage."
+      },
+      {
+        id: "government-dutch-traffic-crash",
+        title: "Government.nl - Participating in Dutch traffic",
+        url: "https://www.government.nl/binaries/government/documenten/reports/2024/02/09/participating-in-dutch-traffic/participating-in-dutch-traffic.pdf",
+        jurisdiction: "Netherlands",
+        domains: ["traffic", "accident procedure"],
+        keywords: ["traffic accident", "crash", "accident report", "injury", "death", "112", "police", "details of the accident", "verkeersongeval", "aanrijding", "авария", "дтп", "полиция", "травма", "112"],
+        text: "Government.nl's traffic guide says that in case of a crash involving injury or death, call 112; the police will make an official report. Drivers should exchange accident details and use the accident form distributed by the insurance company."
+      }
+    ];
+
+    const starterKitPolicies = [
+      {
+        id: "pii_must_be_masked_before_cloud",
+        condition: "sensitive_data_detected",
+        action: "mask_pii"
+      },
+      {
+        id: "legal_answers_require_sources",
+        condition: "legal_question_detected",
+        action: "require_citations"
+      },
+      {
+        id: "high_risk_requires_approval",
+        condition: "risk_level_high",
+        action: "require_human_approval"
+      }
+    ];
+
+    const starterKitRuntime = {
+      active_role: "Governance Officer",
+      active_mode: "Legal Governance Demo",
+      capabilities: ["routing_engine", "pii_masking", "legal_retrieval", "qms_engine", "approval_engine", "audit_engine", "memory_engine", "voice_interface"]
+    };
+
+    const legalBoxAgents = [
+      ["Legal Intake Agent", "receives question and checks missing context"],
+      ["Jurisdiction Agent", "detects country, region, legal system"],
+      ["Legal Domain Classifier", "classifies work, housing, taxes, family, documents, benefits, immigration, consumer, business"],
+      ["Risk Agent", "classifies low, medium, high, emergency"],
+      ["Source Agent", "requires official or reliable sources"],
+      ["Legal Reasoning Agent", "drafts structured legal orientation"],
+      ["Compliance Guard", "removes unsafe advice, guarantees, and overclaims"],
+      ["Human Review Gate", "requires human review for high-risk cases"],
+      ["Audit Agent", "records route, reasons, limits, and decision basis"]
+    ];
+
+    const officialLegalSources = [
+      {
+        id: "ind-ukraine-temporary-protection",
+        title: "IND - Temporary Protection Directive Ukraine",
+        url: "https://ind.nl/en/ukraine/temporary-protection-directive-ukraine",
+        jurisdiction: "Netherlands",
+        domains: ["immigration", "temporary protection", "ukraine"],
+        keywords: ["ukraine", "ukrainian", "украин", "нидерланд", "temporary protection", "ind", "proof of residency", "brp", "gemeente"],
+        text: "IND states that refugees from Ukraine can receive temporary protection in the Netherlands under the EU Temporary Protection Directive. If covered, they may stay in the Netherlands until 4 March 2027, need registration at the municipality/BRP, and people aged 14 or older need proof from IND that they may live and work in the Netherlands."
+      },
+      {
+        id: "ind-ukraine-extension-proof",
+        title: "IND - Extension sticker or card temporary protection Ukraine",
+        url: "https://ind.nl/en/ukraine/extension-sticker-or-card-temporary-protection-ukraine",
+        jurisdiction: "Netherlands",
+        domains: ["immigration", "temporary protection", "ukraine"],
+        keywords: ["ukraine", "украин", "sticker", "card", "proof", "4 march 2027", "продлен", "временная защита"],
+        text: "IND states that temporary protection for refugees from Ukraine has been extended until 4 March 2027 and explains what this means for stickers and cards proving temporary protection."
+      },
+      {
+        id: "government-ukraine-long-term",
+        title: "Government.nl - Long term policy: return and stay",
+        url: "https://www.government.nl/topics/r/reception-of-refugees-from-ukraine/long-term-policy-return-and-stay",
+        jurisdiction: "Netherlands",
+        domains: ["immigration", "temporary protection", "ukraine"],
+        keywords: ["ukraine", "украин", "return", "stay", "transition document", "4 march 2027", "temporary residence permit"],
+        text: "Government.nl states that after 4 March 2027, refugees from Ukraine will be able to obtain a temporary residence permit in the form of a transition document."
+      },
+      {
+        id: "government-minimum-wage-less-than",
+        title: "Government.nl - What if I receive less than the hourly minimum wage?",
+        url: "https://www.government.nl/themes/work/minimum-wage/less-than-the-minimum-wage",
+        jurisdiction: "Netherlands",
+        domains: ["employment", "wages"],
+        keywords: ["salary", "wage", "minimum wage", "зарплат", "работодатель", "underpaid", "unpaid wages", "labour authority"],
+        text: "Government.nl states that if an employer pays less than the minimum wage and refuses to correct it, the employee can contact the Netherlands Labour Authority or take the employer to court. It also says unpaid wages and holiday allowance can be recovered until five years after they should have been received."
+      },
+      {
+        id: "businessgov-salary-payslip",
+        title: "Business.gov.nl - Rules for paying salary and giving a payslip",
+        url: "https://business.gov.nl/staff/personnel-costs-and-salary/salary-and-payslip/",
+        jurisdiction: "Netherlands",
+        domains: ["employment", "wages", "payslip"],
+        keywords: ["salary", "payslip", "loon", "зарплат", "расчет", "pay slip", "employer"],
+        text: "Business.gov.nl states that employers must follow rules when paying salary, must not pay less than the minimum wage, and must provide a payslip with a breakdown of salary."
+      },
+      {
+        id: "government-minimum-wage-amounts",
+        title: "Government.nl - Minimum wage amounts",
+        url: "https://www.government.nl/themes/work/minimum-wage/minimum-wage-amounts",
+        jurisdiction: "Netherlands",
+        domains: ["employment", "minimum wage"],
+        keywords: ["minimum wage", "минимальная зарплата", "minimum hourly wage", "statutory minimum wage"],
+        text: "Government.nl states that from 1 January 2024 the Dutch statutory minimum wage is fixed per hour and employers are required by law to pay workers at least the hourly minimum wage."
+      }
+    ];
+
+    officialLegalSources.push(
+      {
+        id: "wetten-wvw-article-185",
+        title: "Wetten.overheid.nl - Wegenverkeerswet 1994, article 185",
+        url: "https://wetten.overheid.nl/cgi-bin/deeplink/law1/bwbid=BWBR0006622/article=185",
+        jurisdiction: "Netherlands",
+        domains: ["traffic", "liability", "compensation", "vulnerable road user"],
+        keywords: ["article 185", "artikel 185", "wegenverkeerswet", "wvw", "traffic accident", "verkeersongeval", "accident", "aanrijding", "fiets", "fietser", "bicycle", "cyclist", "bike", "car", "auto", "motor vehicle", "motorrijtuig", "liability", "aansprakelijkheid", "compensation", "schadevergoeding", "damage", "schade", "велосипед", "велосипедист", "авто", "машина", "дтп", "авария", "компенсация", "ущерб", "ответственность", "страховка"],
+        text: "Article 185 of the Dutch Road Traffic Act 1994 states that if a motor vehicle on the road is involved in a traffic accident causing damage to persons or property not transported by that motor vehicle, the owner or holder must compensate that damage unless it is plausible that the accident was due to force majeure."
+      },
+      {
+        id: "rijksoverheid-wa-insurance",
+        title: "Rijksoverheid - WA-verzekering voor voertuigen",
+        url: "https://www.rijksoverheid.nl/vraag-en-antwoord/auto/wa-verzekering-voertuig",
+        jurisdiction: "Netherlands",
+        domains: ["traffic", "insurance", "liability"],
+        keywords: ["wa-verzekering", "wam", "third-party liability", "liability insurance", "verzekering", "insurance", "auto", "car", "motorrijtuig", "schade", "damage", "aansprakelijkheid", "страховка", "автострахование", "ущерб"],
+        text: "Rijksoverheid states that owners of cars and other motor vehicles must have WA liability insurance under the Motor Insurance Liability Act. If a motor vehicle causes damage, WA insurance usually covers that damage."
+      },
+      {
+        id: "government-dutch-traffic-crash",
+        title: "Government.nl - Participating in Dutch traffic",
+        url: "https://www.government.nl/binaries/government/documenten/reports/2024/02/09/participating-in-dutch-traffic/participating-in-dutch-traffic.pdf",
+        jurisdiction: "Netherlands",
+        domains: ["traffic", "accident procedure"],
+        keywords: ["traffic accident", "crash", "accident report", "injury", "death", "112", "police", "details of the accident", "verkeersongeval", "aanrijding", "авария", "дтп", "полиция", "травма", "112"],
+        text: "Government.nl's traffic guide says that in case of a crash involving injury or death, call 112; the police will make an official report. Drivers should exchange accident details and use the accident form distributed by the insurance company."
+      }
+    );
+
+    const componentHealth = {
+      "Gateway": "online",
+      "Policy Engine": "online",
+      "Router Config": "online",
+      "Role System": "online",
+      "Skill System": "online",
+      "Memory": "localStorage",
+      "Audit": "localStorage",
+      "Quality Rules": "online",
+      "CRM Connectors": "mock",
+      "Legal Sources": "local",
+      "LLM Connectors": "mock",
+      "UI Configuration": "online",
+      "Starter Kit": "integrated"
+    };
+
+    const storedAudit = (() => {
+      try {
+        return JSON.parse(localStorage.getItem("testbox.audit") || "[]");
+      } catch {
+        return [];
+      }
+    })();
+
+    const storedMemory = (() => {
+      try {
+        return JSON.parse(localStorage.getItem("testbox.memory") || "[]");
+      } catch {
+        return [];
+      }
+    })();
+
+    const state = {
+      activeRole: "Operator",
+      activeSkills: new Set(["Self Presentation", "Routing Explanation", "Policy Explanation", "Quality Review"]),
+      step: -1,
+      running: false,
+      audit: storedAudit,
+      memory: storedMemory,
+      maskMap: {},
+      selectedComponent: "Gateway",
+      selectedRoute: "Local AI",
+      sources: [],
+      draft: "",
+      qmsScores: Object.fromEntries(qms),
+      voiceRecognition: null,
+      routeModeApplied: false,
+      playbookKey: "default",
+      playbookStep: 0,
+      language: "ru",
+      userMessages: [],
+      userAttachments: [],
+      userRisk: "low",
+      userRoute: "Local AI",
+      userPoliciesActive: [],
+      runtimePending: false,
+      runtimeConnected: false,
+      runtimeSession: `user-${Date.now().toString(36)}`,
+      lastGreetingRole: "",
+      lastUserText: "",
+      documentText: "",
+      documentName: "",
+      documentPreviewUrl: "",
+      documentKind: "",
+      documentExtraction: null
+    };
+
+    const roleList = document.querySelector("#roleList");
+    const skillList = document.querySelector("#skillList");
+    const routeNav = document.querySelector("#routeNav");
+    const runtimeModelGrid = document.querySelector("#runtimeModelGrid");
+    const staticMap = document.querySelector("#staticMap");
+    const flow = document.querySelector("#flow");
+    const routingStack = document.querySelector("#routingStack");
+    const auditList = document.querySelector("#auditList");
+    const auditCount = document.querySelector("#auditCount");
+    const runtimeStatus = document.querySelector("#runtimeStatus");
+    const qualityMeters = document.querySelector("#qualityMeters");
+    const qualityList = document.querySelector("#qualityList");
+    const explainList = document.querySelector("#explainList");
+    const adminOutput = document.querySelector("#adminOutput");
+    const adminStack = document.querySelector("#adminStack");
+    const maskOutput = document.querySelector("#maskOutput");
+    const legalSources = document.querySelector("#legalSources");
+    const voiceStatus = document.querySelector("#voiceStatus");
+    const activeRoleState = document.querySelector("#activeRoleState");
+    const activeScenarioState = document.querySelector("#activeScenarioState");
+    const systemStatusState = document.querySelector("#systemStatusState");
+    const playbookTitle = document.querySelector("#playbookTitle");
+    const playbookSummary = document.querySelector("#playbookSummary");
+    const playbookSteps = document.querySelector("#playbookSteps");
+    const playbookCurrent = document.querySelector("#playbookCurrent");
+    const playbookInstruction = document.querySelector("#playbookInstruction");
+    const userConsole = document.querySelector("#userConsole");
+    const chatWindow = document.querySelector("#chatWindow");
+    const chatTitle = document.querySelector("#chatTitle");
+    const chatSubtitle = document.querySelector("#chatSubtitle");
+    const userInput = document.querySelector("#userInput");
+    const userFiles = document.querySelector("#userFiles");
+    const attachmentList = document.querySelector("#attachmentList");
+    const userRisk = document.querySelector("#userRisk");
+    const userRoute = document.querySelector("#userRoute");
+    const userPolicies = document.querySelector("#userPolicies");
+    const userAttachmentSummary = document.querySelector("#userAttachmentSummary");
+    const documentViewer = document.querySelector("#documentViewer");
+    const documentPreview = document.querySelector("#documentPreview");
+    const documentText = document.querySelector("#documentText");
+    const documentPanelLabel = document.querySelector("#documentPanelLabel");
+    const documentFileName = document.querySelector("#documentFileName");
+    const documentOpenLink = document.querySelector("#documentOpenLink");
+    const langRu = document.querySelector("#langRu");
+    const langNl = document.querySelector("#langNl");
+    const langEn = document.querySelector("#langEn");
+    const sendUserButton = document.querySelector("#sendUserMessage");
+    const userVoiceButton = document.querySelector("#userVoiceCommand");
+    const clearUserButton = document.querySelector("#clearUserChat");
+    const pasteUserButton = document.querySelector("#pasteUserText");
+    const clipboardStatus = document.querySelector("#clipboardStatus");
+    const attachSampleImageButton = document.querySelector("#attachSampleImage");
+    const attachSampleDocButton = document.querySelector("#attachSampleDoc");
+
+    const languageText = {
+      ru: {
+        chatTitle: "Чат",
+        chatSubtitle: "Пишите, говорите текстовой командой, загружайте фото или документы. TESTBOX отвечает в выбранной роли и показывает только нужный результат.",
+        send: "Отправить",
+        voice: "Текст как голос",
+        clear: "Очистить",
+        paste: "Вставить",
+        pasteWorking: "Вставляю...",
+        pasteSuccess: "Вставлено: {count} символов.",
+        pasteEmpty: "Буфер обмена пуст.",
+        pasteUnavailable: "Не удалось прочитать буфер обмена. Нажмите в поле ввода и попробуйте Ctrl+V или загрузите текстовый файл.",
+        samplePhoto: "Пример фото",
+        sampleDocument: "Пример документа",
+        placeholder: "Опишите вопрос или ситуацию...",
+        pageTitle: "Чат пользователя",
+        pageDescription: "Отдельная вкладка пользователя: простой чат с ролью, файлами, голосовой командой и управляемым ответом.",
+        userLabel: "Пользователь",
+        adminLabel: "TESTBOX Administrator",
+        noDocument: "Документ не выбран",
+        documentUploadPrompt: "Документ не прикреплён. Загрузите PDF/фото или нажмите «Пример документа».",
+        documentPanel: "Прикреплённый документ",
+        openDocument: "Открыть документ",
+        noReadableText: "Текст не извлечен. Если это скан или изображение, нужен OCR.",
+        policiesNone: "нет",
+        attachmentsNone: "нет"
+      },
+      nl: {
+        chatTitle: "Chat",
+        chatSubtitle: "Typ, gebruik tekst als spraakcommando, upload foto's of documenten. TESTBOX antwoordt vanuit de gekozen rol met een bestuurbaar resultaat.",
+        send: "Versturen",
+        voice: "Tekst als stem",
+        clear: "Wissen",
+        paste: "Plakken",
+        pasteWorking: "Bezig met plakken...",
+        pasteSuccess: "Geplakt: {count} tekens.",
+        pasteEmpty: "Het klembord is leeg.",
+        pasteUnavailable: "Het klembord kon niet worden gelezen. Klik in het tekstveld en probeer Ctrl+V of upload een tekstbestand.",
+        samplePhoto: "Voorbeeldfoto",
+        sampleDocument: "Voorbeelddocument",
+        placeholder: "Beschrijf uw vraag of situatie...",
+        pageTitle: "Gebruikerschat",
+        pageDescription: "Aparte gebruikerstab: eenvoudige chat met rol, bestanden, spraakcommando en gecontroleerd antwoord.",
+        userLabel: "Gebruiker",
+        adminLabel: "TESTBOX Administrator",
+        noDocument: "Geen document geselecteerd",
+        documentUploadPrompt: "Nog geen document toegevoegd. Upload een PDF/foto of kies «Voorbeelddocument».",
+        documentPanel: "Bijgevoegd document",
+        openDocument: "Document openen",
+        noReadableText: "Geen leesbare tekst gevonden. Voor een scan of afbeelding is OCR nodig.",
+        policiesNone: "geen",
+        attachmentsNone: "geen"
+      },
+      en: {
+        chatTitle: "Chat",
+        chatSubtitle: "Type, use a text voice command, or upload photos and documents. TESTBOX answers in the selected role with a governed result.",
+        send: "Send",
+        voice: "Text as Voice",
+        clear: "Clear",
+        paste: "Paste",
+        pasteWorking: "Pasting...",
+        pasteSuccess: "Pasted: {count} characters.",
+        pasteEmpty: "The clipboard is empty.",
+        pasteUnavailable: "The clipboard could not be read. Click in the message field and try Ctrl+V or upload a text file.",
+        samplePhoto: "Sample Photo",
+        sampleDocument: "Sample Document",
+        placeholder: "Describe your question or situation...",
+        pageTitle: "User Chat",
+        pageDescription: "A separate user tab: simple chat with a role, files, voice command, and governed answer.",
+        userLabel: "User",
+        adminLabel: "TESTBOX Administrator",
+        noDocument: "No document selected",
+        documentUploadPrompt: "No document attached. Upload a PDF/photo or choose Sample Document.",
+        documentPanel: "Attached document",
+        openDocument: "Open document",
+        noReadableText: "No readable text extracted. OCR is required for a scan or image.",
+        policiesNone: "none",
+        attachmentsNone: "none"
+      }
+    };
+
+    function tx(key) {
+      return languageText[state.language]?.[key] || languageText.ru[key] || key;
+    }
+
+    function showClipboardStatus(message, tone = "") {
+      clipboardStatus.textContent = message;
+      clipboardStatus.className = `clipboard-feedback ${tone}`.trim();
+      clipboardStatus.hidden = !message;
+    }
+
+    function currentRoute() {
+      return window.location.pathname.replace(/\/$/, "") || "/testbox";
+    }
+
+    function isUserMode() {
+      return currentRoute().includes("user");
+    }
+
+    function applyLanguageToUi() {
+      if (langRu) langRu.classList.toggle("active", state.language === "ru");
+      if (langNl) langNl.classList.toggle("active", state.language === "nl");
+      if (langEn) langEn.classList.toggle("active", state.language === "en");
+      if (chatTitle) chatTitle.textContent = tx("chatTitle");
+      if (chatSubtitle) chatSubtitle.textContent = tx("chatSubtitle");
+      if (sendUserButton) sendUserButton.textContent = tx("send");
+      if (userVoiceButton) userVoiceButton.textContent = tx("voice");
+      if (clearUserButton) clearUserButton.textContent = tx("clear");
+      if (pasteUserButton) pasteUserButton.textContent = tx("paste");
+      if (attachSampleImageButton) attachSampleImageButton.textContent = tx("samplePhoto");
+      if (attachSampleDocButton) attachSampleDocButton.textContent = tx("sampleDocument");
+      if (userInput) userInput.placeholder = tx("placeholder");
+      if (sendUserButton) sendUserButton.disabled = state.runtimePending;
+      if (documentPanelLabel) documentPanelLabel.textContent = tx("documentPanel");
+      if (documentOpenLink) documentOpenLink.textContent = tx("openDocument");
+
+      if (isUserMode()) {
+        const pageTitle = document.querySelector(".page-title");
+        const pageDescription = document.querySelector(".title-block .muted");
+        if (pageTitle) pageTitle.textContent = tx("pageTitle");
+        if (pageDescription) pageDescription.textContent = tx("pageDescription");
+      }
+    }
+
+    async function rebuildUserConversationForLanguage() {
+      const greeting = { from: "admin", text: greetingForRole(state.activeRole) };
+      if (state.lastUserText) {
+        state.userMessages = [greeting, { from: "user", text: state.lastUserText }];
+        render();
+        try {
+          const runtimeResponse = await requestRuntimeAnswer(state.lastUserText);
+          applyRuntimeResponse(runtimeResponse);
+          state.userMessages.push({ from: "admin", text: runtimeResponse.final_response });
+        } catch (error) {
+          state.userMessages.push({ from: "admin", text: runtimeUnavailableMessage(error) });
+        }
+      } else {
+        state.userMessages = [greeting];
+      }
+      state.lastGreetingRole = `${state.activeRole}:${state.language}`;
+    }
+
+    async function switchLanguage(language) {
+      if (state.language === language) return;
+      state.language = language;
+      showClipboardStatus("");
+      addAudit("language.switch", `User chat language changed to ${language.toUpperCase()}.`);
+      await rebuildUserConversationForLanguage();
+      render();
+    }
+
+    function playbookKeyForRoute() {
+      const path = currentRoute();
+      if (path.includes("legalbox")) return "legalbox";
+      if (path.includes("legal-demo") || path.includes("legal")) return "legal-demo";
+      if (path.includes("user")) return "user";
+      if (path.includes("routing")) return "routing";
+      if (path.includes("audit")) return "audit";
+      if (path.includes("hackathon")) return "hackathon";
+      if (path.includes("training")) return "training";
+      return "default";
+    }
+
+    function renderRouteNav() {
+      const path = currentRoute();
+      routeNav.innerHTML = testboxRoutes.map(([href, label, note]) => `
+        <a class="route-link ${path === href ? "active" : ""}" href="${href}">
+          <span>${label}</span><span>${note}</span>
+        </a>
+      `).join("");
+    }
+
+    function applyRouteMode() {
+      if (state.routeModeApplied) return;
+      state.routeModeApplied = true;
+      const path = currentRoute();
+      state.playbookKey = playbookKeyForRoute();
+      state.playbookStep = 0;
+      document.body.classList.toggle("user-mode", path.includes("user"));
+      const eyebrow = document.querySelector(".eyebrow");
+      const pageTitle = document.querySelector(".page-title");
+      const pageDescription = document.querySelector(".title-block .muted");
+      if (path.includes("user")) {
+        eyebrow.textContent = "TESTBOX USER";
+        pageTitle.textContent = "User Chat";
+        pageDescription.textContent = "Role-aware governed chat for text, voice fallback, photos, and documents.";
+      } else {
+        eyebrow.textContent = "TESTBOX COCKPIT";
+        pageTitle.textContent = "AI Operations & Governance Console";
+        pageDescription.textContent = "A demonstration runtime for orchestration, routing, legal governance, PII masking, human oversight, audit, quality, and explainability.";
+      }
+      if (path.includes("legalbox")) {
+        state.activeRole = "Legal Assistant";
+        activeScenarioState.textContent = "LegalBox";
+        say("LegalBox route active. TESTBOX will run legal intake, jurisdiction/domain/risk classification, source requirement, safety review, human review gate when needed, and audit.");
+      } else if (path.includes("legal-demo")) {
+        state.activeRole = "Legal Assistant";
+        activeScenarioState.textContent = "Legal AI Demo";
+        say("Legal Demo route active. This mode prioritizes voice/text input, PII masking visualization, routing, approval gate, audit replay, and final governed response.");
+      } else if (path.includes("routing")) {
+        activeScenarioState.textContent = "Routing Decisions";
+        say("Routing route active. Inspect Local AI, Legal DB, CRM/API, Cloud LLM, and Human Approval to see why each path is selected or skipped.");
+      } else if (path.includes("user")) {
+        state.activeRole = "Operator";
+        activeScenarioState.textContent = "User Intake";
+        say("User Intake mode active. This is a governed interaction tab for text, voice fallback, images, documents, routing explanation, and audited Administrator responses.");
+        ensureUserGreeting(true);
+      } else if (path.includes("audit")) {
+        activeScenarioState.textContent = "Audit Replay";
+        say("Audit route active. The audit stream is the replay surface for runtime governance decisions.");
+      } else if (path.includes("memory")) {
+        activeScenarioState.textContent = "Memory Governance";
+        say("Memory route active. TESTBOX stores workflow metadata locally and avoids raw PII memory writes.");
+      } else if (path.includes("orchestration")) {
+        activeScenarioState.textContent = "Dynamic Orchestration";
+        say("Orchestration route active. The execution lane shows runtime steps, agent activity, approval gates, and quality checks.");
+      } else if (path.includes("training")) {
+        state.activeRole = "Instructor";
+        activeScenarioState.textContent = "Operator Training";
+        say("Training route active. Administrator explains decisions so operators can learn governance behavior.");
+      } else if (path.includes("hackathon")) {
+        state.activeRole = "Hackathon Mentor";
+        activeScenarioState.textContent = "Hackathon Mentor";
+        say("Hackathon route active. TESTBOX can present scenarios, explain architecture, and guide teams through demo flows.");
+      } else if (path.includes("settings")) {
+        activeScenarioState.textContent = "Runtime Settings";
+        say("Settings route active. This MVP exposes local settings through roles, skills, routes, voice controls, and emergency stop.");
+      } else {
+        activeScenarioState.textContent = "Legal AI Demo";
+      }
+      activeRoleState.textContent = state.activeRole === "Operator" ? "Governance Operator" : state.activeRole;
+      systemStatusState.textContent = state.running ? "Running" : "Operational";
+    }
+
+    function renderPlaybook() {
+      const playbook = playbooks[state.playbookKey] || playbooks.default;
+      playbookTitle.textContent = playbook.title;
+      playbookSummary.textContent = playbook.summary;
+      const currentStep = playbook.steps[state.playbookStep] || playbook.steps[playbook.steps.length - 1];
+      playbookCurrent.textContent = currentStep ? currentStep[0] : "Complete";
+      playbookInstruction.textContent = currentStep ? currentStep[1] : "Scenario completed.";
+      playbookSteps.innerHTML = playbook.steps.map(([name, text], index) => {
+        const status = index < state.playbookStep ? "done" : index === state.playbookStep ? "active" : "";
+        const label = index < state.playbookStep ? "done" : index === state.playbookStep ? "current" : "queued";
+        return `
+          <div class="playbook-step ${status}">
+            <div class="playbook-index">${index + 1}</div>
+            <div><strong>${name}</strong><span>${text}</span></div>
+            <span class="status-pill ${label === "current" ? "medium" : label === "done" ? "low" : ""}">${label}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderRuntimeModel() {
+      const activePolicies = starterKitPolicies.map((policy) => policy.id).join(", ");
+      const activeCapabilities = starterKitRuntime.capabilities.join(", ");
+      const activeSkills = [...state.activeSkills].slice(0, 6).join(", ");
+      const tokens = [
+        ["Role", state.activeRole === "Operator" ? "Governance Operator" : state.activeRole],
+        ["Mode", activeScenarioState.textContent || starterKitRuntime.active_mode],
+        ["Capabilities", activeCapabilities],
+        ["Skills", activeSkills || "none"],
+        ["Policies", activePolicies],
+        ["State", `${runtimeStatus.textContent}; route ${state.selectedRoute}`],
+        ["Audit", `${state.audit.length} events`]
+      ];
+      runtimeModelGrid.innerHTML = tokens.map(([name, text]) => `
+        <div class="runtime-token"><strong>${name}</strong><span>${text}</span></div>
+      `).join("");
+    }
+
+    function renderUserConsole() {
+      userConsole.hidden = state.playbookKey !== "user";
+      if (userConsole.hidden) return;
+      applyLanguageToUi();
+      ensureUserGreeting();
+      chatWindow.innerHTML = state.userMessages.map((message) => `
+        <div class="message ${message.from}">
+          <strong>${message.from === "user" ? tx("userLabel") : tx("adminLabel")}</strong>${message.text}
+          ${message.attachments?.length ? `<div class="message-attachments">${message.attachments.map((name) => `<span class="message-file">${name}</span>`).join("")}</div>` : ""}
+        </div>
+      `).join("");
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      userRisk.textContent = state.userRisk;
+      userRoute.textContent = state.userRoute;
+      const policies = state.userPoliciesActive.length ? state.userPoliciesActive : triggeredUserPolicies(userInput.value);
+      userPolicies.textContent = policies.length ? policies.join(", ") : tx("policiesNone");
+      userAttachmentSummary.textContent = state.userAttachments.length ? `${state.userAttachments.length} file(s)` : tx("attachmentsNone");
+      attachmentList.innerHTML = state.userAttachments.map((file, index) => `
+        <div class="attachment-item">
+          <div class="attachment-preview">${file.preview ? `<img src="${file.preview}" alt="" />` : file.kind}</div>
+          <div><strong>${file.name}</strong><span class="small">${file.type || "unknown"} · ${formatBytes(file.size)} · ${file.risk}</span></div>
+        </div>
+      `).join("");
+      documentViewer.hidden = false;
+      documentViewer.classList.toggle("empty", !state.documentName);
+      if (!state.documentName) {
+        documentFileName.textContent = tx("noDocument");
+        documentOpenLink.hidden = true;
+        documentOpenLink.removeAttribute("href");
+        documentPreview.textContent = tx("documentUploadPrompt");
+        documentText.textContent = tx("noReadableText");
+      } else {
+        documentFileName.textContent = state.documentName;
+        documentOpenLink.hidden = !state.documentPreviewUrl;
+        if (state.documentPreviewUrl) {
+          documentOpenLink.href = state.documentPreviewUrl;
+        } else {
+          documentOpenLink.removeAttribute("href");
+        }
+        if (state.documentPreviewUrl && state.documentKind === "image") {
+          documentPreview.innerHTML = `<img src="${state.documentPreviewUrl}" alt="${state.documentName}" />`;
+        } else if (state.documentPreviewUrl && state.documentKind === "PDF") {
+          documentPreview.innerHTML = `<iframe src="${state.documentPreviewUrl}" title="${state.documentName}"></iframe>`;
+        } else {
+          documentPreview.textContent = state.documentName ? `${state.documentKind || "FILE"}: ${state.documentName}` : tx("noDocument");
+        }
+        documentText.textContent = state.documentText || tx("noReadableText");
+      }
+    }
+
+    function greetingForRole(role) {
+      if (state.language === "en") {
+        const greetingsEn = {
+          "Operator": "Hello. Describe your situation or upload a document. I will identify the key issue, provide a reliable response, and outline the next step.",
+          "Instructor": "Hello. Ask your question and I will explain the answer clearly: what matters, why it matters, and what to do next.",
+          "Legal Assistant": "Hello. Describe the legal situation. I will provide information based on available sources, identify risks, and refer you to a competent authority or legal specialist when needed.",
+          "Governance Officer": "Hello. Describe the task or risk. I will assess reliability, constraints, responsibility, and required controls.",
+          "Project Architect": "Hello. Describe the idea or system. I will turn it into architecture, components, risks, and an implementation plan.",
+          "Demo Presenter": "Hello. Tell me what you need to present. I will help make the explanation clear, convincing, and appropriate for the audience.",
+          "Hackathon Mentor": "Hello. Describe your idea or upload material. I will help turn it into a clear challenge, demo scenario, and evaluation criteria.",
+          "CRM Dispatcher": "Hello. Describe the customer case or upload a document. I will help identify the request and the next operational step."
+        };
+        return greetingsEn[role] || greetingsEn.Operator;
+      }
+      if (state.language === "nl") {
+        const greetingsNl = {
+          "Operator": "Hallo. Beschrijf uw situatie of upload een document. Ik help de kern te vinden, geef een betrouwbaar antwoord en noem de volgende stap.",
+          "Instructor": "Hallo. Stel uw vraag, dan leg ik het antwoord helder uit: wat belangrijk is, waarom het belangrijk is en wat u daarna kunt doen.",
+          "Legal Assistant": "Hallo. Beschrijf de juridische situatie. Ik geef informatie op basis van beschikbare bronnen, benoem risico's en verwijs waar nodig naar een bevoegde instantie of jurist.",
+          "Governance Officer": "Hallo. Beschrijf de taak of het risico. Ik beoordeel betrouwbaarheid, beperkingen, verantwoordelijkheid en noodzakelijke controles.",
+          "Project Architect": "Hallo. Beschrijf het idee of systeem. Ik vertaal het naar architectuur, componenten, risico's en een uitvoerbaar plan.",
+          "Demo Presenter": "Hallo. Vertel wat u wilt presenteren. Ik help het verhaal helder, overtuigend en geschikt voor het publiek te maken.",
+          "Hackathon Mentor": "Hallo. Beschrijf uw idee of upload materiaal. Ik help er een duidelijke opdracht, demo-scenario en beoordelingscriteria van te maken.",
+          "CRM Dispatcher": "Hallo. Beschrijf de klantcase of upload een document. Ik help de kern van het verzoek en de volgende werkstap te bepalen."
+        };
+        return greetingsNl[role] || greetingsNl.Operator;
+      }
+      const greetings = {
+        "Operator": "Здравствуйте. Опишите ситуацию или загрузите документ. Я помогу разобраться, выделю главное и предложу понятные следующие шаги.",
+        "Instructor": "Здравствуйте. Опишите вопрос, а я объясню ответ простым языком: что важно, почему это важно и что делать дальше.",
+        "Legal Assistant": "Здравствуйте. Опишите юридическую ситуацию. Я дам аккуратный предварительный разбор, укажу на возможные основания и предложу практические шаги.",
+        "Governance Officer": "Здравствуйте. Опишите задачу или риск. Я помогу оценить надежность решения, ограничения, ответственность и необходимые проверки.",
+        "Project Architect": "Здравствуйте. Опишите идею или систему. Я помогу разложить ее на архитектуру, компоненты, риски и план реализации.",
+        "Demo Presenter": "Здравствуйте. Опишите, что нужно представить. Я помогу сформулировать убедительное объяснение для аудитории.",
+        "Hackathon Mentor": "Здравствуйте. Опишите идею или загрузите материал. Я помогу превратить это в понятную задачу, сценарий и критерии оценки.",
+        "CRM Dispatcher": "Здравствуйте. Опишите клиентский кейс или загрузите документ. Я помогу определить суть обращения и следующий рабочий шаг."
+      };
+      return greetings[role] || greetings.Operator;
+    }
+
+    function ensureUserGreeting(force = false) {
+      if (!isUserMode()) return;
+      const greetingKey = `${state.activeRole}:${state.language}`;
+      if (!force && state.lastGreetingRole === greetingKey && state.userMessages.length) return;
+      state.lastGreetingRole = greetingKey;
+      state.userMessages = [{ from: "admin", text: greetingForRole(state.activeRole) }];
+    }
+
+    function renderRoles() {
+      roleList.innerHTML = roles.map((role) => `
+        <button class="role-button ${role === state.activeRole ? "active" : ""}" data-role="${role}">${role}</button>
+      `).join("");
+      document.querySelectorAll("[data-role]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.activeRole = button.dataset.role;
+          addAudit("role.switch", `Administrator role changed to ${state.activeRole}.`);
+          if (isUserMode()) ensureUserGreeting(true);
+          render();
+          say(`Role switched to ${state.activeRole}. I will keep role boundaries visible and will not merge role behavior with skills or policies.`);
+        });
+      });
+    }
+
+    function renderSkills() {
+      skillList.innerHTML = skills.map((skill) => `
+        <button class="skill-button ${state.activeSkills.has(skill) ? "active" : ""}" data-skill="${skill}">${skill}</button>
+      `).join("");
+      document.querySelectorAll("[data-skill]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const skill = button.dataset.skill;
+          if (state.activeSkills.has(skill)) state.activeSkills.delete(skill);
+          else state.activeSkills.add(skill);
+          addAudit("skill.toggle", `${skill} ${state.activeSkills.has(skill) ? "activated" : "deactivated"}.`);
+          render();
+        });
+      });
+    }
+
+    function renderStaticMap() {
+      staticMap.innerHTML = staticComponents.map(([name, text]) => `
+        <button class="component ${state.selectedComponent === name ? "active" : ""}" data-component="${name}">
+          <strong>${name} · ${componentHealth[name]}</strong><span>${text}</span>
+        </button>
+      `).join("");
+      document.querySelectorAll("[data-component]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.selectedComponent = button.dataset.component;
+          addAudit("component.test", `${state.selectedComponent} self-test returned ${componentHealth[state.selectedComponent]}.`);
+          say(`${state.selectedComponent} is ${componentHealth[state.selectedComponent]}. This block is now wired into the local TESTBOX demo instead of being a passive diagram.`);
+          render();
+        });
+      });
+    }
+
+    function renderFlow() {
+      flow.innerHTML = flowSteps.map(([name, note], index) => {
+        const status = index < state.step ? "done" : index === state.step ? "active" : "";
+        const label = index < state.step ? "done" : index === state.step ? "active" : "queued";
+        return `
+          <div class="flow-step ${status}">
+            <div class="step-index">${index + 1}</div>
+            <div><div class="step-name">${name}</div><div class="step-note">${note}</div></div>
+            <span class="status-pill ${label === "active" ? "medium" : label === "done" ? "low" : ""}">${label}</span>
+          </div>
+        `;
+      }).join("");
+      runtimeStatus.textContent = state.running ? "running" : state.step >= flowSteps.length ? "complete" : "standby";
+    }
+
+    function renderRoutes() {
+      routingStack.innerHTML = routes.map(([name, note]) => {
+        const selected = state.selectedRoute === name;
+        return `<button class="route-card ${selected ? "selected" : ""}" data-route="${name}"><strong>${name}</strong><span>${note}</span></button>`;
+      }).join("");
+      document.querySelectorAll("[data-route]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.selectedRoute = button.dataset.route;
+          addAudit("routing.inspect", `${state.selectedRoute} route inspected by operator.`);
+          explainRoute(state.selectedRoute);
+          renderRoutes();
+        });
+      });
+    }
+
+    function renderAudit() {
+      auditCount.textContent = `${state.audit.length} events`;
+      auditList.innerHTML = state.audit.slice(0, 8).map((item) => `
+        <div class="audit-item"><strong>${item.type}</strong><span>${item.time} - ${item.text}</span></div>
+      `).join("");
+    }
+
+    function renderQuality() {
+      qualityMeters.innerHTML = Object.entries(state.qmsScores).map(([name, value]) => `
+        <div class="qms-meter"><span class="small">${name}</span><div class="bar"><span style="width:${value}%"></span></div></div>
+      `).join("");
+      qualityList.innerHTML = [
+        ["Citation validation", "Legal citations must map to retrieved sources before final answer."],
+        ["Hallucination reduction", "Drafting output is constrained by retrieval and quality gates."],
+        ["Governance validation", "High-risk legal advice cannot bypass approval."]
+      ].map(([name, text]) => `<div class="quality-item"><strong>${name}</strong><span>${text}</span></div>`).join("");
+    }
+
+    function renderExplainability() {
+      explainList.innerHTML = [
+        ["Policy", `${starterKitPolicies[0].id}: sensitive data must be masked before cloud-style drafting.`],
+        ["Sources", `${starterKitPolicies[1].id}: legal answers require citations from legal sources.`],
+        ["Approval", `${starterKitPolicies[2].id}: high-risk legal workflow requires human approval.`],
+        ["Routing", "LLM is not first choice. TESTBOX selects local masking, legal retrieval, then masked drafting."],
+        ["Memory", "Only workflow metadata is eligible for memory update, not raw PII."],
+        ["Starter Runtime", `${starterKitRuntime.active_mode}; capabilities: ${starterKitRuntime.capabilities.join(", ")}.`]
+      ].map(([name, text]) => `<div class="explain-item"><strong>${name}</strong><span>${text}</span></div>`).join("");
+
+      adminStack.innerHTML = [
+        ["Core Identity", "Managed AI environment for human control."],
+        ["Role Layer", state.activeRole],
+        ["Skill Layer", [...state.activeSkills].slice(0, 5).join(", ")],
+        ["Policy Constraints", "PII protection, legal approval, audit required."],
+        ["Execution Behavior", "Explain, route, validate, request approval, log."],
+        ["Memory Items", `${state.memory.length} local workflow memories stored.`]
+      ].map(([name, text]) => `<div class="explain-item"><strong>${name}</strong><span>${text}</span></div>`).join("");
+    }
+
+    function render() {
+      renderRouteNav();
+      renderPlaybook();
+      renderRoles();
+      renderSkills();
+      renderStaticMap();
+      renderFlow();
+      renderRoutes();
+      renderAudit();
+      renderQuality();
+      renderExplainability();
+      activeRoleState.textContent = state.activeRole === "Operator" ? "Governance Operator" : state.activeRole;
+      systemStatusState.textContent = state.running ? "Running" : "Operational";
+      renderRuntimeModel();
+      renderUserConsole();
+    }
+
+    function addAudit(type, text) {
+      state.audit.unshift({
+        type,
+        text,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      });
+      try {
+        localStorage.setItem("testbox.audit", JSON.stringify(state.audit.slice(0, 80)));
+      } catch {
+        // Local audit persistence is best-effort in restricted browsers.
+      }
+      renderAudit();
+    }
+
+    function say(text) {
+      adminOutput.textContent = text;
+    }
+
+    function remember(type, text) {
+      state.memory.unshift({
+        type,
+        text,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      });
+      try {
+        localStorage.setItem("testbox.memory", JSON.stringify(state.memory.slice(0, 40)));
+      } catch {
+        // Local memory persistence is best-effort.
+      }
+      renderExplainability();
+    }
+
+    function explainRoute(route) {
+      const explanations = {
+        "Local AI": "Local AI handles PII detection, masking, policy pre-checks, and any task that should not expose raw sensitive data.",
+        "Legal DB": "Legal DB is used for jurisdiction-aware retrieval before drafting. It grounds the answer in known sources.",
+        "CRM/API": "CRM/API is used only when factual customer or case data is required. This legal demo does not need it.",
+        "Cloud LLM": "Cloud LLM is allowed only after masking. It receives placeholders, never raw PII.",
+        "Human Approval": "Human approval is mandatory for high-risk legal outputs before final delivery or rehydration."
+      };
+      say(explanations[route] || "Route inspected.");
+    }
+
+    function policySummary() {
+      return starterKitPolicies.map((policy) => `${policy.id}: ${policy.condition} -> ${policy.action}`).join("; ");
+    }
+
+    function retrieveLegalSources() {
+      const input = `${document.querySelector("#legalInput").value} ${maskOutput.textContent}`.toLowerCase();
+      state.sources = legalKnowledge.filter((source) => {
+        const haystack = `${source.title} ${source.summary} ${source.jurisdiction}`.toLowerCase();
+        return input.includes("employer") || input.includes("transcript") || haystack.includes("gdpr") || haystack.includes("dutch");
+      });
+      legalSources.innerHTML = state.sources.map((source) => `
+        <div class="source-item"><strong>${source.title} · ${source.jurisdiction}</strong><span>${source.summary}</span></div>
+      `).join("");
+      addAudit("legal.retrieve", `${state.sources.length} local legal sources retrieved.`);
+      return state.sources;
+    }
+
+    function draftLegalAnswer() {
+      if (!state.sources.length) retrieveLegalSources();
+      const sourceRefs = state.sources.map((source) => source.title).join("; ");
+      state.draft = `Draft: employer transcript storage needs a lawful basis, clear purpose, minimization, retention limits, security controls, and employee transparency. Sources: ${sourceRefs}.`;
+      maskOutput.textContent = `${maskOutput.textContent}\n\n${state.draft}`;
+      addAudit("agent.draft", "Legal Assistant produced a source-grounded masked draft.");
+      return state.draft;
+    }
+
+    function runQualityChecks() {
+      const hasSources = state.sources.length >= 3;
+      const hasMaskedPii = /\[[A-Z]+_\d+\]/.test(maskOutput.textContent);
+      const hasApproval = state.audit.some((item) => item.type === "approval.approve");
+      state.qmsScores = {
+        Citation: hasSources ? 94 : 54,
+        Consistency: state.draft ? 88 : 66,
+        Risk: hasApproval ? 86 : 72,
+        Governance: hasMaskedPii ? 95 : 58,
+        Explainability: state.audit.length > 4 ? 96 : 80
+      };
+      addAudit("qms.validate", `QMS recalculated with starter policies: citation ${state.qmsScores.Citation}, governance ${state.qmsScores.Governance}.`);
+      renderQuality();
+      return state.qmsScores;
+    }
+
+    function maskPii() {
+      const input = document.querySelector("#legalInput").value;
+      state.maskMap = {};
+      let masked = input;
+      const patterns = [
+        ["EMAIL", /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi],
+        ["BSN", /\b\d{9}\b/g],
+        ["PHONE", /\+?\d[\d\s-]{7,}\d/g],
+        ["ADDRESS", /\b[A-Z][a-z]+(?:gracht|straat|laan|weg)\s+\d+[A-Za-z]?,\s*[A-Z][a-z]+/g],
+        ["NAME", /\b(Maria Janssen|Jan de Vries|Anna Peters)\b/g],
+        ["COMPANY_ID", /\b(?:KVK|VAT|BTW)[:\s-]*[A-Z0-9-]{6,}\b/gi]
+      ];
+      patterns.forEach(([type, regex]) => {
+        let count = 0;
+        masked = masked.replace(regex, (match) => {
+          count += 1;
+          const key = `[${type}_${count}]`;
+          state.maskMap[key] = match;
+          return key;
+        });
+      });
+      maskOutput.textContent = masked;
+      addAudit("pii.mask", `${Object.keys(state.maskMap).length} sensitive values replaced with placeholders.`);
+      retrieveLegalSources();
+      runQualityChecks();
+      say("PII masking completed locally. The masked text can be sent to retrieval and drafting routes while the original values remain inside the local node.");
+    }
+
+    function rehydrate() {
+      let output = maskOutput.textContent || "";
+      Object.entries(state.maskMap).forEach(([key, value]) => {
+        output = output.split(key).join(value);
+      });
+      maskOutput.textContent = output;
+      addAudit("pii.rehydrate", "Placeholders restored locally after approval.");
+      remember("pii.rehydrate", "A legal workflow restored PII locally after operator control.");
+      runQualityChecks();
+      say("PII rehydration happened locally after operator control. No raw personal data is required for cloud reasoning.");
+    }
+
+    async function runDemo() {
+      state.running = true;
+      state.step = -1;
+      state.audit = [];
+      state.sources = [];
+      state.draft = "";
+      addAudit("workflow.start", "Legal governance scenario started.");
+      render();
+      maskPii();
+      for (let i = 0; i < flowSteps.length; i += 1) {
+        if (!state.running) break;
+        state.step = i;
+        addAudit(`step.${i + 1}`, `${flowSteps[i][0]} executed.`);
+        if (flowSteps[i][0] === "Legal Source Retrieval") retrieveLegalSources();
+        if (flowSteps[i][0] === "LLM Drafting") draftLegalAnswer();
+        if (flowSteps[i][0] === "Citation Validation") runQualityChecks();
+        if (flowSteps[i][0] === "Quality Check") runQualityChecks();
+        if (flowSteps[i][0] === "Human Approval") {
+          say("Mandatory human approval is required. I can explain the policy, routing, audit trail, and quality gates before the operator decides.");
+        }
+        render();
+        await new Promise((resolve) => setTimeout(resolve, 520));
+      }
+      if (state.running) {
+        state.step = flowSteps.length;
+        state.running = false;
+        addAudit("workflow.complete", "Demo execution reached final audit state.");
+        remember("workflow.complete", "Legal governance workflow completed with masked drafting and audit trail.");
+        say("The legal workflow completed with masked drafting, quality validation, human oversight, local rehydration, and audit logging.");
+        render();
+      }
+    }
+
+    function stopDemo() {
+      state.running = false;
+      addAudit("operator.stop", "Emergency stop activated by operator.");
+      say("Emergency stop is active. Runtime execution is paused and no additional routing or agent execution will occur.");
+      render();
+    }
+
+    function handleVoiceCommand(command) {
+      const normalized = command.toLowerCase();
+      addAudit("voice.command", `Voice/text command received: ${command}`);
+      if (normalized.includes("routing")) {
+        explainRoute(state.selectedRoute);
+      } else if (normalized.includes("policy")) {
+        say("Voice command processed. Current policy requires local PII masking, legal retrieval, QMS validation, human approval, and audit logging.");
+      } else if (normalized.includes("run") || normalized.includes("demo")) {
+        runDemo();
+        say("Voice command processed. Starting the legal governance demo.");
+      } else if (normalized.includes("mask")) {
+        maskPii();
+      } else if (normalized.includes("stop")) {
+        stopDemo();
+      } else {
+        say(`Voice command processed as operator note: ${command}`);
+      }
+    }
+
+    function startVoice() {
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Recognition) {
+        voiceStatus.textContent = "Speech recognition is not available in this browser. Text command fallback is active.";
+        addAudit("voice.fallback", "Browser STT unavailable; text command fallback active.");
+        return;
+      }
+      state.voiceRecognition = new Recognition();
+      state.voiceRecognition.lang = "en-US";
+      state.voiceRecognition.interimResults = false;
+      state.voiceRecognition.onresult = (event) => {
+        const command = event.results[0][0].transcript;
+        document.querySelector("#voiceCommand").value = command;
+        handleVoiceCommand(command);
+      };
+      state.voiceRecognition.onerror = () => {
+        voiceStatus.textContent = "Speech recognition stopped with an error. Text command fallback remains available.";
+      };
+      state.voiceRecognition.start();
+      voiceStatus.textContent = "Listening. Say: explain routing, explain policy, run demo, mask PII, or stop.";
+      addAudit("voice.start", "Voice meeting mode started.");
+    }
+
+    function stopVoice() {
+      if (state.voiceRecognition) state.voiceRecognition.stop();
+      voiceStatus.textContent = "Voice meeting mode stopped. Text command fallback remains available.";
+      addAudit("voice.stop", "Voice meeting mode stopped.");
+    }
+
+    function speakAdmin() {
+      if (!("speechSynthesis" in window)) {
+        voiceStatus.textContent = "Text to speech is not available in this browser.";
+        addAudit("voice.tts_unavailable", "Browser TTS unavailable.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(adminOutput.textContent || "TESTBOX Administrator is ready."));
+      addAudit("voice.speak", "Administrator output sent to browser TTS.");
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return "0 B";
+      const units = ["B", "KB", "MB", "GB"];
+      const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+      return `${(bytes / Math.pow(1024, index)).toFixed(index ? 1 : 0)} ${units[index]}`;
+    }
+
+    function readAsText(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(file);
+      });
+    }
+
+    function readAsArrayBuffer(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function roughPdfText(arrayBuffer) {
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+      const chunks = [];
+      const literalMatches = binary.matchAll(/\(([^()]{2,})\)\s*T[jJ]/g);
+      for (const match of literalMatches) chunks.push(match[1]);
+      const arrayMatches = binary.matchAll(/\[((?:\([^()]*\)\s*)+)\]\s*TJ/g);
+      for (const match of arrayMatches) {
+        chunks.push([...match[1].matchAll(/\(([^()]*)\)/g)].map((item) => item[1]).join(""));
+      }
+      const decoded = chunks.join(" ")
+        .replace(/\\\(/g, "(")
+        .replace(/\\\)/g, ")")
+        .replace(/\\n/g, "\n")
+        .replace(/\\r/g, "\n")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+      return decoded || "PDF preview is available, but text was not extractable in-browser. This may be a scanned PDF or compressed PDF stream.";
+    }
+
+    async function inflateRaw(bytes) {
+      if (!("DecompressionStream" in window)) return "";
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return await new Response(stream).text();
+    }
+
+    async function extractDocxText(arrayBuffer) {
+      const bytes = new Uint8Array(arrayBuffer);
+      const decoder = new TextDecoder("utf-8");
+      for (let i = 0; i < bytes.length - 30; i += 1) {
+        if (bytes[i] !== 0x50 || bytes[i + 1] !== 0x4b || bytes[i + 2] !== 0x03 || bytes[i + 3] !== 0x04) continue;
+        const method = bytes[i + 8] | (bytes[i + 9] << 8);
+        const compressedSize = bytes[i + 18] | (bytes[i + 19] << 8) | (bytes[i + 20] << 16) | (bytes[i + 21] << 24);
+        const fileNameLength = bytes[i + 26] | (bytes[i + 27] << 8);
+        const extraLength = bytes[i + 28] | (bytes[i + 29] << 8);
+        const nameStart = i + 30;
+        const name = decoder.decode(bytes.slice(nameStart, nameStart + fileNameLength));
+        const dataStart = nameStart + fileNameLength + extraLength;
+        const data = bytes.slice(dataStart, dataStart + compressedSize);
+        if (name !== "word/document.xml") continue;
+        const xml = method === 0 ? decoder.decode(data) : await inflateRaw(data);
+        if (!xml) return "DOCX detected, but this browser could not decompress the document text.";
+        return xml
+          .replace(/<w:tab\/>/g, "\t")
+          .replace(/<\/w:p>/g, "\n")
+          .replace(/<[^>]+>/g, "")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&amp;/g, "&")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+      }
+      return "DOCX text could not be found. The file may be encrypted, unsupported, or not a valid DOCX.";
+    }
+
+    function isTrafficLiabilityQuestion(text) {
+      const value = text.toLowerCase();
+      return /(велосипед|велосипедист|авто|машин|дтп|авари|компенсац|ущерб|страхов|ответствен|законн|fiets|fietser|auto|aanrijding|verkeersongeval|schade|schadevergoeding|aansprakelijk|liability|compensation|accident|cyclist|bicycle|bike|car)/i.test(value);
+    }
+
+    function triggeredUserPolicies(text) {
+      const value = `${text} ${state.userAttachments.map((file) => file.name).join(" ")}`.toLowerCase();
+      const policies = [];
+      if (/[\w.+-]+@[\w.-]+\.[a-z]{2,}|\+?\d[\d\s-]{7,}\d|\b\d{9}\b/i.test(value)) policies.push("pii_must_be_masked_before_cloud");
+      if (isTrafficLiabilityQuestion(value)) policies.push("legal_answers_require_sources");
+      if (/salary|зарплат|работодатель|legal|law|contract|dismissal|увол|суд|украин|нідерланд|нидерланд|netherlands|nederland|основан|нахожд|пребыван|тимчасов|temporary protection|ind|uwv|gemeente|внж|visa|residence|immigration|защит/i.test(value)) policies.push("legal_answers_require_sources");
+      if (policies.includes("legal_answers_require_sources") || state.userAttachments.some((file) => file.risk !== "low")) policies.push("high_risk_requires_approval");
+      return [...new Set(policies)];
+    }
+
+    function legalBoxClassify(text) {
+      const value = text.toLowerCase();
+      const language = /[а-яё]/i.test(text) ? "Russian" : "English / unknown";
+      const jurisdiction = /netherlands|nederland|amsterdam|uwv|ind|gemeente|belasting|нидерланд|голланд/i.test(value)
+        ? "Netherlands"
+        : "unknown, must clarify";
+      let domain = "general legal orientation";
+      if (isTrafficLiabilityQuestion(value)) domain = "traffic accident / civil liability";
+      if (/salary|wage|employer|employment|работодатель|зарплат|увол|contract/i.test(value)) domain = "employment / labor";
+      else if (/rent|tenant|landlord|housing|аренд|жиль/i.test(value)) domain = "housing";
+      else if (/tax|belasting|налог/i.test(value)) domain = "tax";
+      else if (/ind|visa|residence|immigration|внж|виза|украин|нідерланд|основан|нахожд|пребыван|тимчасов|temporary protection|защит/i.test(value)) domain = "immigration / temporary protection";
+      else if (/benefit|uwv|toeslag|пособ/i.test(value)) domain = "benefits / social support";
+      const policies = triggeredUserPolicies(text);
+      const risk = /urgent|emergency|police|violence|насил|угроз|срочно/i.test(value)
+        ? "emergency"
+        : policies.includes("high_risk_requires_approval") ? "high" : policies.length ? "medium" : "low";
+      const sources = jurisdiction === "Netherlands"
+        ? "official Dutch sources may include rijksoverheid.nl, juridischloket.nl, UWV, IND, gemeente, Belastingdienst depending on domain"
+        : "jurisdiction must be clarified before reliable source selection";
+      return { language, jurisdiction, domain, risk, policies, sources };
+    }
+
+    function retrieveOfficialLegalSources(text) {
+      const value = text.toLowerCase();
+      const scored = officialLegalSources.map((source) => {
+        const score = source.keywords.reduce((total, keyword) => value.includes(keyword.toLowerCase()) ? total + 1 : total, 0);
+        return { ...source, score };
+      }).filter((source) => source.score > 0);
+      return scored.sort((a, b) => b.score - a.score).slice(0, 4);
+    }
+
+    function sourceOnlyLegalAnswerNl(text, sources, attachmentText) {
+      if (!sources.length) {
+        return `Ik heb geen gekoppelde officiele bron gevonden die goed genoeg bij deze vraag past.\n\nVolgens de LegalBox-regel geef ik dan geen juridische orientatie zonder bron. Verduidelijk de jurisdictie en het rechtsgebied, of voeg een officiele link/document toe. Daarna kan TESTBOX een brongebonden antwoord maken.\n\nDisclaimer\n\nDit is geen juridisch advies. Voor een besluit in een concrete zaak is een jurist, gemeente, IND, UWV, Belastingdienst, belastingadviseur of andere bevoegde instantie nodig.`;
+      }
+      if (isTrafficLiabilityQuestion(text)) {
+        const sourceLines = sources.map((source, index) => `${index + 1}. ${source.title}\n${source.url}\n${source.text}`).join("\n\n");
+        return `1. Краткий ответ\n\nЕсли ДТП произошло в Нидерландах и участвовали автомобиль и велосипедист, требование велосипедиста о компенсации не является автоматически незаконным только потому, что он сам врезался. По статье 185 Wegenverkeerswet 1994 владелец/держатель моторного транспортного средства может быть обязан компенсировать вред лицу или имуществу, не находившемуся в этом автомобиле, если не доказано overmacht/форс-мажор. Поэтому вопрос решается по фактам, доказательствам и страховке, а не по одной фразе “он врезался”.\n\n2. Официальные источники\n\n${sourceLines}\n\n3. Что это значит practically\n\n- Не признавайте вину в переписке без проверки фактов.\n- Передайте кейс в свою WA/автостраховку и отправьте им требование велосипедиста.\n- Соберите фото, видео, схему, данные свидетелей, место, дату, погодные условия, повреждения, медицинские документы, accident form.\n- Если были травмы, полиция/112 и официальный отчет особенно важны.\n- Если велосипедист нарушал правила, это важно, но само по себе не всегда полностью снимает риск ответственности автомобилиста.\n\n4. Что нужно уточнить\n\n- Где произошло ДТП: Нидерланды или другая страна.\n- Был ли вред здоровью или только имущество.\n- Кто двигался, кто стоял, была ли велодорожка/приоритет/знаки.\n- Есть ли свидетели, dashcam, фото, police report, claim letter.\n- Требование пришло лично, от юриста или от страховщика.\n\n5. Следующий шаг\n\n1. Не платите напрямую до проверки.\n2. Сообщите в свою страховую и передайте все документы.\n3. Попросите письменное обоснование суммы и основания требования.\n4. Если сумма большая или есть травмы, обратитесь к юристу/letselschade specialist.\n\n6. Дисклеймер\n\nЭто информационная правовая ориентация по подключенным источникам, не точный юридический совет и не решение по делу. Для вывода нужна проверка документов, фактов ДТП и позиции страховой.${attachmentText}`;
+      }
+      const legalBox = legalBoxClassify(text);
+      const sourceLines = sources.map((source, index) => `${index + 1}. ${source.title}\n${source.url}\n${source.text}`).join("\n\n");
+      return `1. Kort antwoord\n\nOp basis van de gekoppelde officiele bronnen hoort deze vraag bij: ${legalBox.domain}. Jurisdictie: ${legalBox.jurisdiction}. Dit is juridische informatie en geen definitief juridisch advies.\n\n2. Wat de bronnen zeggen\n\n${sourceLines}\n\n3. Mogelijke gevolgen\n\nDe uitkomst hangt af van de precieze status, documenten, termijnen en feiten. Als de voorwaarden uit de bron niet gelden, kan het resultaat anders zijn.\n\n4. Wat nog moet worden verduidelijkt\n\n- Exacte jurisdictie, gemeente of instantie.\n- Status van de persoon, arbeidsovereenkomst of verblijfsgrond.\n- Datums, brieven, besluiten, loonstroken, bewijs van verblijf of andere documenten.\n- Of er een weigering, bezwaar, schuld, deadline of spoedrisico bestaat.\n\n5. Welke documenten nuttig zijn\n\nIdentiteitsdocumenten, BRP/registratie, contracten, brieven van instanties, proof of residency, loonstroken, bankafschriften, correspondentie en besluiten van IND/UWV/gemeente/werkgever, afhankelijk van de vraag.\n\n6. Waar u terecht kunt\n\nGebruik eerst de officiele bronnen hierboven. In Nederland kunnen relevante routes zijn: IND, gemeente, Government.nl/Rijksoverheid, Netherlands Labour Authority, UWV, Belastingdienst, Juridisch Loket of een gespecialiseerde adviseur.\n\n7. Risico\n\nRisiconiveau: ${legalBox.risk}. Bij betwiste status, documenten, termijnen, bedragen of persoonsgegevens is menselijke controle nodig. Deel geen BSN, paspoort, adres, bankgegevens of volledige documenten zonder masking.\n\n8. Volgende stappen\n\n1. Vergelijk uw feiten met de voorwaarden in de bronnen.\n2. Verzamel documenten en datums.\n3. Open de actuele pagina van de bevoegde instantie via de bronlink.\n4. Bij bezwaar, weigering of spoed: neem contact op met de bevoegde instantie of specialist.\n\n9. Disclaimer\n\nDit is informatie op basis van gekoppelde bronnen. Het is geen exact juridisch advies en geen besluit in uw zaak.${attachmentText}`;
+    }
+
+    function governedUserAnswerNl(text) {
+      const analysis = analyzeUserIntake(text);
+      const combinedText = `${text}\n\n${state.documentText || ""}`;
+      const attachmentText = state.userAttachments.length
+        ? `\n\nIk zie bijlagen: ${state.userAttachments.map((file) => `${file.name} (${file.kind})`).join(", ")}. Als daarin een contract, loonstrook, correspondentie of documentfoto staat, moeten datums, bedragen, partijen en handtekeningen apart worden gecontroleerd.`
+        : "";
+      if (analysis.hasLegal) {
+        const legalBoxAudit = legalBoxClassify(combinedText);
+        const officialSources = retrieveOfficialLegalSources(combinedText);
+        addAudit("legalbox.workflow", `LegalBox: ${legalBoxAudit.language}; ${legalBoxAudit.jurisdiction}; ${legalBoxAudit.domain}; risk ${legalBoxAudit.risk}.`);
+        addAudit("legalbox.sources", `${officialSources.length} official source(s) retrieved.`);
+        if (isTrafficLiabilityQuestion(combinedText) && officialSources.length) return trafficLiabilityAnswerNl(combinedText, officialSources, attachmentText);
+        return sourceOnlyLegalAnswerNl(combinedText, officialSources, attachmentText);
+      }
+      if (isAiOperatingSystemQuestion(combinedText)) {
+        addAudit("architecture.answer", "AI operating system design principles answer generated.");
+        return `Kort antwoord\n\nEen besturingssysteem voor AI moet niet worden ontworpen als een verzameling chatbots, maar als een gecontroleerde runtime: rollen, beleid, routering, geheugen, tools, agents, approvals, audit en kwaliteit zijn gescheiden en zichtbaar.\n\nHoofdregel\n\nAI OS = Governance + Orchestration + Tools + Memory + Audit + Human Control.\n\nBasisprincipes\n\n1. Scheid static en dynamic layers.\nStatic layer bewaart rollen, policies, skills, connectors, memory rules, audit rules en modelconfiguratie. Dynamic layer voert workflows, routes, agent calls, approvals, checks en updates uit.\n\n2. Meng role en skill niet.\nEen role bepaalt bevoegdheid en verantwoordelijkheid. Een skill bepaalt wat het systeem kan uitleggen of uitvoeren.\n\n3. LLM only when needed.\nPII masking, routing, validatie en audit moeten waar mogelijk lokaal of deterministisch gebeuren. Een LLM is nuttig voor reasoning, drafting en samenvatting, maar niet als enig brein van het proces.\n\n4. Policies moeten uitvoerbaar zijn.\nVoorbeelden: sensitive data detected -> mask locally; high risk -> human approval; legal answer -> sources required; external tool call -> log and explain.\n\n5. Human authority by design.\nDe mens moet approve, reject, pause, override, emergency stop en replay kunnen gebruiken.\n\n6. Audit hoort in de kern.\nElke belangrijke stap laat een spoor achter: input, route, policy trigger, tool call, agent action, approval en final output.\n\n7. UI toont het proces.\nDe gebruiker moet zien wat het systeem begreep, waarom een route is gekozen, welke beperking actief is, waar menselijke controle nodig is en wat in audit is opgeslagen.\n\nPraktische volgende stap\n\nVoor ASTREB TESTBOX is de logische roadmap: runtime model vastzetten, local state naar backend events brengen, persistent audit toevoegen, document parser/OCR aansluiten, echte PII masking, legal retrieval en approval workflow bouwen.${attachmentText}`;
+      }
+      const docSummary = state.documentText
+        ? `\n\nUit het document gelezen\n\n${state.documentText.slice(0, 1200)}${state.documentText.length > 1200 ? "\n\n[Lang document: alleen het eerste fragment wordt getoond.]" : ""}`
+        : "";
+      return `Antwoord\n\nIk begrijp de vraag. Kort gezegd: eerst moeten doel, feiten, beperkingen en gewenst resultaat duidelijk zijn. Daarna kan ik een betrouwbare volgende stap geven in plaats van een algemene reactie.\n\nWat ik zie\n\n- Onderwerp: ${text || "vraag op basis van bijlagen"}\n- Er zijn mogelijk nog te weinig gegevens voor een definitieve conclusie.\n- Documenten of afbeeldingen moeten worden gecontroleerd op datums, namen, bedragen, bron en context.${docSummary}\n\nWat nu te doen\n\n1. Geef aan welk resultaat u nodig hebt: uitleg, actieplan, brief, documentcontrole of voorbereiding van een beslissing.\n2. Voeg kernfeiten toe: datums, partijen, bedragen, plaats/jurisdictie en beperkingen.\n3. Bij risico, recht, geld of persoonsgegevens: deel geen volledige gevoelige gegevens zonder noodzaak.\n\nIk kan verdergaan en een preciezer antwoord maken als u context of een document toevoegt.${attachmentText}`;
+    }
+
+    function sourceOnlyLegalAnswer(text, sources, attachmentText) {
+      if (state.language === "nl") return sourceOnlyLegalAnswerNl(text, sources, attachmentText);
+      if (!sources.length) {
+        return `Я не нашел подключенных официальных источников для этого вопроса.\n\nПо правилу LegalBox я не должен давать правовую ориентацию без источников. Уточните юрисдикцию, область права или добавьте официальный документ/ссылку, после чего я смогу сформировать ответ на основе источников.\n\nДисклеймер\n\nЭто не юридический совет. Для решения по делу нужен юрист, gemeente, IND, UWV, Belastingdienst, belastingadviseur или другой компетентный орган в зависимости от ситуации.`;
+      }
+      const legalBox = legalBoxClassify(text);
+      const sourceLines = sources.map((source, index) => `${index + 1}. ${source.title}\n${source.url}\n${source.text}`).join("\n\n");
+      return `1. Краткий ответ\n\nНа основании подключенных официальных источников вопрос относится к области: ${legalBox.domain}. Юрисдикция: ${legalBox.jurisdiction}. Ответ ниже является правовой ориентацией, а не окончательным юридическим советом.\n\n2. Что подтверждают источники\n\n${sourceLines}\n\n3. Возможные последствия\n\nВывод зависит от того, подпадает ли ситуация под условия, описанные в источниках. Если условия не выполняются или документы отличаются, результат может быть другим.\n\n4. Что важно уточнить\n\n- Точная юрисдикция и город/муниципалитет.\n- Статус человека или тип договора.\n- Даты, документы, письма, решения органов, proof of residency или payslip, если применимо.\n- Есть ли отказ, спор, appeal, задолженность или срочный риск.\n\n5. Какие документы нужны\n\nДокументы личности, регистрация/BRP или договор, письма компетентных органов, proof of residency, payslips, банковские выписки, переписка, решения IND/UWV/gemeente/работодателя — в зависимости от темы.\n\n6. Куда обращаться\n\nОриентируйтесь на источники выше. Для Нидерландов это может быть IND, gemeente, Government.nl/Rijksoverheid, Netherlands Labour Authority, UWV, Belastingdienst, Juridisch Loket или профильный юрист/adviseur.\n\n7. Риски\n\nРиск: ${legalBox.risk}. Если статус, документы, сроки или суммы спорные, нужен человек-специалист. Не отправляйте BSN, паспорт, адрес, банковские данные и полные документы без маскирования.\n\n8. Следующие шаги\n\n1. Сравните вашу ситуацию с условиями из источников.\n2. Соберите документы и даты.\n3. Проверьте актуальную страницу официального органа по ссылке.\n4. Если есть спор или отказ, обратитесь к компетентному органу или специалисту.\n\n9. Дисклеймер\n\nЭто информационная правовая ориентация на основе подключенных источников. Это не точный юридический совет и не решение по делу.${attachmentText}`;
+    }
+
+    function analyzeUserIntake(text) {
+      const policies = triggeredUserPolicies(text);
+      const hasLegal = policies.includes("legal_answers_require_sources");
+      const hasPii = policies.includes("pii_must_be_masked_before_cloud");
+      const hasFiles = state.userAttachments.length > 0;
+      state.userRisk = policies.includes("high_risk_requires_approval") ? "high" : hasPii || hasFiles ? "medium" : "low";
+      state.userRoute = hasLegal
+        ? "Local preprocessing -> Legal DB -> Masked Cloud LLM -> Human Approval"
+        : hasPii || hasFiles
+          ? "Local preprocessing -> Masked Cloud LLM"
+          : "Local AI";
+      return { policies, hasLegal, hasPii, hasFiles };
+    }
+
+    function isUkraineNetherlandsQuestion(text) {
+      const value = text.toLowerCase();
+      return /украин|україн|ukrain/.test(value) && /нидерланд|нідерланд|netherlands|nederland|голланд/.test(value);
+    }
+
+    function isAiOperatingSystemQuestion(text) {
+      const value = text.toLowerCase();
+      return /(операционн|operating system|os|runtime|платформ|архитектур|governance|оркестр|orchestrat|agent|агент|llm|ии|ai)/i.test(value)
+        && /(правил|создан|проектир|строит|design|build|principle|requirements|требован)/i.test(value);
+    }
+
+    function trafficLiabilityAnswerRu(text, sources, attachmentText) {
+      const sourceLines = sources.map((source, index) => `${index + 1}. ${source.title}\n${source.url}\n${source.text}`).join("\n\n");
+      return `1. Краткий ответ\n\nЕсли ДТП произошло в Нидерландах и участвовали автомобиль и велосипедист, требование велосипедиста о компенсации не является автоматически незаконным только потому, что он сам врезался. По статье 185 Wegenverkeerswet 1994 владелец/держатель моторного транспортного средства может быть обязан компенсировать вред лицу или имуществу, не находившемуся в этом автомобиле, если не доказано overmacht/форс-мажор. Поэтому вопрос решается по фактам, доказательствам и страховке, а не по одной фразе “он врезался”.\n\n2. Официальные источники\n\n${sourceLines}\n\n3. Что это значит practically\n\n- Не признавайте вину в переписке без проверки фактов.\n- Передайте кейс в свою WA/автостраховку и отправьте им требование велосипедиста.\n- Соберите фото, видео, схему, данные свидетелей, место, дату, погодные условия, повреждения, медицинские документы, accident form.\n- Если были травмы, полиция/112 и официальный отчет особенно важны.\n- Если велосипедист нарушал правила, это важно, но само по себе не всегда полностью снимает риск ответственности автомобилиста.\n\n4. Что нужно уточнить\n\n- Где произошло ДТП: Нидерланды или другая страна.\n- Был ли вред здоровью или только имущество.\n- Кто двигался, кто стоял, была ли велодорожка/приоритет/знаки.\n- Есть ли свидетели, dashcam, фото, police report, claim letter.\n- Требование пришло лично, от юриста или от страховщика.\n\n5. Следующий шаг\n\n1. Не платите напрямую до проверки.\n2. Сообщите в свою страховую и передайте все документы.\n3. Попросите письменное обоснование суммы и основания требования.\n4. Если сумма большая или есть травмы, обратитесь к юристу/letselschade specialist.\n\n6. Дисклеймер\n\nЭто информационная правовая ориентация по подключенным источникам, не точный юридический совет и не решение по делу. Для вывода нужна проверка документов, фактов ДТП и позиции страховой.${attachmentText}`;
+    }
+
+    function trafficLiabilityAnswerNl(text, sources, attachmentText) {
+      const sourceLines = sources.map((source, index) => `${index + 1}. ${source.title}\n${source.url}\n${source.text}`).join("\n\n");
+      return `1. Kort antwoord\n\nAls het ongeval in Nederland gebeurde en er een auto en fietser bij betrokken waren, is de schadeclaim van de fietser niet automatisch onrechtmatig alleen omdat de fietser tegen uw auto aanreed. Artikel 185 Wegenverkeerswet 1994 kan de eigenaar/houder van een motorrijtuig verplichten schade te vergoeden aan personen of zaken die niet in dat motorrijtuig werden vervoerd, tenzij overmacht aannemelijk is.\n\n2. Officiele bronnen\n\n${sourceLines}\n\n3. Praktische betekenis\n\n- Erken geen aansprakelijkheid in berichten voordat feiten zijn gecontroleerd.\n- Meld de claim direct bij uw WA/autoverzekeraar.\n- Verzamel foto's, video, situatieschets, getuigen, datum, plaats, weersomstandigheden, schade, medische informatie en het schadeformulier.\n- Bij letsel of overlijden: bel 112/politie en vraag om officieel proces-verbaal.\n- Een verkeersfout van de fietser is belangrijk, maar sluit aansprakelijkheid van de automobilist niet automatisch uit.\n\n4. Te verduidelijken\n\n- Land/jurisdictie van het ongeval.\n- Alleen materiele schade of ook letsel.\n- Wie reed, wie stond stil, verkeersregels, fietspad, voorrang en borden.\n- Of er getuigen, dashcam, foto's, police report of claim letter zijn.\n- Of de claim persoonlijk, via advocaat of via verzekeraar kwam.\n\n5. Volgende stap\n\n1. Betaal niet rechtstreeks zonder controle.\n2. Meld de zaak aan uw verzekeraar en stuur alle stukken door.\n3. Vraag een schriftelijke onderbouwing van bedrag en grondslag.\n4. Bij hoge schade of letsel: raadpleeg een jurist/letselschade specialist.\n\n6. Disclaimer\n\nDit is juridische informatie op basis van gekoppelde bronnen, geen definitief juridisch advies en geen besluit in uw zaak.${attachmentText}`;
+    }
+
+    function runtimeUnavailableMessage(error) {
+      const detail = error?.message || "backend unavailable";
+      if (window.location.protocol === "file:") {
+        return state.language === "nl"
+          ? "De backend-runtime werkt niet vanuit een los lokaal HTML-bestand. Open TESTBOX via de lokale server: http://127.0.0.1:8000/testbox/user."
+          : "Backend runtime не работает из отдельно открытого HTML-файла. Откройте TESTBOX через локальный сервер: http://127.0.0.1:8000/testbox/user.";
+      }
+      return state.language === "nl"
+        ? `De TESTBOX runtime is tijdelijk niet bereikbaar (${detail}). Het antwoord is niet lokaal gesimuleerd.`
+        : `TESTBOX runtime сейчас недоступен (${detail}). Ответ не был подменен локальным шаблоном.`;
+    }
+
+    function isLocalRuntimeHost() {
+      return ["127.0.0.1", "localhost"].includes(window.location.hostname);
+    }
+
+    function localRuntimeDemoToken() {
+      return window.__TESTBOX_DEMO_TOKEN || "";
+    }
+
+    function ensureLocalRuntimeToken(force = false) {
+      const configured = window.sessionStorage.getItem("astreb.admin_token");
+      const localToken = localRuntimeDemoToken();
+      if (localToken && (force || !configured)) {
+        window.sessionStorage.setItem("astreb.admin_token", localToken);
+        return localToken;
+      }
+      return configured || localToken;
+    }
+
+    async function requestRuntimeAnswer(text, retryAfterAuthRefresh = true) {
+      if (window.location.protocol === "file:") {
+        throw new Error("file mode");
+      }
+      ensureLocalRuntimeToken();
+      const response = await fetch("/api/testbox/runtime/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...privilegedRuntimeHeaders() },
+        body: JSON.stringify({
+          message: text,
+          user_session: state.runtimeSession,
+          role: state.activeRole,
+          language: state.language,
+          document_text: state.documentText || null,
+          attachment_names: state.userAttachments.map((file) => file.name),
+          document_extraction: state.documentExtraction,
+          conversation_history: state.userMessages
+            .filter((message) => message.from === "user")
+            .map((message) => message.text)
+            .slice(0, -1)
+            .slice(-3)
+        })
+      });
+      if (response.status === 401 && retryAfterAuthRefresh && localRuntimeDemoToken()) {
+        ensureLocalRuntimeToken(true);
+        return requestRuntimeAnswer(text, false);
+      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    }
+
+    function applyRuntimeResponse(runtimeResponse) {
+      state.runtimeConnected = true;
+      state.userRisk = runtimeResponse.risk_level || "low";
+      state.userRoute = runtimeResponse.route || "Local AI";
+      state.userPoliciesActive = runtimeResponse.policies || [];
+      state.sources = runtimeResponse.sources || [];
+      (runtimeResponse.events || []).forEach((event) => {
+        addAudit(
+          `runtime.${event.action.toLowerCase()}`,
+          `${event.action}; route ${event.route}; risk ${event.risk_level}; approval ${event.approval_state}.`
+        );
+      });
+      remember(
+        "runtime.backend",
+        `Backend processed ${runtimeResponse.events?.length || 0} events; route ${state.userRoute}; approval ${runtimeResponse.approval_state}.`
+      );
+    }
+
+    function governedUserAnswer(text) {
+      if (state.language === "nl") return governedUserAnswerNl(text);
+      const analysis = analyzeUserIntake(text);
+      const combinedText = `${text}\n\n${state.documentText || ""}`;
+      const legalBox = legalBoxClassify(combinedText);
+      const attachmentText = state.userAttachments.length
+        ? `\n\nЯ вижу вложения: ${state.userAttachments.map((file) => `${file.name} (${file.kind})`).join(", ")}. Если в них есть договор, расчетный лист, переписка или фото документа, по ним нужно отдельно проверить даты, суммы, стороны и подписи.`
+        : "";
+      if (analysis.hasLegal) {
+        const legalBoxAudit = legalBoxClassify(combinedText);
+        const officialSources = retrieveOfficialLegalSources(combinedText);
+        addAudit("legalbox.workflow", `LegalBox: ${legalBoxAudit.language}; ${legalBoxAudit.jurisdiction}; ${legalBoxAudit.domain}; risk ${legalBoxAudit.risk}.`);
+        addAudit("legalbox.sources", `${officialSources.length} official source(s) retrieved.`);
+        if (isTrafficLiabilityQuestion(combinedText) && officialSources.length) return trafficLiabilityAnswerRu(combinedText, officialSources, attachmentText);
+        return sourceOnlyLegalAnswer(combinedText, officialSources, attachmentText);
+      }
+      if (isAiOperatingSystemQuestion(combinedText)) {
+        addAudit("architecture.answer", "AI operating system design principles answer generated.");
+        return `Краткий ответ\n\nОперационная система для ИИ должна проектироваться не как набор чат-ботов, а как управляемая runtime-среда: роли, политики, маршрутизация, память, инструменты, агенты, approvals, audit и качество должны быть разделены и наблюдаемы.\n\nГлавное правило\n\nAI OS = Governance + Orchestration + Tools + Memory + Audit + Human Control.\n\nБазовые принципы\n\n1. Разделять static и dynamic layers\n\nStatic layer хранит роли, политики, skills, connectors, memory rules, audit rules, model config.\nDynamic layer исполняет workflows, routes, agent calls, approvals, checks, updates.\n\n2. Не смешивать роль и навык\n\nRole отвечает за полномочия и ответственность.\nSkill отвечает за способность объяснять или выполнять конкретную функцию.\nНапример: Governance Officer может использовать Risk Analysis и Policy Explanation, но это не одно и то же.\n\n3. LLM only when needed\n\nНе каждый шаг должен идти в LLM. Простые проверки, PII masking, routing, validation и audit лучше делать детерминированно или локально. LLM нужен для reasoning, drafting, summarization, но не как единый мозг всего процесса.\n\n4. Политики должны быть исполняемыми\n\nПолитика должна иметь условие и действие:\n- sensitive data detected -> mask locally\n- high risk -> require human approval\n- legal answer -> require sources\n- external tool call -> log and explain\n\n5. Human authority by design\n\nСистема не должна выдавать себя за автономную власть. Человек должен иметь approve, reject, pause, override, emergency stop и replay.\n\n6. Audit должен быть встроен, а не добавлен потом\n\nКаждое важное действие должно оставлять след: вход, route, policy trigger, tool call, agent action, approval, final output.\n\n7. Memory должна быть управляемой\n\nНельзя просто сохранять все. Нужно различать:\n- short-term runtime state\n- user preferences\n- case memory\n- sensitive data\n- forbidden memory\n\n8. Оркестрация важнее промпта\n\nПромпт не заменяет architecture. Нужны workflow graph, state machine, retries, guardrails, validators, source checks и fallback paths.\n\n9. UI должен показывать процесс\n\nПользователь и оператор должны видеть не магию, а управляемый процесс: что система поняла, куда routed, какие ограничения сработали, где нужен человек, что записано в audit.\n\n10. Модули должны быть заменяемыми\n\nModel provider, CRM, Legal DB, OCR, memory, vector store, approval service должны подключаться как modules/connectors, а не быть зашитыми в один монолит.\n\nМинимальная архитектура AI OS\n\n- Gateway\n- Identity / Role System\n- Skill Registry\n- Policy Engine\n- Router\n- Workflow Orchestrator\n- Tool / Connector Layer\n- Memory Layer\n- Audit Layer\n- QMS / Validation Layer\n- Human Approval Layer\n- Observation Cockpit\n\nПрактический следующий шаг\n\nДля ASTREB TESTBOX логично развивать это так:\n1. Сначала закрепить runtime model: Role + Mode + Capabilities + Skills + Policies + State + Audit.\n2. Затем вынести local state в backend events.\n3. Потом добавить persistent audit, real document parser, real PII masking, legal/source retrieval и approval workflow.\n\nВывод\n\nПравильная AI OS строится не вокруг “ответа модели”, а вокруг контролируемого процесса: кто действует, что разрешено, какие данные используются, почему выбран маршрут, кто подтверждает результат и как это потом проверить.${attachmentText}`;
+      }
+      const docSummary = state.documentText
+        ? `\n\nЧто извлечено из документа\n\n${state.documentText.slice(0, 1200)}${state.documentText.length > 1200 ? "\n\n[Текст длинный, показан первый фрагмент.]" : ""}`
+        : "";
+      return `Ответ\n\nЯ понял запрос. Коротко: сначала нужно выделить цель, факты, ограничения и желаемый результат. После этого можно предложить надежный следующий шаг, а не просто общий совет.\n\nЧто я вижу\n\n- Тема: ${text || "вопрос по вложениям"}\n- Данных для окончательного вывода пока может быть недостаточно.\n- Если есть документы или изображения, их нужно сверять по датам, именам, суммам, источнику и контексту.${docSummary}\n\nЧто делать дальше\n\n1. Уточните, какой результат нужен: объяснение, план действий, письмо, проверка документа или подготовка решения.\n2. Добавьте ключевые факты: даты, стороны, суммы, место/юрисдикция, ограничения.\n3. Если вопрос связан с риском, законом, деньгами или персональными данными, лучше не публиковать полные чувствительные данные без необходимости.\n\nЯ могу продолжить и подготовить более точный ответ, если вы добавите контекст или документ.${attachmentText}`;
+    }
+
+    async function sendUserMessage() {
+      const text = userInput.value.trim();
+      if (!text && !state.userAttachments.length) {
+        say("User Intake is waiting for a message, voice command, photo, or document.");
+        return;
+      }
+      const userText = text || "[attachments only]";
+      state.lastUserText = userText;
+      state.userMessages.push({
+        from: "user",
+        text: userText,
+        attachments: state.userAttachments.map((file) => file.name)
+      });
+      state.runtimePending = true;
+      render();
+      let answer = "";
+      try {
+        const runtimeResponse = await requestRuntimeAnswer(userText);
+        applyRuntimeResponse(runtimeResponse);
+        answer = runtimeResponse.final_response;
+        addAudit("user.intake", `Backend intake processed. Risk ${state.userRisk}; route ${state.userRoute}.`);
+      } catch (error) {
+        state.runtimeConnected = false;
+        state.userPoliciesActive = [];
+        answer = runtimeUnavailableMessage(error);
+        addAudit("runtime.unavailable", error?.message || "Backend runtime unavailable.");
+      } finally {
+        state.runtimePending = false;
+      }
+      state.userMessages.push({ from: "admin", text: answer });
+      say(answer);
+      render();
+    }
+
+    function privilegedRuntimeHeaders() {
+      const token = ensureLocalRuntimeToken();
+      return token ? { "X-AI-Cabinet-Admin-Token": token } : {};
+    }
+
+    async function pasteUserTextFromClipboard() {
+      userInput.focus();
+      showClipboardStatus(tx("pasteWorking"));
+      let clipboardText = "";
+      let localClipboardAvailable = false;
+      try {
+        const response = await fetch("/api/testbox/runtime/clipboard/read", {
+          method: "POST",
+          headers: privilegedRuntimeHeaders()
+        });
+        if (response.ok) {
+          const result = await response.json();
+          clipboardText = result.text || "";
+          localClipboardAvailable = true;
+        }
+      } catch (localClipboardError) {
+        localClipboardAvailable = false;
+      }
+      if (!localClipboardAvailable && navigator.clipboard?.readText) {
+        try {
+          clipboardText = await Promise.race([
+            navigator.clipboard.readText(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("clipboard_timeout")), 750))
+          ]);
+        } catch (browserClipboardError) {
+          clipboardText = "";
+        }
+      }
+      if (!localClipboardAvailable && !clipboardText) {
+        showClipboardStatus(tx("pasteUnavailable"), "error");
+        return;
+      }
+      if (!clipboardText) {
+        showClipboardStatus(tx("pasteEmpty"), "error");
+        return;
+      }
+      try {
+        const start = userInput.selectionStart ?? userInput.value.length;
+        const end = userInput.selectionEnd ?? userInput.value.length;
+        userInput.setRangeText(clipboardText, start, end, "end");
+        addAudit("user.paste", `Text inserted from clipboard (${clipboardText.length} characters).`);
+        userInput.scrollTop = userInput.scrollHeight;
+        userInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        userInput.focus();
+        showClipboardStatus(tx("pasteSuccess").replace("{count}", clipboardText.length), "success");
+      } catch (insertionError) {
+        showClipboardStatus(tx("pasteUnavailable"), "error");
+      }
+    }
+
+    async function extractDocument(file) {
+      const lowerName = file.name.toLowerCase();
+      const kind = file.type?.startsWith("image/") ? "image" : lowerName.endsWith(".pdf") ? "PDF" : lowerName.endsWith(".docx") ? "DOCX" : lowerName.endsWith(".txt") || lowerName.endsWith(".md") || lowerName.endsWith(".json") ? "TEXT" : "FILE";
+      state.documentName = file.name;
+      state.documentKind = kind;
+      state.documentText = "";
+      state.documentExtraction = {
+        filename: file.name,
+        extracted_text: null,
+        extraction_status: "provided",
+        method: "browser_extraction",
+        confidence: null,
+        pages_seen: null,
+        limitation_reason: null,
+        pages: []
+      };
+      if (state.documentPreviewUrl) URL.revokeObjectURL(state.documentPreviewUrl);
+      state.documentPreviewUrl = "";
+      if (kind === "image") {
+        state.documentPreviewUrl = URL.createObjectURL(file);
+        state.documentText = "Image preview is available. An OCR worker is not connected in this local runtime, so document text is not extracted yet.";
+        state.documentExtraction.extraction_status = "ocr_required";
+        state.documentExtraction.method = "image_preview";
+        state.documentExtraction.confidence = 0;
+        state.documentExtraction.limitation_reason = "ocr_worker_not_connected";
+      } else if (kind === "PDF") {
+        state.documentPreviewUrl = URL.createObjectURL(file);
+        state.documentText = roughPdfText(await readAsArrayBuffer(file));
+        state.documentExtraction.method = "browser_rough_pdf_text";
+        if (state.documentText.includes("text was not extractable")) {
+          state.documentExtraction.extraction_status = "ocr_required";
+          state.documentExtraction.confidence = 0;
+          state.documentExtraction.limitation_reason = "no_readable_document_text";
+        } else {
+          state.documentExtraction.confidence = 0.55;
+          state.documentExtraction.extracted_text = state.documentText;
+        }
+      } else if (kind === "DOCX") {
+        state.documentText = await extractDocxText(await readAsArrayBuffer(file));
+        state.documentExtraction.method = "browser_docx_text";
+        if (state.documentText.includes("could not")) {
+          state.documentExtraction.extraction_status = "unsupported";
+          state.documentExtraction.confidence = 0;
+          state.documentExtraction.limitation_reason = "docx_extraction_failed";
+        } else {
+          state.documentExtraction.confidence = 0.8;
+          state.documentExtraction.extracted_text = state.documentText;
+        }
+      } else if (kind === "TEXT") {
+        state.documentText = await readAsText(file);
+        state.documentExtraction.method = "browser_plain_text";
+        state.documentExtraction.confidence = 1;
+        state.documentExtraction.extracted_text = state.documentText;
+      } else {
+        state.documentText = "File attached. This file type can be tracked as context, but text extraction is not supported yet.";
+        state.documentExtraction.extraction_status = "unsupported";
+        state.documentExtraction.method = "attachment_metadata_only";
+        state.documentExtraction.confidence = 0;
+        state.documentExtraction.limitation_reason = "unsupported_file_type";
+      }
+      addAudit("document.extract", `${file.name}: ${state.documentText.length} characters extracted or described.`);
+    }
+
+    function addAttachment(file, preview = "") {
+      const lowerName = file.name.toLowerCase();
+      const kind = file.type?.startsWith("image/") ? "image" : lowerName.endsWith(".pdf") ? "PDF" : lowerName.endsWith(".doc") || lowerName.endsWith(".docx") ? "DOC" : "FILE";
+      const risk = kind === "image" || kind === "PDF" || kind === "DOC" ? "medium" : "low";
+      state.userAttachments.push({ name: file.name, size: file.size, type: file.type, kind, risk, preview });
+      addAudit("user.attachment", `${file.name} attached as ${kind}.`);
+      analyzeUserIntake(userInput.value);
+      render();
+    }
+
+    function handleUserFiles(files) {
+      Array.from(files).forEach((file) => {
+        extractDocument(file).then(() => render()).catch((error) => {
+          state.documentName = file.name;
+          state.documentKind = "ERROR";
+          state.documentText = `Could not read document: ${error?.message || error}`;
+          state.documentExtraction = {
+            filename: file.name,
+            extracted_text: null,
+            extraction_status: "failed",
+            method: "browser_extraction",
+            confidence: 0,
+            pages_seen: null,
+            limitation_reason: "browser_extraction_failed",
+            pages: []
+          };
+          addAudit("document.error", `${file.name}: extraction failed.`);
+          render();
+        });
+        if (file.type?.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = () => addAttachment(file, reader.result);
+          reader.readAsDataURL(file);
+        } else {
+          addAttachment(file);
+        }
+      });
+    }
+
+    function clearUserChat() {
+      state.userMessages = [];
+      state.userAttachments = [];
+      state.userRisk = "low";
+      state.userRoute = "Local AI";
+      state.userPoliciesActive = [];
+      state.runtimeConnected = false;
+      state.lastUserText = "";
+      state.documentText = "";
+      state.documentName = "";
+      state.documentKind = "";
+      if (state.documentPreviewUrl) URL.revokeObjectURL(state.documentPreviewUrl);
+      state.documentPreviewUrl = "";
+      userFiles.value = "";
+      userInput.value = "";
+      showClipboardStatus("");
+      addAudit("user.clear", "User intake console cleared.");
+      render();
+    }
+
+    function setRole(role) {
+      state.activeRole = role;
+      addAudit("role.switch", `Administrator role changed to ${state.activeRole}.`);
+      say(`Role switched to ${state.activeRole}. I will keep role boundaries visible and will not merge role behavior with skills or policies.`);
+      render();
+    }
+
+    function activateSkills(skillNames) {
+      skillNames.forEach((skill) => state.activeSkills.add(skill));
+      addAudit("skill.activate", `${skillNames.join(", ")} activated by playbook.`);
+      render();
+    }
+
+    function navigateMode(path) {
+      window.history.pushState({}, "", path);
+      state.routeModeApplied = false;
+      applyRouteMode();
+      addAudit("route.navigate", `Playbook moved operator to ${path}.`);
+      render();
+    }
+
+    async function executePlaybookAction(action) {
+      if (action === "self") {
+        say("I am the TESTBOX Administrator: an AI operator and orchestration supervisor for ASTREB OS. I guide the operator through roles, policies, routing, audit, and governed AI workflows.");
+        addAudit("playbook.self", "Administrator introduced TESTBOX.");
+      } else if (action === "static") {
+        state.selectedComponent = "Policy Engine";
+        addAudit("component.test", "Gateway and Policy Engine self-tests reviewed by playbook.");
+        say("Static layer inspected. Gateway controls ingress; Policy Engine defines risk thresholds, approval rules, and allowed routes.");
+      } else if (action === "routing") {
+        state.selectedRoute = "Cloud LLM";
+        explainRoute("Cloud LLM");
+        addAudit("playbook.routing", "Routing philosophy explained.");
+      } else if (action === "run") {
+        await runDemo();
+      } else if (action === "audit") {
+        navigateMode("/testbox/audit");
+        state.selectedComponent = "Audit";
+        say("Audit Replay mode is active. This is the evidence surface for runtime governance decisions.");
+      } else if (action === "audit-hackathon") {
+        window.history.pushState({}, "", "/testbox/audit");
+        state.selectedComponent = "Audit";
+        activeScenarioState.textContent = "Audit Replay";
+        addAudit("route.navigate", "Hackathon playbook moved operator to /testbox/audit.");
+        say("Audit Replay is now visible, but the Hackathon Mentor playbook remains active so the team can complete the v0.2 challenge.");
+      } else if (action === "legal-role") {
+        setRole("Legal Assistant");
+      } else if (action === "mask") {
+        maskPii();
+      } else if (action === "sources") {
+        retrieveLegalSources();
+        say("Legal sources retrieved locally. The draft must remain grounded in these sources before approval.");
+      } else if (action === "approve") {
+        addAudit("approval.approve", "Operator approved high-risk legal answer path from playbook.");
+        remember("approval.approve", "Operator approved high-risk legal answer path.");
+        runQualityChecks();
+        say("Approval recorded. TESTBOX may continue to local PII rehydration and final audit logging.");
+      } else if (action === "rehydrate") {
+        rehydrate();
+      } else if (action === "governance-role") {
+        setRole("Governance Officer");
+      } else if (action === "route-local") {
+        state.selectedRoute = "Local AI";
+        explainRoute("Local AI");
+        addAudit("routing.inspect", "Local AI route inspected by playbook.");
+      } else if (action === "route-legal") {
+        state.selectedRoute = "Legal DB";
+        explainRoute("Legal DB");
+        addAudit("routing.inspect", "Legal DB route inspected by playbook.");
+      } else if (action === "route-crm") {
+        state.selectedRoute = "CRM/API";
+        explainRoute("CRM/API");
+        addAudit("routing.inspect", "CRM/API route inspected by playbook.");
+      } else if (action === "route-llm") {
+        state.selectedRoute = "Cloud LLM";
+        explainRoute("Cloud LLM");
+        addAudit("routing.inspect", "Cloud LLM route inspected by playbook.");
+      } else if (action === "route-human") {
+        state.selectedRoute = "Human Approval";
+        explainRoute("Human Approval");
+        addAudit("routing.inspect", "Human Approval route inspected by playbook.");
+      } else if (action === "operator-role") {
+        setRole("Operator");
+      } else if (action === "audit-component") {
+        state.selectedComponent = "Audit";
+        addAudit("component.test", "Audit self-test returned localStorage.");
+        say("Audit is active as a local replay surface. v0.2 should move this into persistent backend audit storage.");
+      } else if (action === "audit-narrate") {
+        say("Audit narration: every operator action, route inspection, approval, rejection, and workflow step is recorded as evidence for review.");
+        addAudit("audit.narrate", "Administrator narrated audit trail.");
+      } else if (action === "replay") {
+        await runDemo();
+      } else if (action === "memory") {
+        state.selectedComponent = "Memory";
+        say(`Memory check complete. TESTBOX currently stores ${state.memory.length} local workflow memories and avoids raw PII memory writes.`);
+        addAudit("memory.inspect", "Memory governance inspected by playbook.");
+      } else if (action === "mentor-role") {
+        setRole("Hackathon Mentor");
+      } else if (action === "layers") {
+        state.selectedComponent = "Quality Rules";
+        addAudit("playbook.layers", "Static, dynamic, and observation layers identified.");
+        say("Challenge prompt: identify which blocks are static configuration, which are runtime behavior, and which are observation surfaces.");
+      } else if (action === "challenge-routing") {
+        state.selectedRoute = "Human Approval";
+        explainRoute("Human Approval");
+        addAudit("playbook.challenge", "Hackathon routing challenge executed.");
+      } else if (action === "v02") {
+        say("Hackathon task: design TESTBOX v0.2 backend integration with real event API, persistent audit, PII masking service, legal retrieval, approval workflow, and exportable demo report.");
+        addAudit("playbook.v02", "v0.2 backend integration challenge assigned.");
+      } else if (action === "user-focus") {
+        say("User Intake receives text, voice fallback commands, photos, and documents. The operator still sees policies, routing, risk, and audit.");
+        addAudit("user.focus", "User intake playbook focused input console.");
+      } else if (action === "user-risk") {
+        analyzeUserIntake(userInput.value);
+        say(`Risk analysis complete. Current user intake risk: ${state.userRisk}. Triggered policies: ${triggeredUserPolicies(userInput.value).join(", ") || "none"}.`);
+        addAudit("user.risk", `User intake risk evaluated as ${state.userRisk}.`);
+      } else if (action === "user-route") {
+        analyzeUserIntake(userInput.value);
+        state.selectedRoute = state.userRoute.includes("Legal DB") ? "Legal DB" : "Local AI";
+        say(`User intake route selected: ${state.userRoute}. Human authority remains required for high-risk outputs.`);
+        addAudit("user.route", `User intake route selected: ${state.userRoute}.`);
+      } else if (action === "user-answer") {
+        sendUserMessage();
+      } else if (action === "instructor-role") {
+        setRole("Instructor");
+      } else if (action === "training-skills") {
+        activateSkills(["Workflow Explanation", "Audit Narration", "Risk Analysis", "Policy Explanation"]);
+      } else if (action === "pause") {
+        state.running = false;
+        addAudit("approval.pause", "Workflow paused by playbook.");
+        say("Workflow paused. This proves the operator can interrupt runtime execution.");
+      } else if (action === "override") {
+        addAudit("routing.override", "Operator requested routing override review from playbook.");
+        say("Routing override requested. Policy constraints still prevent raw PII from being routed to cloud LLM.");
+      } else if (action === "reject") {
+        addAudit("approval.reject", "Operator rejected draft output from playbook.");
+        say("Rejected. The workflow remains auditable, but final delivery is blocked until revised.");
+      }
+      render();
+    }
+
+    async function nextPlaybookStep() {
+      const playbook = playbooks[state.playbookKey] || playbooks.default;
+      const step = playbook.steps[state.playbookStep];
+      if (!step) {
+        say("Scenario playbook is complete. Review audit and decide whether to replay or export the demo report in v0.2.");
+        addAudit("playbook.complete", `${playbook.title} completed.`);
+        return;
+      }
+      playbookCurrent.textContent = step[0];
+      playbookInstruction.textContent = step[1];
+      state.playbookStep = Math.min(state.playbookStep + 1, playbook.steps.length);
+      renderPlaybook();
+      await executePlaybookAction(step[2]);
+      if (state.playbookStep >= playbook.steps.length) {
+        addAudit("playbook.complete", `${playbook.title} completed.`);
+        say(`${playbook.title} completed. The operator can now inspect audit, routing, memory, and QMS evidence.`);
+      }
+      render();
+    }
+
+    function resetPlaybook() {
+      state.playbookStep = 0;
+      addAudit("playbook.reset", `${(playbooks[state.playbookKey] || playbooks.default).title} reset.`);
+      say("Scenario guide reset. Use Next Step to continue with guided operation.");
+      render();
+    }
+
+    document.querySelector("#runDemo").addEventListener("click", runDemo);
+    document.querySelector("#replayDemo").addEventListener("click", runDemo);
+    document.querySelector("#emergencyStop").addEventListener("click", stopDemo);
+    document.querySelector("#maskButton").addEventListener("click", maskPii);
+    document.querySelector("#rehydrateButton").addEventListener("click", rehydrate);
+    document.querySelector("#approveButton").addEventListener("click", () => {
+      addAudit("approval.approve", "Operator approved high-risk legal answer path.");
+      remember("approval.approve", "Operator approved high-risk legal answer path.");
+      runQualityChecks();
+      say("Approval recorded. TESTBOX may continue to local PII rehydration and final audit logging.");
+    });
+    document.querySelector("#rejectButton").addEventListener("click", () => {
+      addAudit("approval.reject", "Operator rejected draft output.");
+      say("Rejected. The workflow remains auditable, but final delivery is blocked until revised.");
+    });
+    document.querySelector("#pauseButton").addEventListener("click", () => {
+      state.running = false;
+      addAudit("approval.pause", "Workflow paused by operator.");
+      say("Workflow paused. Current state can be replayed from the audit trail.");
+      render();
+    });
+    document.querySelector("#overrideButton").addEventListener("click", () => {
+      addAudit("routing.override", "Operator requested routing override review.");
+      say("Routing override is available, but policy constraints remain in force. Raw PII cannot be routed to cloud LLM.");
+    });
+    document.querySelector("#selfPresentation").addEventListener("click", () => {
+      say("I am the TESTBOX Administrator: an AI operator and orchestration supervisor for ASTREB OS. I present the system, explain governance, coordinate workflows, narrate audit, and keep human oversight visible.");
+    });
+    document.querySelector("#explainRouting").addEventListener("click", () => {
+      say("Routing follows the rule: LLM only when needed. Sensitive data stays local, factual data goes to CRM/API, legal retrieval goes to legal sources, reasoning may use a masked cloud LLM, and high-risk decisions go to humans.");
+    });
+    document.querySelector("#explainPolicies").addEventListener("click", () => {
+      say(`Policy evaluation separates static rules from runtime behavior. Starter kit policies loaded: ${policySummary()}. In this scenario, legal domain plus detected PII triggers masking, citation validation, mandatory approval, local rehydration, and audit logging.`);
+    });
+    document.querySelector("#startVoice").addEventListener("click", startVoice);
+    document.querySelector("#stopVoice").addEventListener("click", stopVoice);
+    document.querySelector("#sendVoiceCommand").addEventListener("click", () => {
+      handleVoiceCommand(document.querySelector("#voiceCommand").value || "explain routing");
+    });
+    document.querySelector("#speakAdmin").addEventListener("click", speakAdmin);
+    document.querySelector("#playbookNext").addEventListener("click", nextPlaybookStep);
+    document.querySelector("#playbookReset").addEventListener("click", resetPlaybook);
+    sendUserButton.addEventListener("click", sendUserMessage);
+    clearUserButton.addEventListener("click", clearUserChat);
+    pasteUserButton.addEventListener("click", pasteUserTextFromClipboard);
+    langRu.addEventListener("click", () => switchLanguage("ru"));
+    langNl.addEventListener("click", () => switchLanguage("nl"));
+    langEn.addEventListener("click", () => switchLanguage("en"));
+    document.querySelector("#userFiles").addEventListener("change", (event) => handleUserFiles(event.target.files));
+    userVoiceButton.addEventListener("click", () => {
+      document.querySelector("#voiceCommand").value = userInput.value || "explain routing";
+      handleVoiceCommand(document.querySelector("#voiceCommand").value);
+      state.userMessages.push({ from: "user", text: `[voice fallback] ${document.querySelector("#voiceCommand").value}` });
+      state.userMessages.push({ from: "admin", text: adminOutput.textContent });
+      render();
+    });
+    attachSampleImageButton.addEventListener("click", () => {
+      addAttachment({ name: "sample-workplace-photo.png", size: 248000, type: "image/png" }, "");
+    });
+    attachSampleDocButton.addEventListener("click", () => {
+      state.documentName = "sample-employment-contract.pdf";
+      state.documentKind = "PDF";
+      if (state.documentPreviewUrl) URL.revokeObjectURL(state.documentPreviewUrl);
+      state.documentPreviewUrl = "";
+      state.documentText = "EMPLOYMENT CONTRACT\n\nEmployer: Example Services B.V.\nEmployee: Sample Worker\nPayment: EUR 1,250 due on 14 January 2025\nTermination notice: 30 days\n\nDemo document text for DocumentBox review.";
+      addAttachment({ name: "sample-employment-contract.pdf", size: 512000, type: "application/pdf" }, "");
+    });
+
+    addAudit("system.ready", "TESTBOX cockpit initialized.");
+    say("TESTBOX is online. AI Cabinet remains the static governance architecture; TESTBOX is the dynamic demonstration and operations environment.");
+    applyRouteMode();
+    render();
+    maskPii();
+  </script>
+</body>
+</html>

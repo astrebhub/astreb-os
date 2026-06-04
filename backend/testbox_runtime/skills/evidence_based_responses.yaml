@@ -1,0 +1,12 @@
+id: evidence_based_responses
+name: Evidence-Based Responses
+version: 1.0.0
+purpose: Ensure regulated answers are grounded in sources or visibly limited.
+constraints:
+  - Source-required domains need sources or limitation disclosure.
+evaluation_rules:
+  - Flag source-required answers with no sources and no limitation.
+intervention_rules:
+  - Add limitation notice and require human review.
+improvement_history:
+  - 1.0.0 initial runtime skill.

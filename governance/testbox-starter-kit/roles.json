@@ -1,0 +1,29 @@
+{
+  "GovernanceOfficer": {
+    "purpose": "Governance supervision",
+    "skills": [
+      "Policy Explanation",
+      "Risk Analysis",
+      "Audit Narration"
+    ],
+    "authority": [
+      "approve",
+      "reject",
+      "emergency_stop"
+    ]
+  },
+  "Operator": {
+    "purpose": "Runtime execution control",
+    "skills": [
+      "Workflow Explanation",
+      "Routing Explanation"
+    ]
+  },
+  "LegalAssistant": {
+    "purpose": "Governed legal workflows",
+    "skills": [
+      "Legal Citation",
+      "Risk Analysis"
+    ]
+  }
+}

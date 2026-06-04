@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>AI Cabinet | JAZEKKER</title><link rel="stylesheet" href="/static/foundation.css?v=foundation-2" /></head>
+<body>
+  <header class="site-header"><div class="header-inner">
+    <a class="foundation-brand" href="/jazekker"><img src="/jazekker/assets/jazekker-logo.png" alt="JAZEKKER" /><span class="brand-word"><strong>JAZEKKER</strong><span>Orientation infrastructure</span></span></a>
+    <nav class="primary-nav"><a href="/jazekker">Home</a><a href="/jazekker/orientation">Orientation</a><a href="/jazekker/local">Local</a><a href="/jazekker/research">Research</a><a class="active" href="/jazekker/ai-cabinet">AI Cabinet</a><a href="/jazekker/testbox">TESTBOX</a><a href="/jazekker/co-creation">Co-Creation</a></nav>
+    <a class="btn header-action mobile-nav" href="/jazekker">Home</a>
+  </div></header>
+  <div class="page">
+    <section class="page-hero"><div><span class="eyebrow">AI Cabinet Demo</span><h1>Governed intelligence, not a chatbot</h1><p>Specialist agents may analyze and propose. Authority stays with human approval and auditable policy.</p></div><button id="runWorkflow" class="btn primary">Run governed preview</button></section>
+    <section class="section">
+      <div class="section-heading"><div><span class="eyebrow">Agent registry</span><h2>Bounded specialist roles</h2></div><p>Agents cannot publish, execute external actions or change durable policy without authority.</p></div>
+      <div class="agent-grid">
+        <article class="agent"><h3>Research Agent</h3><p>Builds source packs and separates evidence from interpretation.</p><div class="agent-status">Allowed: draft evidence</div></article>
+        <article class="agent"><h3>Verification Agent</h3><p>Checks claims, citations, contradiction and uncertainty.</p><div class="agent-status">Allowed: flag risk</div></article>
+        <article class="agent"><h3>Context Agent</h3><p>Maps systemic consequences and orientation relevance.</p><div class="agent-status">Allowed: synthesize</div></article>
+        <article class="agent"><h3>Governance Agent</h3><p>Applies policy boundaries, approvals and escalation.</p><div class="agent-status">Required: human authority</div></article>
+        <article class="agent"><h3>Strategic Agent</h3><p>Connects signals to scenarios and coordination choices.</p><div class="agent-status">Allowed: recommend</div></article>
+        <article class="agent"><h3>Memory Agent</h3><p>Preserves bounded context without uncontrolled retention.</p><div class="agent-status">Restricted: policy bound</div></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-heading"><div><span class="eyebrow">Workflow</span><h2>Routing and approval chain</h2></div><p id="workflowResult" class="muted">Select the preview to observe routing. Nothing will publish or execute.</p></div>
+      <div class="graph" aria-label="Governed workflow">
+        <span class="node">Signal</span><span class="arrow">-></span><span class="node">Research</span><span class="arrow">-></span><span class="node">Verification</span><span class="arrow">-></span><span class="node">Governance</span><span class="arrow">-></span><span class="node">Human Approval</span><span class="arrow">-></span><span class="node">Audit</span>
+      </div>
+      <div class="trust-band">
+        <div class="trust-unit"><strong>Governance status</strong><p>Approval required for public impact.</p></div>
+        <div class="trust-unit"><strong>Memory boundary</strong><p>No raw sensitive data retained.</p></div>
+        <div class="trust-unit"><strong>Publication</strong><p>Draft only in this preview.</p></div>
+        <div class="trust-unit"><strong>Audit</strong><p>Workflow state is reviewable.</p></div>
+      </div>
+    </section>
+    <footer class="footer"><span>Intelligence is not authority.</span><a href="/jazekker/testbox">Observe in TESTBOX -></a></footer>
+  </div>
+  <script src="/static/foundation.js?v=foundation-2"></script>
+</body>
+</html>

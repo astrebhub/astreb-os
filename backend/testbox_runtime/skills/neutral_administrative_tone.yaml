@@ -1,0 +1,12 @@
+id: neutral_administrative_tone
+name: Neutral Administrative Tone
+version: 1.0.0
+purpose: Preserve calm, neutral, administrative language.
+constraints:
+  - Avoid guarantees, hype, pressure, or blame.
+evaluation_rules:
+  - Flag excessive certainty and aggressive language.
+intervention_rules:
+  - Replace with bounded, neutral phrasing.
+improvement_history:
+  - 1.0.0 initial runtime skill.

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>TESTBOX | JAZEKKER</title><link rel="stylesheet" href="/static/foundation.css?v=foundation-4" /></head>
+<body>
+  <header class="site-header"><div class="header-inner">
+    <a class="foundation-brand" href="/jazekker"><img src="/jazekker/assets/jazekker-logo.png" alt="JAZEKKER" /><span class="brand-word"><strong>JAZEKKER</strong><span>Orientation infrastructure</span></span></a>
+    <nav class="primary-nav"><a href="/jazekker">Home</a><a href="/jazekker/orientation">Orientation</a><a href="/jazekker/local">Local</a><a href="/jazekker/research">Research</a><a href="/jazekker/ai-cabinet">AI Cabinet</a><a class="active" href="/jazekker/testbox">TESTBOX</a><a href="/jazekker/co-creation">Co-Creation</a></nav>
+    <a class="btn header-action mobile-nav" href="/jazekker">Home</a>
+  </div></header>
+  <div class="page">
+    <section class="page-hero"><div><span class="eyebrow">TESTBOX Demo</span><h1>Observe AI governance in motion</h1><p>TESTBOX reveals orchestration, routing, approvals, audit and explainability. It is an observation surface, not an autonomous actor.</p></div><div class="hero-actions"><button id="simulateRoute" class="btn primary">Simulate workflow</button><a class="btn" href="/testbox">Open full cockpit</a></div></section>
+    <div class="runtime-grid">
+      <section class="preview-panel">
+        <h2>Orchestration graph</h2>
+        <div class="graph"><span class="node active">Input</span><span class="arrow">-></span><span class="node">Classifier</span><span class="arrow">-></span><span class="node">Policy</span><span class="arrow">-></span><span class="node">Router</span><span class="arrow">-></span><span class="node">Approval</span><span class="arrow">-></span><span class="node">Audit</span></div>
+        <div class="brief-section"><h3>Explainability layer</h3><p id="simulationState">Ready for a controlled simulation. All shown actions remain observational.</p></div>
+      </section>
+      <aside class="form-panel">
+        <h2>Runtime supervision</h2>
+        <div class="brief-section"><h3>Static Layer</h3><p>Roles, capabilities and policies.</p></div>
+        <div class="brief-section"><h3>Dynamic Layer</h3><p>Routing, masking and approval gates.</p></div>
+        <div class="brief-section"><h3>Observation Layer</h3><p>Events, explanations and audit evidence.</p></div>
+      </aside>
+    </div>
+    <section class="section">
+      <div class="section-heading"><div><span class="eyebrow">Audit snapshot</span><h2>Visible governance trace</h2></div><p>Based on the supplied TESTBOX governance ontology: human authority remains required for high-risk action.</p></div>
+      <div class="timeline">
+        <div class="event"><span>00:00.014</span><strong>Runtime ready</strong><span class="status">observed</span></div>
+        <div class="event hide"><span>00:00.021</span><strong>Routing selected: Governance review</strong><span class="status">logged</span></div>
+        <div class="event hide"><span>00:00.034</span><strong>Policy: approval required</strong><span class="status">applied</span></div>
+        <div class="event hide"><span>00:00.045</span><strong>External action blocked until human approval</strong><span class="status">protected</span></div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-heading"><div><span class="eyebrow">ASTREB META-QMS</span><h2>Living Evolution Mode</h2></div><p>Deviations become reviewable improvement proposals. No proposed change applies itself.</p></div>
+      <div class="evolution-cycle" aria-label="Meta QMS runtime cycle">
+        <span>Event</span><span>Context</span><span>Risk</span><span>Policy</span><span>Decision</span><span>Audit</span><span>Learning</span><span>Proposal</span>
+      </div>
+      <div class="runtime-grid">
+        <section class="preview-panel">
+          <div class="brief-header"><div><span class="eyebrow">Quality at runtime</span><strong>Mission alignment review</strong></div><span id="metaQmsStatus" class="pill risk">review ready</span></div>
+          <p class="muted meta-copy">Run a controlled review of an orientation signal whose source provenance is incomplete. The system records a deviation and proposes a bounded improvement.</p>
+          <button id="runMetaQmsReview" type="button" class="btn primary">Run quality review</button>
+          <div class="brief-section"><h3>Result</h3><p id="metaQmsResult">No evolution proposal generated in this session.</p></div>
+        </section>
+        <aside class="form-panel" aria-live="polite">
+          <h2>Evolution proposal</h2>
+          <div id="metaQmsProposal" class="brief-section"><p class="muted">Awaiting a quality assessment.</p></div>
+          <div class="card-actions">
+            <button id="approveEvolution" type="button" class="btn" disabled>Approve for implementation</button>
+            <button id="rejectEvolution" type="button" class="btn" disabled>Reject</button>
+          </div>
+          <p class="muted meta-note">Approval records a decision only. Implementation remains a separate governed task.</p>
+        </aside>
+      </div>
+    </section>
+    <footer class="footer"><span>Observable, explainable, human-authorized.</span><a href="/testbox">Full TESTBOX cockpit -></a></footer>
+  </div>
+  <script src="/static/foundation.js?v=foundation-3"></script>
+</body>
+</html>

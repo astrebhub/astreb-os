@@ -1,0 +1,12 @@
+id: uncertainty_disclosure
+name: Uncertainty Disclosure
+version: 1.0.0
+purpose: Make forecast limits, missing facts, and uncertainty visible.
+constraints:
+  - Forecasts and unsupported claims must disclose uncertainty.
+evaluation_rules:
+  - Flag unbounded predictions.
+intervention_rules:
+  - Add explicit scenario/uncertainty framing.
+improvement_history:
+  - 1.0.0 initial runtime skill.

@@ -1,0 +1,7 @@
+policies:
+- action: mask_pii
+  condition: sensitive_data_detected
+  id: pii_must_be_masked_before_cloud
+- action: require_human_approval
+  condition: risk_level_high
+  id: high_risk_requires_approval

@@ -1,0 +1,10 @@
+{
+  "active_role": "Governance Officer",
+  "active_mode": "Legal Governance Demo",
+  "capabilities": [
+    "routing_engine",
+    "pii_masking",
+    "audit_engine",
+    "qms_engine"
+  ]
+}

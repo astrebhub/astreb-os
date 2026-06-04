@@ -1,500 +1,255 @@
 import json
+from html import escape
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-from fastapi import Depends, FastAPI, Header, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 
-from cabinet.actions import ActionQueue
-from cabinet.agent_registry import AgentRegistry
-from cabinet.approval_center import ApprovalCenter
-from cabinet.budget_governor import BudgetGovernor
-from cabinet.classifier import DataClassifier
-from cabinet.config import ADMIN_API_TOKEN, APP_NAME, FRONTEND_DIR, load_yaml
-from cabinet.connector_registry import ConnectorRegistry
-from cabinet.control_center import PROCESS_MAP, panel_audit
-from cabinet.database import Database
-from cabinet.evidence import EvidenceLayer
-from cabinet.forecasting import ForecastCreateRequest, ForecastOutcomeRequest, ForecastingEngine
-from cabinet.guide_agent import CabinetGuideAgent
-from cabinet.identity import IdentityAccessLayer
-from cabinet.local_runtime import LocalRuntimeManager
-from cabinet.memory_engine import MemoryEngine
-from cabinet.multimodal import MultimodalNormalizer
-from cabinet.observability import ObservabilityLayer
-from cabinet.output_guard import OutputGuard
-from cabinet.pii import PiiDetector
-from cabinet.pipeline import CabinetPipeline
-from cabinet.policy import PolicyEngine
-from cabinet.providers import ProviderAdapter
-from cabinet.router import ModelRouter
-from cabinet.secrets_vault import SecretsVault
-from cabinet.schemas import SubmitRequest, SubmitResponse
-from cabinet.state_engine import StateEngine
-from cabinet.tokens import TokenCostEstimator
-from cabinet.plugin_sandbox import PluginSandbox
-from cabinet.vector_memory import LocalEmbeddingEngine, VectorMemory
+from asti.service import AstiService
+from asti.store import ActionQueue, AstiAuditLog
+from testbox_runtime.api import create_testbox_router
 
 
-class VectorAddRequest(BaseModel):
-    namespace: str = "project"
-    content: str
+BASE_DIR = Path(__file__).resolve().parents[1]
+FRONTEND_DIR = BASE_DIR / "frontend"
+CONTENT_DIR = BASE_DIR / "content"
+ASSET_DIR = FRONTEND_DIR / "assets"
 
-
-class VectorSearchRequest(BaseModel):
-    namespace: str = "project"
-    query: str
-    limit: int = 5
-
-
-class SecretPutRequest(BaseModel):
-    name: str
-    value: str
-    provider: str = ""
-
-
-class AgentRegisterRequest(BaseModel):
-    id: str
-    role: str = "agent"
-    instructions: str = ""
-    permissions: list[str] = []
-    budget: Dict[str, Any] = {}
-    tools: list[str] = []
-    memory_scope: str = "operational"
-    risk_level: str = "low"
-    status: str = "active"
-
-
-class GuideChatRequest(BaseModel):
-    message: str = ""
-    ui_state: Dict[str, Any] = {}
-
-app = FastAPI(title=APP_NAME)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI(title="JAZEKKER News Portal")
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
-
-database = Database()
-database.init()
-
-pii_detector = PiiDetector()
-action_queue = ActionQueue(database)
-memory_engine = MemoryEngine(database)
-local_runtime = LocalRuntimeManager()
-PLUGIN_ROOT = Path(__file__).resolve().parents[1] / "plugins"
-plugin_sandbox = PluginSandbox(PLUGIN_ROOT)
-connector_registry = ConnectorRegistry(PLUGIN_ROOT)
-vector_memory = VectorMemory(database, LocalEmbeddingEngine())
-state_engine = StateEngine(database)
-identity_layer = IdentityAccessLayer(database)
-secrets_vault = SecretsVault(database)
-agent_registry = AgentRegistry(database)
-agent_registry.ensure_defaults()
-approval_center = ApprovalCenter(database)
-evidence_layer = EvidenceLayer(database)
-observability_layer = ObservabilityLayer(database)
-forecasting_engine = ForecastingEngine(database)
-guide_agent = CabinetGuideAgent()
-pipeline = CabinetPipeline(
-    database=database,
-    state=state_engine,
-    normalizer=MultimodalNormalizer(),
-    identity=identity_layer,
-    pii=pii_detector,
-    classifier=DataClassifier(),
-    policy=PolicyEngine(load_yaml("policy.yaml")),
-    estimator=TokenCostEstimator(database),
-    budget=BudgetGovernor(database),
-    router=ModelRouter(load_yaml("model_routing.yaml")),
-    provider=ProviderAdapter(secrets_vault),
-    plugin_sandbox=plugin_sandbox,
-    output_guard=OutputGuard(pii_detector),
-    actions=action_queue,
-    approvals=approval_center,
-    evidence=evidence_layer,
-    observability=observability_layer,
-    memory_engine=memory_engine,
+asti_service = AstiService(
+    ActionQueue(BASE_DIR / "action_queue" / "asti_actions.json"),
+    AstiAuditLog(BASE_DIR / "audit" / "asti_events.jsonl"),
 )
+app.include_router(create_testbox_router(BASE_DIR, asti_service))
 
 
-def read_plugin_manifests() -> list[Dict[str, Any]]:
-    return plugin_sandbox.manifests()
+def load_articles() -> list[dict[str, Any]]:
+    articles_dir = CONTENT_DIR / "articles"
+    articles: list[dict[str, Any]] = []
+    for path in sorted(articles_dir.glob("*.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(data, list):
+            articles.extend(item for item in data if isinstance(item, dict))
+        elif isinstance(data, dict):
+            articles.append(data)
+
+    public_articles = [
+        article
+        for article in articles
+        if article.get("status") in {"published_local", "published_external", "published"}
+    ]
+    return sorted(public_articles, key=lambda item: item.get("published_at", ""), reverse=True)
 
 
-def require_admin_token(x_ai_cabinet_admin_token: str | None = Header(default=None)) -> None:
-    if not ADMIN_API_TOKEN:
-        raise HTTPException(status_code=503, detail="admin_api_token_not_configured")
-    if x_ai_cabinet_admin_token != ADMIN_API_TOKEN:
-        raise HTTPException(status_code=403, detail="admin_token_required")
+def article_categories(articles: list[dict[str, Any]]) -> list[dict[str, str]]:
+    categories: dict[str, str] = {}
+    for article in articles:
+        category = str(article.get("category") or "signals")
+        categories[category] = str(article.get("category_label") or category)
+    return [{"id": key, "label": value} for key, value in sorted(categories.items(), key=lambda item: item[1])]
 
 
-@app.get("/", response_class=HTMLResponse)
-async def index():
-    with (FRONTEND_DIR / "index.html").open("r", encoding="utf-8") as handle:
-        return handle.read()
+def article_url(article: dict[str, Any]) -> str:
+    slug = article.get("slug") or article.get("id") or "article"
+    return f"/jazekker/articles/{slug}"
 
 
-@app.get("/styles.css")
-async def styles():
-    return FileResponse(FRONTEND_DIR / "styles.css", media_type="text/css")
-
-
-@app.get("/app.js")
-async def frontend_app():
-    return FileResponse(FRONTEND_DIR / "app.js", media_type="application/javascript")
-
-
-@app.post("/submit", response_model=SubmitResponse)
-async def submit(req: SubmitRequest):
-    return await pipeline.run(req)
-
-
-@app.get("/audit", dependencies=[Depends(require_admin_token)])
-async def audit(limit: int = 50):
-    return list(database.list_rows("audit_log", limit))
-
-
-@app.get("/memory", dependencies=[Depends(require_admin_token)])
-async def memory(limit: int = 50):
-    return list(database.list_rows("memory", limit))
-
-
-@app.get("/actions", dependencies=[Depends(require_admin_token)])
-async def actions(limit: int = 50):
-    rows = list(database.list_rows("action_queue", limit))
-    for row in rows:
-        row["payload"] = json.loads(row["payload"]) if row.get("payload") else {}
-    return rows
-
-
-@app.get("/memory/layers", dependencies=[Depends(require_admin_token)])
-async def memory_layers(limit: int = 50):
-    return {
-        "layers": [
-            "constitution",
-            "role_instruction",
-            "policy",
-            "project",
-            "operational",
-            "learning",
-            "audit",
-        ],
-        "records": list(database.list_rows("governed_memory", limit)),
-        "proposals": list(database.list_rows("memory_proposals", limit)),
-    }
-
-
-@app.get("/state/{request_id}", dependencies=[Depends(require_admin_token)])
-async def runtime_state(request_id: str, limit: int = 100):
-    rows = list(database.list_rows("runtime_state", limit))
-    return [row for row in rows if row.get("request_id") == request_id]
-
-
-@app.post("/memory/proposals/{proposal_id}/approve", dependencies=[Depends(require_admin_token)])
-async def approve_memory_proposal(proposal_id: str):
-    result = memory_engine.approve_proposal(proposal_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Memory proposal not found")
-    return result
-
-
-@app.post("/memory/proposals/{proposal_id}/reject", dependencies=[Depends(require_admin_token)])
-async def reject_memory_proposal(proposal_id: str):
-    result = memory_engine.reject_proposal(proposal_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Memory proposal not found")
-    return result
-
-
-@app.post("/actions/{action_id}/approve", dependencies=[Depends(require_admin_token)])
-async def approve_action(action_id: str):
-    result = action_queue.approve(action_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Action not found")
-    return result
-
-
-@app.post("/actions/{action_id}/reject", dependencies=[Depends(require_admin_token)])
-async def reject_action(action_id: str):
-    result = action_queue.reject(action_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Action not found")
-    return result
-
-
-@app.post("/actions/{action_id}/execute", dependencies=[Depends(require_admin_token)])
-async def execute_action(action_id: str):
-    result = action_queue.execute_noop(action_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Action not found")
-    return result
-
-
-@app.post("/actions/{action_id}/rollback", dependencies=[Depends(require_admin_token)])
-async def rollback_action(action_id: str):
-    result = action_queue.rollback(action_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Action not found")
-    return result
-
-
-@app.post("/actions/{action_id}/expire", dependencies=[Depends(require_admin_token)])
-async def expire_action(action_id: str):
-    result = action_queue.expire(action_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Action not found")
-    return result
-
-
-@app.get("/plugins")
-async def plugins():
-    return read_plugin_manifests()
-
-
-@app.get("/connectors/status")
-async def connectors_status():
-    return connector_registry.capabilities()
-
-
-@app.get("/connectors/{connector_name}")
-async def connector_detail(connector_name: str):
-    connector = connector_registry.get(connector_name)
-    if not connector:
-        raise HTTPException(status_code=404, detail="Connector not found")
-    return connector
-
-
-@app.post("/connectors/{connector_name}/dry-run", dependencies=[Depends(require_admin_token)])
-async def connector_dry_run(connector_name: str, action: str, data_class: str = "public", access_level: int = 2):
-    return connector_registry.dry_run(connector_name, action, data_class, access_level)
-
-
-@app.get("/approvals", dependencies=[Depends(require_admin_token)])
-async def approvals(limit: int = 50):
-    return list(database.list_rows("approvals", limit))
-
-
-@app.get("/budget/status", dependencies=[Depends(require_admin_token)])
-async def budget_status(limit: int = 50):
-    return list(database.list_rows("budget_events", limit))
-
-
-@app.get("/access/users", dependencies=[Depends(require_admin_token)])
-async def users(limit: int = 50):
-    return list(database.list_rows("users", limit))
-
-
-@app.post("/access/users/{user_id}/ensure", dependencies=[Depends(require_admin_token)])
-async def ensure_user(user_id: str, access_level: int = 1):
-    return identity_layer.ensure_user(user_id, access_level)
-
-
-@app.post("/secrets", dependencies=[Depends(require_admin_token)])
-async def put_secret(req: SecretPutRequest):
-    secret_id = secrets_vault.put(req.name, req.value, req.provider)
-    return {"id": secret_id, "name": req.name, "stored": True}
-
-
-@app.get("/secrets/{name}/metadata", dependencies=[Depends(require_admin_token)])
-async def secret_metadata(name: str):
-    return secrets_vault.metadata(name)
-
-
-@app.get("/agents", dependencies=[Depends(require_admin_token)])
-async def agents(limit: int = 50):
-    return list(database.list_rows("agent_registry", limit))
-
-
-@app.get("/runtime/personalization")
-async def runtime_personalization():
-    return {
-        "profiles": load_yaml("user_profiles.yaml").get("profiles", {}),
-        "dialog_modes": load_yaml("dialog_modes.yaml").get("modes", {}),
-        "agents": list(database.list_rows("agent_registry", 100)),
-    }
-
-
-@app.post("/guide/chat")
-async def guide_chat(req: GuideChatRequest):
-    import os
-
-    runtime = connector_registry.capabilities()
-    runtime.update(
-        {
-            "app": APP_NAME,
-            "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
-            "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
-            "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY")),
-            "local_only_mode": os.getenv("LOCAL_ONLY_MODE", "false").lower() == "true",
-        }
+def render_article(article: dict[str, Any]) -> str:
+    paragraphs = "\n".join(
+        f"<p>{escape(str(paragraph))}</p>" for paragraph in article.get("body", [])
     )
-    reply = guide_agent.reply(req.message, req.ui_state, runtime)
-    return {
-        "agent_id": "cabinet_guide_agent",
-        "answer": reply.answer,
-        "suggestions": reply.suggestions,
-        "recommended_panel": reply.recommended_panel,
-        "governance": {
-            "execution": "advisory_only",
-            "external_actions": "none",
-            "policy": "control_before_autonomy",
-        },
-    }
-
-
-@app.post("/agents", dependencies=[Depends(require_admin_token)])
-async def register_agent(req: AgentRegisterRequest):
-    return {"id": agent_registry.register(req.model_dump()), "status": "registered"}
-
-
-@app.get("/evidence", dependencies=[Depends(require_admin_token)])
-async def evidence(limit: int = 50):
-    return list(database.list_rows("evidence_sources", limit))
-
-
-@app.get("/observability/events", dependencies=[Depends(require_admin_token)])
-async def observability_events(limit: int = 50):
-    return list(database.list_rows("observability_events", limit))
-
-
-@app.post("/forecasts")
-async def create_forecast(req: ForecastCreateRequest):
-    return forecasting_engine.create_forecast(req)
-
-
-@app.get("/forecasts", dependencies=[Depends(require_admin_token)])
-async def forecasts(limit: int = 50):
-    return forecasting_engine.list_forecasts(limit)
-
-
-@app.post("/forecasts/{forecast_id}/outcome", dependencies=[Depends(require_admin_token)])
-async def forecast_outcome(forecast_id: str, req: ForecastOutcomeRequest):
-    result = forecasting_engine.resolve_forecast(forecast_id, req)
-    if not result:
-        raise HTTPException(status_code=404, detail="Forecast not found")
-    return result
-
-
-@app.get("/forecasts/calibration-profile", dependencies=[Depends(require_admin_token)])
-async def forecast_calibration_profile():
-    return forecasting_engine.calibration_profile()
-
-
-@app.get("/local-runtime/status")
-async def local_runtime_status():
-    return await local_runtime.status()
-
-
-@app.post("/local-runtime/models/{model_name}/load", dependencies=[Depends(require_admin_token)])
-async def load_local_model(model_name: str):
-    return await local_runtime.load_model(model_name)
-
-
-@app.post("/local-runtime/models/{model_name}/unload", dependencies=[Depends(require_admin_token)])
-async def unload_local_model(model_name: str):
-    return await local_runtime.unload_model(model_name)
-
-
-@app.get("/voice/status")
-async def voice_status():
-    from cabinet.voice_runtime import VoiceRuntime
-
-    return VoiceRuntime().status()
-
-
-@app.get("/multimodal/status")
-async def multimodal_status():
-    return {
-        "inputs": ["text", "voice", "image", "file", "browser_action", "email", "calendar", "plugin_action"],
-        "normalizer": "enabled",
-        "risk_classifier": "normalizer_modality_risk_plus_data_classifier",
-        "governance": "all_modalities_enter_same pipeline",
-    }
-
-
-@app.get("/control-center/process-map")
-async def control_center_process_map():
-    return PROCESS_MAP
-
-
-@app.get("/control-center/panel-audit")
-async def control_center_panel_audit():
-    return panel_audit()
-
-
-@app.post("/vector-memory/add", dependencies=[Depends(require_admin_token)])
-async def add_vector_memory(req: VectorAddRequest):
-    return vector_memory.add(req.namespace, req.content)
-
-
-@app.post("/vector-memory/search", dependencies=[Depends(require_admin_token)])
-async def search_vector_memory(req: VectorSearchRequest):
-    return vector_memory.search(req.namespace, req.query, req.limit)
-
-
-@app.get("/config/policy", dependencies=[Depends(require_admin_token)])
-async def policy_config():
-    return load_yaml("policy.yaml")
-
-
-@app.get("/config/model-routing", dependencies=[Depends(require_admin_token)])
-async def model_routing_config():
-    return load_yaml("model_routing.yaml")
-
-
-@app.get("/config/dialog-modes", dependencies=[Depends(require_admin_token)])
-async def dialog_modes_config():
-    return load_yaml("dialog_modes.yaml")
-
-
-@app.get("/config/user-profiles", dependencies=[Depends(require_admin_token)])
-async def user_profiles_config():
-    return load_yaml("user_profiles.yaml")
+    title = escape(article.get("title", "JAZEKKER"))
+    dek = escape(article.get("dek", ""))
+    category = escape(article.get("category_label", ""))
+    reading_minutes = escape(str(article.get("reading_minutes", 4)))
+    published_at = escape(article.get("published_at", ""))
+    lens = escape(article.get("orientation_lens", ""))
+    next_step = escape(article.get("next_orientation_step", ""))
+    return f"""<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <style>
+    :root {{
+      color-scheme: dark;
+      --bg: #071019;
+      --line: #203345;
+      --text: #edf4f7;
+      --gold: #e2b354;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; background: radial-gradient(circle at 75% 0%, #11243a 0, var(--bg) 38%); color: var(--text); }}
+    .shell {{ width: min(920px, calc(100% - 36px)); margin: 0 auto; padding: 24px 0 64px; }}
+    header {{ display: flex; justify-content: space-between; gap: 18px; align-items: center; padding-bottom: 22px; border-bottom: 1px solid var(--line); }}
+    a {{ color: inherit; }}
+    .back {{ min-height: 38px; border: 1px solid var(--line); border-radius: 6px; padding: 0 12px; display: inline-flex; align-items: center; text-decoration: none; background: #12283a; }}
+    .brand {{ display: grid; gap: 7px; text-decoration: none; }}
+    .brand-logo {{ display: block; width: 176px; height: auto; border-radius: 8px; background: #050505; box-shadow: 0 12px 28px rgba(0,0,0,.28); }}
+    article {{ margin-top: 42px; }}
+    .meta {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }}
+    .chip {{ display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 6px; background: #13283a; color: #c5d1db; font-size: 12px; }}
+    .chip.local {{ background: #173628; color: #aee7c7; }}
+    h1 {{ margin: 0; max-width: 820px; font-size: 44px; line-height: 1.05; letter-spacing: 0; }}
+    .dek {{ margin-top: 18px; max-width: 760px; color: #c7d4df; font-size: 20px; line-height: 1.5; }}
+    .lens {{ margin: 28px 0; padding: 16px; border: 1px solid #385339; border-radius: 8px; background: rgba(17, 38, 31, .88); color: #dceadf; }}
+    .body {{ margin-top: 26px; max-width: 760px; }}
+    p {{ color: #d7e1e8; font-size: 18px; line-height: 1.72; }}
+    .next {{ margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--gold); }}
+    @media (max-width: 760px) {{ h1 {{ font-size: 34px; }} .dek, p {{ font-size: 17px; }} }}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="/jazekker" aria-label="JAZEKKER">
+        <img class="brand-logo" src="/jazekker/assets/jazekker-logo.png" alt="JAZEKKER" />
+      </a>
+      <a class="back" href="/jazekker/news">Назад к ленте</a>
+    </header>
+    <article>
+      <div class="meta">
+        <span class="chip local">опубликовано</span>
+        <span class="chip">{category}</span>
+        <span class="chip">{reading_minutes} мин</span>
+        <span class="chip">{published_at}</span>
+      </div>
+      <h1>{title}</h1>
+      <div class="dek">{dek}</div>
+      <div class="lens"><strong>Фокус материала:</strong> {lens}</div>
+      <div class="body">{paragraphs}</div>
+      <div class="next"><strong>Следующий шаг:</strong> {next_step}</div>
+    </article>
+  </div>
+</body>
+</html>"""
 
 
 @app.get("/health")
-async def health():
-    import os
+async def health() -> dict[str, str]:
+    return {"status": "ok", "service": "jazekker-news-portal"}
 
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/jazekker", status_code=307)
+
+
+@app.get("/testbox")
+@app.get("/testbox/cockpit")
+@app.get("/testbox/orchestration")
+@app.get("/testbox/legal")
+@app.get("/testbox/legalbox")
+@app.get("/testbox/legal-demo")
+@app.get("/testbox/user")
+@app.get("/testbox/audit")
+@app.get("/testbox/routing")
+@app.get("/testbox/memory")
+@app.get("/testbox/settings")
+@app.get("/testbox/training")
+@app.get("/testbox/hackathon")
+async def testbox():
+    return FileResponse(
+        FRONTEND_DIR / "testbox.html",
+        media_type="text/html",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+@app.get("/jazekker")
+async def homepage():
+    return FileResponse(FRONTEND_DIR / "jazekker-foundation.html", media_type="text/html")
+
+
+@app.get("/jazekker/legacy")
+async def legacy_homepage():
+    return FileResponse(FRONTEND_DIR / "jazekker.html", media_type="text/html")
+
+
+@app.get("/jazekker/orientation")
+async def orientation_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-orientation.html", media_type="text/html")
+
+
+@app.get("/jazekker/local")
+async def local_orientation_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-local.html", media_type="text/html")
+
+
+@app.get("/jazekker/research")
+async def research_desk_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-research.html", media_type="text/html")
+
+
+@app.get("/jazekker/ai-cabinet")
+async def ai_cabinet_demo_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-cabinet-demo.html", media_type="text/html")
+
+
+@app.get("/jazekker/testbox")
+async def testbox_demo_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-testbox-preview.html", media_type="text/html")
+
+
+@app.get("/jazekker/co-creation")
+async def co_creation_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-co-creation.html", media_type="text/html")
+
+
+@app.get("/jazekker/news")
+async def news_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-workspace.html", media_type="text/html")
+
+
+@app.get("/jazekker/public-news")
+async def public_news_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-news.html", media_type="text/html")
+
+
+@app.get("/jazekker/workspace")
+async def workspace_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-workspace.html", media_type="text/html")
+
+
+@app.get("/jazekker/banner")
+async def banner_page():
+    return FileResponse(FRONTEND_DIR / "jazekker-banner.html", media_type="text/html")
+
+
+@app.get("/jazekker/assets/{asset_name}")
+async def asset(asset_name: str):
+    asset_path = ASSET_DIR / asset_name
+    if not asset_path.exists() or asset_path.parent != ASSET_DIR:
+        raise HTTPException(status_code=404, detail="asset_not_found")
+    return FileResponse(asset_path)
+
+
+@app.get("/jazekker/articles")
+async def articles():
+    loaded_articles = load_articles()
+    items = []
+    for article in loaded_articles:
+        item = dict(article)
+        item["url"] = article_url(article)
+        items.append(item)
     return {
-        "status": "ok",
-        "app": APP_NAME,
-        "pipeline": [
-            "INPUT",
-            "MULTIMODAL NORMALIZER",
-            "STATE ENGINE",
-            "PII DETECTOR",
-            "DATA CLASSIFIER",
-            "POLICY ENGINE",
-            "TOKEN / COST GOVERNOR",
-            "MODEL / VOICE / TOOL ROUTER",
-            "LOCAL/CLOUD DECISION LAYER",
-            "PLUGIN SANDBOX",
-            "PROVIDER ADAPTER",
-            "OUTPUT GUARD",
-            "ACTION QUEUE",
-            "APPROVAL CENTER",
-            "AUDIT LOG",
-            "MEMORY UPDATE PROPOSAL",
-            "HUMAN APPROVAL IF REQUIRED",
-        ],
-        "states": state_engine.states(),
-        "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
-        "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
-        "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY")),
-        "free_models": {
-            "local": "ollama_or_local_safe_fallback",
-            "openrouter": os.getenv("OPENROUTER_MODEL", "openrouter/free"),
-            "gemini": os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
-        },
-        "connectors": connector_registry.capabilities(),
-        "local_only_mode": os.getenv("LOCAL_ONLY_MODE", "false").lower() == "true",
+        "articles": items,
+        "categories": article_categories(loaded_articles),
+        "count": len(items),
     }
+
+
+@app.get("/jazekker/articles/{slug}", response_class=HTMLResponse)
+async def article_page(slug: str):
+    for article in load_articles():
+        if slug in {article.get("slug"), article.get("id")}:
+            return render_article(article)
+    raise HTTPException(status_code=404, detail="article_not_found")
