@@ -23,6 +23,8 @@ audit/testbox_runtime_events.jsonl
 audit/testbox_runtime_events.jsonl.tmp
 audit/meta_qms_evolution_proposals.json
 audit/meta_qms_evolution_proposals.json.tmp
+audit/qms_learning_records.jsonl
+audit/qms_learning_records.jsonl.tmp
 
 # Secrets
 backend/.env
@@ -44,6 +46,8 @@ build/
 *.b64.part*
 github_bundle/
 _incoming/
+distribution/TESTBOX_PORTABLE_v0.5/
+distribution/Разработка_ТБ_v0.5/
 
 # Non-canonical local preview helpers
 scripts/local_jazekker_server.mjs
