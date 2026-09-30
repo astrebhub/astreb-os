@@ -1,0 +1,11 @@
+{
+  "reviewed_at": "2026-09-30",
+  "source": "https://astreb.nl/",
+  "scope": "Public website snapshot only. No private Cabinet data.",
+  "entries": [
+    {"id":"strategy","title":"AI Strategy","en":"ASTREB offers independent AI consultancy. AI Strategy helps identify where AI could save time and reduce costs in daily operations.","nl":"ASTREB biedt onafhankelijk AI-advies. AI Strategy helpt onderzoeken waar AI tijd kan besparen en kosten kan verlagen in dagelijkse processen.","ru":"ASTREB предлагает независимый консалтинг по ИИ. Направление AI Strategy помогает определить, где ИИ может экономить время и снижать затраты в повседневной работе."},
+    {"id":"integration","title":"Integration","en":"ASTREB offers integration of ChatGPT, large language models and automation tools into existing software.","nl":"ASTREB biedt integratie van ChatGPT, taalmodellen en automatiseringstools met bestaande software.","ru":"ASTREB предлагает интеграцию ChatGPT, языковых моделей и инструментов автоматизации с существующим программным обеспечением."},
+    {"id":"workshops","title":"Workshops","en":"ASTREB offers hands-on workshops to help teams learn to use generative AI tools.","nl":"ASTREB biedt praktische workshops om teams te leren werken met generatieve AI-tools.","ru":"ASTREB предлагает практические занятия для команд по использованию инструментов генеративного ИИ."},
+    {"id":"contact","title":"Contact","en":"The published contact address is info@astreb.nl. The website does not publish prices, delivery timelines, named customers or guarantees. Contact ASTREB to discuss a specific request.","nl":"Het gepubliceerde contactadres is info@astreb.nl. De website vermeldt geen prijzen, levertijden, klantnamen of garanties. Neem contact op met ASTREB voor een concrete vraag.","ru":"На сайте опубликован контакт info@astreb.nl. Цены, сроки выполнения, имена клиентов и гарантии на сайте не указаны. Для обсуждения конкретной задачи свяжитесь с ASTREB."}
+  ]
+}
